@@ -30,4 +30,6 @@ public interface UserService {
 	boolean updatePassword(String key, String code, String newPassword);
 	boolean exists(String username, String phone);
 	String sendMessageCode(String username, String phone, long currentClientMilliseconds);
+	
+	boolean bindParent(String invitationCode, Long currentUserId);
 }

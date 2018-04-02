@@ -2,10 +2,10 @@ package com.moraydata.general.primary.service.impl;
 
 import static com.moraydata.general.management.util.BooleanExpressionUtils.addExpression;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.like;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.toBooleanValue;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.toIntegerValue;
+import static com.moraydata.general.management.util.BooleanExpressionUtils.toBoolean;
+import static com.moraydata.general.management.util.BooleanExpressionUtils.toInteger;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.toLocalDateTime;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.toLongValue;
+import static com.moraydata.general.management.util.BooleanExpressionUtils.toLong;
 
 import java.util.Arrays;
 import java.util.List;
@@ -136,17 +136,17 @@ public class RoleServiceImpl extends BaseAbstractService implements RoleService 
 		BooleanExpression exp = null;
 		
 		String id = conditions.getString(role.id.getMetadata().getName());
-		exp = addExpression(id, exp, role.id.eq(toLongValue(id)));
+		exp = addExpression(id, exp, role.id.eq(toLong(id)));
 		
 		String name = conditions.getString(role.name.getMetadata().getName());
 		exp = addExpression(name, exp, role.name.like(like(name)));
 		
 		String priority = conditions.getString(role.priority.getMetadata().getName());
-		exp = addExpression(priority, exp, role.priority.eq(toIntegerValue(priority)));
+		exp = addExpression(priority, exp, role.priority.eq(toInteger(priority)));
 		
 		
 		String available = conditions.getString(role.available.getMetadata().getName());
-		exp = addExpression(available, exp, role.available.eq(toBooleanValue(available)));
+		exp = addExpression(available, exp, role.available.eq(toBoolean(available)));
 		
 		String createdDate = conditions.getString(role.createdDate.getMetadata().getName());
 		exp = addExpression(createdDate, exp, role.createdDate.before(toLocalDateTime(createdDate)));

@@ -1,19 +1,16 @@
 package com.moraydata.general.primary.entity.query;
 
-import static com.querydsl.core.types.PathMetadataFactory.forVariable;
+import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.querydsl.core.types.dsl.*;
+
+import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
 
 import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.PathMetadata;
-import com.querydsl.core.types.dsl.DateTimePath;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.PathInits;
-import com.querydsl.core.types.dsl.SetPath;
-import com.querydsl.core.types.dsl.StringPath;
 
 
 /**
@@ -22,20 +19,28 @@ import com.querydsl.core.types.dsl.StringPath;
 @Generated("com.querydsl.codegen.EntitySerializer")
 public class QUser extends EntityPathBase<User> {
 
-    private static final long serialVersionUID = -602793730L;
+    private static final long serialVersionUID = 1836618619L;
 
     public static final QUser user = new QUser("user");
 
     public final QBaseAbstractEntity _super = new QBaseAbstractEntity(this);
 
+    public final StringPath avatarUrl = createString("avatarUrl");
+
+    public final NumberPath<Integer> countOfInvitationCodes = createNumber("countOfInvitationCodes", Integer.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
+
+    public final NumberPath<Long> creator = createNumber("creator", Long.class);
 
     public final StringPath email = createString("email");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath nickname = createString("nickname");
+
+    public final NumberPath<Long> parentId = createNumber("parentId", Long.class);
 
     public final StringPath password = createString("password");
 

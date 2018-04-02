@@ -59,32 +59,32 @@ public class BooleanExpressionUtils {
 	}
 	
 	/**
-	 * @Title: toIntegerValue  
+	 * @Title: toInteger  
 	 * @Description: 当输入值不为空或""时，将其转换为长整形并返回，否则返回0  
 	 * @param value 需要被转型的字符串
 	 * @return Integer 转型后的整形  
 	 */
-	public static Integer toIntegerValue(String value) throws NumberFormatException {
+	public static Integer toInteger(String value) throws NumberFormatException {
 		return StringUtils.isNotBlank(value) ? Integer.valueOf(value) : 0;
 	}
 	
 	/**
-	 * @Title: toLongValue  
+	 * @Title: toLong  
 	 * @Description: 当输入值不为空或""时，将其转换为长整形并返回，否则返回0L  
 	 * @param value 需要被转型的字符串
 	 * @return Long 转型后的长整形  
 	 */
-	public static Long toLongValue(String value) throws NumberFormatException {
+	public static Long toLong(String value) throws NumberFormatException {
 		return StringUtils.isNotBlank(value) ? Long.valueOf(value) : 0L;
 	}
 	
 	/**
-	 * @Title: toBooleanValue  
+	 * @Title: toBoolean  
 	 * @Description: 当输入值不为空或""时，将其转换为Boolean类型对象并返回，否则返回false  
 	 * @param value 需要被转型的字符串
 	 * @return Boolean 转型后的Boolean类型对象
 	 */
-	public static Boolean toBooleanValue(String value) {
+	public static Boolean toBoolean(String value) {
 		return StringUtils.isNotBlank(value) ? Boolean.valueOf(value) : Boolean.FALSE;
 	}
 	

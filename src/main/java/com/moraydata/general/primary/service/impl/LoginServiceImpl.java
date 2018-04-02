@@ -2,7 +2,7 @@ package com.moraydata.general.primary.service.impl;
 
 import static com.moraydata.general.management.util.BooleanExpressionUtils.addExpression;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.like;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.toLongValue;
+import static com.moraydata.general.management.util.BooleanExpressionUtils.toLong;
 
 import java.util.List;
 
@@ -79,7 +79,7 @@ public class LoginServiceImpl extends BaseAbstractService implements LoginServic
 		BooleanExpression exp = null;
 		
 		String id = conditions.getString(login.id.getMetadata().getName());
-		exp = addExpression(id, exp, login.id.eq(toLongValue(id)));
+		exp = addExpression(id, exp, login.id.eq(toLong(id)));
 		
 		String nickname = conditions.getString(login.user.nickname.getMetadata().getName());
 		exp = addExpression(nickname, exp, login.user.nickname.like(like(nickname)));

@@ -2,9 +2,9 @@ package com.moraydata.general.primary.service.impl;
 
 import static com.moraydata.general.management.util.BooleanExpressionUtils.addExpression;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.like;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.toIntegerValue;
+import static com.moraydata.general.management.util.BooleanExpressionUtils.toInteger;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.toLocalDateTime;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.toLongValue;
+import static com.moraydata.general.management.util.BooleanExpressionUtils.toLong;
 import static com.moraydata.general.management.util.ImageUtils.deletePhotoFile;
 import static com.moraydata.general.management.util.ImageUtils.generateImageFilePath;
 import static com.moraydata.general.management.util.ImageUtils.getClearPhotoString;
@@ -31,9 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSONObject;
 import com.moraydata.general.management.annotation.Property;
 import com.moraydata.general.management.message.MessageCodeManager;
+import com.moraydata.general.primary.entity.InvitationCode;
+import com.moraydata.general.primary.entity.InvitationCode.Type;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.entity.query.QUser;
 import com.moraydata.general.primary.repository.UserRepository;
+import com.moraydata.general.primary.service.InvitationCodeService;
 import com.moraydata.general.primary.service.UserService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
@@ -60,6 +63,9 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 	
 	@Autowired
 	private RedisTemplate<Object, Object> redisTemplate;
+	
+	@Autowired
+	private InvitationCodeService invitationCodeService;
 	
 	@Transactional
 	@Override
@@ -151,7 +157,7 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 		BooleanExpression exp = null;
 		
 		String id = conditions.getString(user.id.getMetadata().getName());
-		exp = addExpression(id, exp, user.id.eq(toLongValue(id)));
+		exp = addExpression(id, exp, user.id.eq(toLong(id)));
 		
 		String nickname = conditions.getString(user.nickname.getMetadata().getName());
 		exp = addExpression(nickname, exp, user.nickname.like(like(nickname)));
@@ -169,7 +175,7 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 		exp = addExpression(phone, exp, user.phone.like(like(phone)));
 		
 		String status = conditions.getString(user.status.getMetadata().getName());
-		exp = addExpression(status, exp, user.status.eq(toIntegerValue(status)));
+		exp = addExpression(status, exp, user.status.eq(toInteger(status)));
 		
 		String createdDate = conditions.getString(user.createdDate.getMetadata().getName());
 		exp = addExpression(createdDate, exp, user.createdDate.before(toLocalDateTime(createdDate)));
@@ -302,17 +308,52 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 
 	@Override
 	public boolean updatePassword(String key, String code, String newPassword) {
-		// 1. Get code from key
+		// 1. Get code by key
 		Object storedCode = redisTemplate.opsForValue().get(key);
 		if (storedCode == null) {
-			log.debug(String.format("无法通过Key[%s]获取验证码或验证码已经失效", key));
+			log.debug(String.format("Cannot get relative message code by given key[%s], or the message code[%s] related to given key has been expired", key, code));
 			return false;
 		}
-		
+		// 2. Check codes are matched
 		if (!storedCode.equals(code)) {
-			
+			log.debug(String.format("The typed message code[%s] and the stored message code[%s] for key[%s] are not matched", code, storedCode, key));
+			return false;
 		}
-		
+		// 3. Updating new password
+		QUser $ = QUser.user;
+		String[] keyParser = key.substring(key.indexOf(":")).split("#");
+		long updatedRecords = userRepository.update($.password, newPassword, $.username.eq(keyParser[0]).and($.phone.eq(keyParser[1])));
+		if (updatedRecords > 0) {
+			log.info("The password of user[%s] has been updated by given message code[%s]", keyParser[0], code); 
+			return true;
+		}
+		log.debug(String.format("An unknown error occurred, that causes the operation of updating password by message code[%s] to phone[%s] of user[%s] failed", code, keyParser[1], keyParser[0]));
 		return false;
+	}
+	
+	@Transactional
+	@Override
+	public boolean bindParent(String invitationCode, Long currentUserId) {
+		// 1. Get invitationCode information
+		InvitationCode instance = invitationCodeService.get(invitationCode, Type.BIND_PARENT_USER_ID);
+		if (instance == null) {
+			log.debug(String.format("Invalid invitation code[%s]", invitationCode));
+			return false;
+		} else if (!instance.getAvailable()) {
+			log.debug(String.format("Current invitation code[%s] is unavailable", invitationCode));
+			return false;
+		}
+		// 2. bind user parent id by current user id
+		QUser $ = QUser.user;
+		Long parentUserId = instance.getUserId();
+		long updatedRecords = userRepository.update($.parentId, parentUserId, $.id.eq(currentUserId));
+		if (updatedRecords > 0) {
+			invitationCodeService.delete(invitationCode);
+			log.info(String.format("A parent user[$s] has been bound to current user[%s]", parentUserId, currentUserId));
+			return true;
+		} else {
+			log.debug(String.format("An unknown error occurred, that causes the operation of binding parent user by invitation code[%s] for current user[%s] failed", invitationCode, currentUserId));
+			return false;
+		}
 	}
 }

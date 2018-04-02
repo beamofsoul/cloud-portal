@@ -24,6 +24,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath avatarUrl = createString("avatarUrl");
 
+    public final NumberPath<Integer> countOfInvitationCodes = createNumber("countOfInvitationCodes", Integer.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
 

@@ -2,7 +2,7 @@ package com.moraydata.general.primary.service.impl;
 
 import static com.moraydata.general.management.util.BooleanExpressionUtils.addExpression;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.like;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.toLongValue;
+import static com.moraydata.general.management.util.BooleanExpressionUtils.toLong;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +64,7 @@ public class UserRoleServiceImpl extends BaseAbstractService implements UserRole
 			BooleanExpression exp = null;
 			
 			String userId = conditions.getString($.userId.getMetadata().getName());
-			exp = addExpression(userId, exp, $.userId.eq(toLongValue(userId)));
+			exp = addExpression(userId, exp, $.userId.eq(toLong(userId)));
 			
 			String nickname = conditions.getString($.nickname.getMetadata().getName());
 			exp = addExpression(nickname, exp, $.nickname.like(like(nickname)));

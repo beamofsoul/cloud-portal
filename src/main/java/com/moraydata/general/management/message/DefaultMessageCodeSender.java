@@ -9,6 +9,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Mingshu Jian  
  * @date 2018-03-30
  */
+@Component
 final class DefaultMessageCodeSender implements MessageCodeSender {
 	
 	private final String requestUrl = "http://api.feige.ee/SmsService/Send";

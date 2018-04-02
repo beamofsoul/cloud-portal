@@ -2,8 +2,8 @@ package com.moraydata.general.primary.service.impl;
 
 import static com.moraydata.general.management.util.BooleanExpressionUtils.addExpression;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.like;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.toBooleanValue;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.toLongValue;
+import static com.moraydata.general.management.util.BooleanExpressionUtils.toBoolean;
+import static com.moraydata.general.management.util.BooleanExpressionUtils.toLong;
 
 import java.util.Arrays;
 import java.util.List;
@@ -119,14 +119,15 @@ public class PermissionServiceImpl extends BaseAbstractService implements Permis
 	public BooleanExpression search(JSONObject conditions) {
 		if (conditions == null) return null;
 		
-		QPermission permission = QPermission.permission;
+//		QPermission permission = QPermission.permission;
+		QPermission permission = new QPermission("Permission");
 		BooleanExpression exp = null;
 		
 		String name = conditions.getString(permission.name.getMetadata().getName());
 		exp = addExpression(name, exp, permission.name.like(like(name)));
 		
 		String id = conditions.getString(permission.id.getMetadata().getName());
-		exp = addExpression(id, exp, permission.id.eq(toLongValue(id)));
+		exp = addExpression(id, exp, permission.id.eq(toLong(id)));
 		
 		String action = conditions.getString(permission.action.getMetadata().getName());
 		exp = addExpression(action, exp, permission.action.like(like(action)));
@@ -135,14 +136,14 @@ public class PermissionServiceImpl extends BaseAbstractService implements Permis
 		exp = addExpression(group, exp, permission.group.like(like(group)));
 		
 		String parentId = conditions.getString(permission.parentId.getMetadata().getName());
-		exp = addExpression(parentId, exp, permission.parentId.eq(toLongValue(parentId)));
+		exp = addExpression(parentId, exp, permission.parentId.eq(toLong(parentId)));
 		
 		String resourceType = conditions.getString(permission.resourceType.getMetadata().getName());
 		if (StringUtils.isNotBlank(resourceType))
 			exp = addExpression(resourceType, exp, permission.resourceType.eq(resourceType));
 		
 		String available = conditions.getString(permission.available.getMetadata().getName());
-		exp = addExpression(available, exp, permission.available.eq(toBooleanValue(available)));
+		exp = addExpression(available, exp, permission.available.eq(toBoolean(available)));
 		
 		return exp;
 	}

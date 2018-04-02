@@ -68,6 +68,9 @@ public class User extends BaseAbstractEntity {
 	@Column(columnDefinition = "bigint default 0 comment '创建者'")
 	private Long creator;
 	
+	@Column(columnDefinition = "smallint default 0 comment '邀请码数量'")
+	private Integer countOfInvitationCodes;
+	
 	@Transient
 	private String photoString;
 	

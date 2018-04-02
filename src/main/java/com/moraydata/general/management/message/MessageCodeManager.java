@@ -3,7 +3,7 @@ package com.moraydata.general.management.message;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.RandomUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
@@ -14,7 +14,6 @@ import lombok.Setter;
  * @author Mingshu Jian  
  * @date 2018-03-30
  */
-@ConditionalOnBean(MessageCodeSender.class)
 @Component
 public class MessageCodeManager {
 
@@ -28,12 +27,11 @@ public class MessageCodeManager {
 	@Getter
 	private TimeUnit timeUnit = TimeUnit.SECONDS;
 	@Setter
+	@Autowired(required = false)
 	private MessageCodeSender messageCodeSender;
 	
 	public boolean send(String phone, int code, String content) throws Exception {
-		if (messageCodeSender == null)
-			messageCodeSender = new DefaultMessageCodeSender();
-		return messageCodeSender.send(phone, code, content);
+		return getMessageCodeSender().send(phone, code, content);
 	}
 	
 	public boolean send(String phone, int code) throws Exception {
@@ -60,5 +58,11 @@ public class MessageCodeManager {
 	
 	public int getRandomMessageCode() {
 		return getRandomMessageCode(digits);
+	}
+
+	public MessageCodeSender getMessageCodeSender() {
+		if (messageCodeSender == null)
+			messageCodeSender = new DefaultMessageCodeSender();
+		return messageCodeSender;
 	}
 }
