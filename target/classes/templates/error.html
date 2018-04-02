@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Error</title>
+		<style type="text/css">
+			span {font-family: cursive}
+		</style>
+	</head>
+	<body>
+		<h1 th:text="'Error - '+ ${status}"></h1>
+		<hr></hr>
+		<ul>
+			<li>
+				<div th:switch="${status}">
+					<span th:case="403" th:text="'You Have No Permissions To Access The Resource That You Expect'"></span>
+					<span th:case="404" th:text="'Could Not Find The Page That You Want To Access'"></span>
+					<span th:case="500" th:text="'An ' + ${error} + ' Occurred, ' + ${message}"></span>
+					<span th:case="*" th:text="'An Unknown Exception Or Error Occurred'"></span>
+				</div>
+			</li>
+			<li>
+				<span th:text="'Via The Request With URL ' + ${path}"></span>
+			</li>
+			<li>
+				<span th:text="'At ' + ${timestamp}"></span>
+			</li>
+		</ul>
+		<ul>
+			<li>
+				<span>
+					Please Access <a th:href="@{/index}">Index Page</a> Or Try Current Operation Later...
+				</span>
+			</li>
+		</ul>
+	</body>
+</html>

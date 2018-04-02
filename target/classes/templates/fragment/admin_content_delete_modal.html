@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<body>
+		<Modal v-model="vueDeleteModalVisible" width="360">
+	        <p slot="header" style="color:#f60;text-align:center">
+	            <Icon type="information-circled"></Icon>
+	            <span>删除确认</span>
+	        </p>
+	        <div style="text-align:center">
+	            <p>{{vueDeleteMessage}}</p>
+	        </div>
+	        <div slot="footer">
+	        	<i-button type="error" :loading="vueDeleteProgressVisible" v-on:click="submitDeleteForm">删除</i-button>
+	        	<i-button type="primary" v-on:click="vueDeleteModalVisible = false">取消</i-button>
+	        </div>
+	    </Modal>
+	</body>
+</html>

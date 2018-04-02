@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+	<head>
+		<title>Login</title>
+	</head>
+	<body>
+		<form method="post" action="login">
+			<label for="username">Username : </label> <input type="text" name="username" id="username" value="beamofsoul" /> <br>
+			<label for="password">Password : </label> <input type="password" name="password" id="password" value="Justin1987." /> <br> 
+			<input id="remember-me" name="remember-me" type="checkbox" value="true" />Remember-Me<br> <br>
+			<div>
+				<button type="submit">Login</button>
+			</div>
+			<br>
+			<a href="/socialAuth/weixin">微信登录</a>
+			<br>
+			<div th:with="message=${session.SPRING_SECURITY_LAST_EXCEPTION != null} ? ${session.SPRING_SECURITY_LAST_EXCEPTION.message}">
+				<span th:text="${message != null} ? ${message} : (${expired != null} ? ${expired})"></span>
+			</div>
+		</form>
+	</body>
+</html>
