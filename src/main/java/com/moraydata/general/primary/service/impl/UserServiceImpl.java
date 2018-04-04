@@ -245,29 +245,29 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 		QUser $ = new QUser("User");
 		BooleanExpression specificUser = $.id.eq(userId);
 		// 1. Get original password (has been encoded) by given userId
-		QueryResults<?> originalPasswordQueryResults = userRepository.findSpecificDataByPredicate(specificUser, $.password);
+		QueryResults<?> originalPasswordQueryResults = userRepository.findSpecificData(specificUser, $.password);
 		if (originalPasswordQueryResults.isEmpty()) {
-			log.debug(String.format("Required user cannot be found by input userId: %s", userId));
+			log.error(String.format("Required user cannot be found by input userId: %s", userId));
 			return false;
 		}
 		String originalPassword = ((Tuple) originalPasswordQueryResults.getResults().get(0)).get($.password);
 		if (StringUtils.isBlank(originalPassword)) {
-			log.debug(String.format("Required user's password cannot be found correctly, the illegal password is ", originalPassword));
+			log.error(String.format("Required user's password cannot be found correctly, the illegal password is ", originalPassword));
 			return false;
 		}
 		// 2. Compare original password with oldPassword (uncoded)
 		if (!passwordEncoder.matches(oldPassword, originalPassword)) {
-			log.debug("Original password and old password inputted are not matched");
+			log.error("Original password and old password inputted are not matched");
 			return false;
 		}
 		// 3. Update password to the new one
 		String encodedNewPassword = passwordEncoder.encode(newPassword);
 		long count = userRepository.update($.password, encodedNewPassword, specificUser);
 		if (count != 1) {
-			log.debug(String.format("An unknown error occurred, which caused the return value of updating password SQL is not 1 but %s", count));
+			log.error(String.format("An unknown error occurred, which caused the return value of updating password SQL is not 1 but %s", count));
 			return false;
 		}
-		log.debug(String.format("The password of user[%s] has been updated successfully. The new password is %s", userId, newPassword));
+		log.info(String.format("The password of user[%s] has been updated successfully. The new password is %s", userId, newPassword));
 		return true;
 	}
 
@@ -282,7 +282,7 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 		// 1. Check whether username and phone are matched
 		boolean exists = exists(username, phone);
 		if (!exists) {
-			log.debug(String.format("Given username[%s] and phone[%s] are not matched", username, phone));
+			log.error(String.format("Given username[%s] and phone[%s] are not matched", username, phone));
 			return null;
 		}
 		// 2. Send user a message code
@@ -294,7 +294,7 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 		}
 		// 3. Save message code into Redis cache for further checking
 		if (code == null) {
-			log.debug(String.format("An unknown error occurred, that causes the operation of sending message code[%s] to phone[%s] of user[%s] failed", code, phone, username));
+			log.error(String.format("An unknown error occurred, that causes the operation of sending message code[%s] to phone[%s] of user[%s] failed", code, phone, username));
 			return null;
 		}
 		
@@ -302,7 +302,7 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 		String key = String.format("messageCode:%s#%s#%s", username, phone, expiredDate);
 		redisTemplate.opsForValue().set(key, code, messageCodeManager.getTime2Live(), messageCodeManager.getTimeUnit());
 		
-		log.debug(String.format("A message code[%s] has been sent to phone[%s] of user[%s] and the expired date is %s", code, phone, username, new Date(expiredDate)));
+		log.info(String.format("A message code[%s] has been sent to phone[%s] of user[%s] and the expired date is %s", code, phone, username, new Date(expiredDate)));
 		return key;
 	}
 
@@ -311,12 +311,12 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 		// 1. Get code by key
 		Object storedCode = redisTemplate.opsForValue().get(key);
 		if (storedCode == null) {
-			log.debug(String.format("Cannot get relative message code by given key[%s], or the message code[%s] related to given key has been expired", key, code));
+			log.error(String.format("Cannot get relative message code by given key[%s], or the message code[%s] related to given key has been expired", key, code));
 			return false;
 		}
 		// 2. Check codes are matched
 		if (!storedCode.equals(code)) {
-			log.debug(String.format("The typed message code[%s] and the stored message code[%s] for key[%s] are not matched", code, storedCode, key));
+			log.error(String.format("The typed message code[%s] and the stored message code[%s] for key[%s] are not matched", code, storedCode, key));
 			return false;
 		}
 		// 3. Updating new password
@@ -327,7 +327,7 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 			log.info("The password of user[%s] has been updated by given message code[%s]", keyParser[0], code); 
 			return true;
 		}
-		log.debug(String.format("An unknown error occurred, that causes the operation of updating password by message code[%s] to phone[%s] of user[%s] failed", code, keyParser[1], keyParser[0]));
+		log.error(String.format("An unknown error occurred, that causes the operation of updating password by message code[%s] to phone[%s] of user[%s] failed", code, keyParser[1], keyParser[0]));
 		return false;
 	}
 	
@@ -337,10 +337,10 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 		// 1. Get invitationCode information
 		InvitationCode instance = invitationCodeService.get(invitationCode, Type.BIND_PARENT_USER_ID);
 		if (instance == null) {
-			log.debug(String.format("Invalid invitation code[%s]", invitationCode));
+			log.error(String.format("Invalid invitation code[%s]", invitationCode));
 			return false;
 		} else if (!instance.getAvailable()) {
-			log.debug(String.format("Current invitation code[%s] is unavailable", invitationCode));
+			log.error(String.format("Current invitation code[%s] is unavailable", invitationCode));
 			return false;
 		}
 		// 2. bind user parent id by current user id
@@ -352,7 +352,7 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 			log.info(String.format("A parent user[$s] has been bound to current user[%s]", parentUserId, currentUserId));
 			return true;
 		} else {
-			log.debug(String.format("An unknown error occurred, that causes the operation of binding parent user by invitation code[%s] for current user[%s] failed", invitationCode, currentUserId));
+			log.error(String.format("An unknown error occurred, that causes the operation of binding parent user by invitation code[%s] for current user[%s] failed", invitationCode, currentUserId));
 			return false;
 		}
 	}

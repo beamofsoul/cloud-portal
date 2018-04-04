@@ -92,12 +92,6 @@ public class InvitationCodeServiceImpl extends BaseAbstractService implements In
 		return exp;
 	}
 
-//	@Override
-//	public boolean exists(Long userId, String code) {
-//		QInvitationCode $ = QInvitationCode.invitationCode;
-//		return invitationCodeRepository.exists($.userId.eq(userId).and($.code.eq(code)));
-//	}
-
 	@Override
 	public InvitationCode get(String code) {
 		return invitationCodeRepository.findByCode(code);

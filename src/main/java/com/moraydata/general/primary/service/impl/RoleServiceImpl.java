@@ -44,10 +44,7 @@ public class RoleServiceImpl extends BaseAbstractService implements RoleService 
 //	
 	@Autowired
 	private UserRoleRepository userRoleRepository;
-//	
-//	@Autowired
-//	private RolePermissionRepository rolePermissionRepository;
-	
+
 	@Override
 //	@CachePut(key="#result.id")
 	public Role create(Role instance) {
@@ -96,7 +93,7 @@ public class RoleServiceImpl extends BaseAbstractService implements RoleService 
 	
 	@Override
 	public Role get(Long instanceId) {
-		return roleRepository.getOne(instanceId);
+		return roleRepository.findOne(instanceId); 
 	}
 
 	@Override

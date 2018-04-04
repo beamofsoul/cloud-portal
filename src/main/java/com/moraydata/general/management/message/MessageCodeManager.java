@@ -1,9 +1,11 @@
 package com.moraydata.general.management.message;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
@@ -14,12 +16,10 @@ import lombok.Setter;
  * @author Mingshu Jian  
  * @date 2018-03-30
  */
+@ConditionalOnProperty(name = "project.base.message.enabled", havingValue = "true")
 @Component
 public class MessageCodeManager {
 
-	@Setter
-	@Getter
-	private String contentTemplate = "手机验证码%s，在五分钟内有效。";
 	private int digits = 6; // 10 * 10 * 10 * 10 * 10 * 10
 	@Setter
 	@Getter
@@ -27,20 +27,19 @@ public class MessageCodeManager {
 	@Getter
 	private TimeUnit timeUnit = TimeUnit.SECONDS;
 	@Setter
-	@Autowired(required = false)
+	@Autowired
 	private MessageCodeSender messageCodeSender;
 	
-	public boolean send(String phone, int code, String content) throws Exception {
-		return getMessageCodeSender().send(phone, code, content);
-	}
-	
+	@SuppressWarnings("serial")
 	public boolean send(String phone, int code) throws Exception {
-		return send(phone, code, contentTemplate);
+		return getMessageCodeSender().send(phone, new HashMap<String, Object>(){{
+			put("code", code);
+		}});
 	}
 	
 	public Integer send(String phone) throws Exception {
 		int randomMessageCode = getRandomMessageCode();
-		boolean send = send(phone, randomMessageCode, contentTemplate);
+		boolean send = send(phone, randomMessageCode);
 		return send ? randomMessageCode : null;
 	}
 
@@ -61,8 +60,8 @@ public class MessageCodeManager {
 	}
 
 	public MessageCodeSender getMessageCodeSender() {
-		if (messageCodeSender == null)
-			messageCodeSender = new DefaultMessageCodeSender();
+//		if (messageCodeSender == null)
+//			messageCodeSender = new AliyunVerificationCodeSender();
 		return messageCodeSender;
 	}
 }

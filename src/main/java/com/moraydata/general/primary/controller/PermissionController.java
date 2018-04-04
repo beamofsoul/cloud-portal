@@ -45,8 +45,15 @@ public class PermissionController {
     @PreAuthorize("authenticated and hasPermission('permission','permission:add')")
 	@PostMapping("/add")
     public Permission createPermission(@RequestBody Permission permission) {
-        return permissionService.create(permission);
+    	return permissionService.create(permission);
     }
+    
+//    @ApiOperation(value = "创建权限", notes = "根据Permission对象创建权限")
+//    @PreAuthorize("authenticated and hasPermission('permission','permission:add')")
+//	@PostMapping("/add")
+//    public JSONObject createPermission(@RequestBody Permission permission) {
+//    	return ResponseUtils.response(permissionService.create(permission)) ;
+//    }
     
     @ApiOperation(value="获取所有权限详细信息", notes="获取权限信息列表")
 	@GetMapping("/list")
@@ -54,7 +61,7 @@ public class PermissionController {
 		return permissionService.get();
 	}
 	
-    @ApiOperation(value="获取权限详细信息列表", notes="根据一组权限ID获取对应的权限信息列表")
+    @ApiOperation(value="获取权限详细信息列表", notes="根据一组权限ID获取对应的权限信息列表，每个id之间用逗号分隔")
 	@GetMapping("/list/{ids}")
 	public List<Permission> getPermissions(@PathVariable Long... ids) {
 		return permissionService.get(ids);
@@ -96,7 +103,7 @@ public class PermissionController {
     @PreAuthorize("authenticated and hasPermission('permission','permission:list')")
 	@GetMapping("/listOfChildren/{parentPermissionId}")
     public List<Permission> getChildrenPermissions(@PathVariable Long parentPermissionId) {
-		return permissionService.getRelational(permissionService.searchRelational(parentPermissionId));
+		return permissionService.getRelational(parentPermissionId);
 	}
 	
     @ApiOperation(value="查询所有可用的权限信息", notes="查询所有Available属性为true的权限信息")

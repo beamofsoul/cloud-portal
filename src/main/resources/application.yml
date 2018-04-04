@@ -106,3 +106,12 @@ project:
       user:
         # Default password of new user which logged in by scanning qrcode
         defaultPassword: 123456
+    message:
+      enabled: true
+      product: Dysmsapi # 产品名称:云通信短信API产品,开发者无需替换
+      domain: dysmsapi.aliyuncs.com # 产品域名,开发者无需替换
+      accessKeyId: LTAImyRL3hwgWVqo
+      accessKeySecret: oeXnKT9SZZu4lx4bOTg0F1dVnwCHJT
+      sendTimeout: 10000
+      signName: 海鳗数据 # 签名
+      verificationCodeTemplateCode: SMS_129763401 # 短信模板编码

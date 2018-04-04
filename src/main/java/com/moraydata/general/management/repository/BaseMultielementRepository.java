@@ -14,6 +14,7 @@ import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.PathBuilder;
 
 @SuppressWarnings("unchecked")
 @NoRepositoryBean
@@ -38,6 +39,8 @@ public interface BaseMultielementRepository<T, ID extends Serializable> extends 
 	QueryResults<ID> findPageableIds(Pageable pageable);
 	QueryResults<ID> findPageableIds(Pageable pageable, Predicate predicate);
 	QueryResults<ID> findAllIds();
-    QueryResults<?> findSpecificDataByPredicate(Predicate predicate, Expression<?>... selects);
-//	PathBuilder<T> getEntityPath();
+    QueryResults<?> findSpecificData(Predicate predicate, Expression<?>... selects);
+    QueryResults<?> findSpecificData(Predicate predicate, Sort sort, Expression<?>... selects);
+	PathBuilder<T> getEntityPath();
+	Path<ID> getIdPath();
 }

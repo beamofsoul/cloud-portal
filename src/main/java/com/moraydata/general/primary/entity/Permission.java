@@ -66,6 +66,9 @@ public class Permission extends BaseAbstractRelationalEntity {
 		public static ResourceType getInstance(String code) {
 			return codeValueMap.get(code);
 		}
+		public static boolean exists(String code) {
+			return codeValueMap.containsKey(code);
+		}
 	}
 
 	@Override

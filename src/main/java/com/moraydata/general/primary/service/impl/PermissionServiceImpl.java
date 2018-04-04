@@ -16,14 +16,13 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
 import com.moraydata.general.management.cache.CacheEvictBasedCollection;
+import com.moraydata.general.management.cache.CacheableAvailableCollection;
 import com.moraydata.general.management.cache.CacheableBasedPageableCollection;
 import com.moraydata.general.management.cache.CacheableCommonCollection;
 import com.moraydata.general.management.security.SecurityPermissionEvaluator;
@@ -40,7 +39,9 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service("permissionService")
 @CacheConfig(cacheNames = PermissionServiceImpl.CACHE_NAME)
 public class PermissionServiceImpl extends BaseAbstractService implements PermissionService {
@@ -57,34 +58,57 @@ public class PermissionServiceImpl extends BaseAbstractService implements Permis
 	private RolePermissionRepository rolePermissionRepository;
 	
 	@Override
-	@CachePut(key="#result.id")
+	@CachePut(key="#result.id", condition="#result ne null")
 	public Permission create(Permission instance) {
-		return permissionRepository.save(instance);
+		try {
+			if (!Permission.ResourceType.exists(instance.getResourceType())) {
+				throw new IllegalArgumentException();
+			}
+			return permissionRepository.save(instance);
+		} catch (Exception e) {
+			log.error(String.format("Illegal input parameter[%s] to create [Permission] object", instance), e);
+			return null;
+		}
 	}
 	
 	@Transactional
-	@CachePut(key="#instance.id")
+	@CachePut(key="#result.id", condition="#result ne null")
 	@Override
 	public Permission update(Permission instance) {
-		Permission originalInstance = get(instance.getId());
-		BeanUtils.copyProperties(instance, originalInstance);
-		return permissionRepository.save(originalInstance);
+		try {
+			if (!Permission.ResourceType.exists(instance.getResourceType())) {
+				throw new IllegalArgumentException();
+			}
+			Permission originalInstance = get(instance.getId());
+			BeanUtils.copyProperties(instance, originalInstance);
+			return permissionRepository.save(originalInstance);
+		} catch (Exception e) {
+			log.error(String.format("Illegal input parameter[%s] to update [Permission] object", instance), e);
+			return null;
+		}
 	}
 
 	@Transactional
 	@Override
 	@CacheEvictBasedCollection(key="#p0")
-	public long delete(@NonNull Long... instanceIds) {
+	public long delete(Long... instanceIds) {
 		long count = 0L;
-		if (!isUsedPermissions(instanceIds)) {
-			count = permissionRepository.deleteByIds(instanceIds);
-			if (count > 0) RolePermissionsMapping.refill(rolePermissionService.findAllRolePermissionMapping());
+		try {
+			if (instanceIds == null) {
+				throw new IllegalArgumentException();
+			}
+			if (!isUsedPermissions(instanceIds)) {
+				count = permissionRepository.deleteByIds(instanceIds);
+				if (count > 0) RolePermissionsMapping.refill(rolePermissionService.findAllRolePermissionMapping());
+			}
+		} catch (Exception e) {
+			log.error(String.format("Illegal input parameter[%s] to delete [Permission] objects", Arrays.toString(instanceIds)), e);
 		}
 		return count;
 	}
 	
 	@Override
-	@Cacheable(key="#instanceId")
+	@Cacheable(key="#result.id", condition="#result ne null")
 	public Permission get(Long instanceId) {
 		return permissionRepository.findOne(instanceId);
 	}
@@ -148,37 +172,27 @@ public class PermissionServiceImpl extends BaseAbstractService implements Permis
 		return exp;
 	}
 	
+	@CacheableAvailableCollection
 	@Override
 	public List<Permission> getAllAvailable() {
-		QPermission permission = new QPermission("Permission");
-		return permissionRepository.findByPredicateAndSort(permission.available.eq(true), 
-				new Sort(Direction.ASC, 
-						Arrays.asList(permission.sort.getMetadata().getName(),
-								permission.group.getMetadata().getName(),
-								permission.id.getMetadata().getName())));
+//		QPermission permission = new QPermission("Permission");
+//		return permissionRepository.findByPredicateAndSort(permission.available.eq(true), 
+//				new Sort(Direction.ASC, 
+//						Arrays.asList(permission.sort.getMetadata().getName(),
+//								permission.group.getMetadata().getName(),
+//								permission.id.getMetadata().getName())));
+		return null;
 	}
 	
 	@Override
-	@CachePut(key="#result.id")
+	@CachePut(key="#result.id", condition="#result ne null")
 	public Permission get(String name) {
 		return permissionRepository.findByName(name);
 	}
 	
 	@Override
-	public List<Permission> getRelational(Predicate predicate) {
-		List<Permission> children = permissionRepository.findByPredicateAndSort(predicate, 
-				new Sort(Direction.ASC, QPermission.permission.sort.getMetadata().getName()));
-		loadRelationalInformation(children);
-		return children;
-	}
-	
-	private void loadRelationalInformation(List<Permission> permissions) {
-		permissions.stream().forEach(e -> e.setCountOfChildren(permissionRepository.count(QPermission.permission.parentId.eq(e.getId()))));
-	}
-	
-	@Override
-	public BooleanExpression searchRelational(Long parentInstanceId) {
-		return new QPermission("Permission").parentId.eq(parentInstanceId);
+	public List<Permission> getRelational(Long parentPermissionId) {
+		return permissionRepository.getRelational(parentPermissionId);
 	}
 	
 	/**

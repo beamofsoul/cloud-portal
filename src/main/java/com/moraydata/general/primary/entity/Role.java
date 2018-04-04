@@ -14,8 +14,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 
-@JsonIgnoreProperties(value={"hibernateLazyInitializer","handler","fieldHandler"})
+//@JsonIgnoreProperties({"permissions"})
 
 @Entity
 @Table(name = "T_ROLE")

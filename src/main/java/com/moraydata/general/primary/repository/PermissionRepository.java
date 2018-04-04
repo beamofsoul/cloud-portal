@@ -6,7 +6,7 @@ import com.moraydata.general.management.repository.BaseMultielementRepository;
 import com.moraydata.general.primary.entity.Permission;
 
 @Repository
-public interface PermissionRepository extends BaseMultielementRepository<Permission,Long> {
+public interface PermissionRepository extends BaseMultielementRepository<Permission,Long>, PermissionRepositoryCustom<Permission, Long> {
 
 	Permission findByName(String name);
 }

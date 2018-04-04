@@ -26,11 +26,9 @@ public interface PermissionService {
 	
 	Permission get(String name);
 
-	List<Permission> getRelational(Predicate predicate);
-	BooleanExpression searchRelational(Long parentInstanceId);
-
 	boolean isPermissionNameUnique(String name, Long instanceId);
 	boolean isUsedPermissions(Long... instanceId);
 	
 	boolean hasPermission(String action);
+	List<Permission> getRelational(Long parentPermissionId);
 }

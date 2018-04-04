@@ -26,6 +26,8 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 
+import lombok.Getter;
+
 /**
  * 
  * @ClassName BaseMultielementRepositoryImpl
@@ -41,14 +43,16 @@ import com.querydsl.jpa.impl.JPAQuery;
 public class BaseMultielementRepositoryImpl<T,ID extends Serializable> extends QuerydslJpaRepository<T, ID> implements BaseMultielementRepository<T, ID> {
 
     private final EntityManager entityManager;
+    @Getter
     private final PathBuilder<T> entityPath;
-    private final Path<?> idPath;
+    @Getter
+    private final Path<ID> idPath;
     
 	public BaseMultielementRepositoryImpl(JpaEntityInformation<T, ID> entityInformation, EntityManager entityManager) {
 		super(entityInformation, entityManager, QueryEntityPathResolver.INSTANCE);
 		this.entityManager = entityManager;
 		this.entityPath = new PathBuilder<T>(entityInformation.getJavaType(), entityInformation.getEntityName());
-		this.idPath = entityPath.getNumber(Constants.ENTITY.DEFAULT_PRIMARY_KEY, Long.class);
+		this.idPath = (Path<ID>) entityPath.getNumber(Constants.ENTITY.DEFAULT_PRIMARY_KEY, Long.class);
 	}
 	
 	public BaseMultielementRepositoryImpl(Class<T> domainClass, EntityManager entityManager) {
@@ -174,16 +178,30 @@ public class BaseMultielementRepositoryImpl<T,ID extends Serializable> extends Q
 		return (QueryResults<ID>) query.fetchResults();
 	}
 
-      /**
+   /**
 	 * @Title: findSpecificDataByPredicate
 	 * @Description: 根据查询需要的字段查询当前泛型业务实体类的特定结果集
 	 * @param predicate 断言对象，保存了查询的条件
-       * @param selects 查询需要的字段
+     * @param selects 查询需要的字段
 	 * @return QueryResults<?> 查询到的业务实体类的特定结果集
 	 */
 	@Override
-	public QueryResults<?> findSpecificDataByPredicate( Predicate predicate, Expression<?>... selects) {
+	public QueryResults<?> findSpecificData(Predicate predicate, Expression<?>... selects) {
 		JPAQuery<T> query = newQuery(entityManager, entityPath, predicate, null, selects);
+		return query.fetchResults();
+	}
+	
+   /**
+	 * @Title: findSpecificDataByPredicate
+	 * @Description: 根据查询需要的字段查询当前泛型业务实体类的特定结果集
+	 * @param predicate 断言对象，保存了查询的条件
+	 * @param sort 排序对象，保存了排序的条件
+     * @param selects 查询需要的字段
+	 * @return QueryResults<?> 查询到的业务实体类的特定结果集
+	 */
+	@Override
+	public QueryResults<?> findSpecificData(Predicate predicate, Sort sort, Expression<?>... selects) {
+		JPAQuery<T> query = newQuery(entityManager, entityPath, predicate, sort, selects);
 		return query.fetchResults();
 	}
 
