@@ -4,7 +4,9 @@ import java.lang.reflect.Constructor;
 
 import org.springframework.stereotype.Component;
 
-import com.moraydata.general.management.annotation.Property;
+import com.moraydata.general.management.system.ConfigurationReader;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
@@ -14,19 +16,13 @@ import com.moraydata.general.management.annotation.Property;
  * @Date 2017年8月29日 下午3:52:14
  * @version 1.0.0
  */
+@Slf4j
 @Component
 public class BaseMultielementRepositoryConfigurer {
 
 	public static final String DEFAULT_PROVIDER_INSTANCE_PATH = "project.base.repository.provider";
 	public static final String DEFAULT_PROVIDER_INSTANCE = "com.moraydata.general.management.repository.BaseMultielementRepositoryFactory";
 	
-	/**
-	 * application.yml配置文件中配置的BaseMultielementRepositoryProvider的全路径
-	 * 如未设置则获取默认的BaseMultielementRepositoryProvider实现类全路径
-	 */
-	@Property(value = DEFAULT_PROVIDER_INSTANCE_PATH, defaultValue = DEFAULT_PROVIDER_INSTANCE)
-    private static String providerInstancePath;
-    
 	/**
 	 * 暴露出来的provider对象实例
 	 * 当有其他类需要在该配置类注册(向Spring容器)provider之前获取provider实例
@@ -49,13 +45,26 @@ public class BaseMultielementRepositoryConfigurer {
 		 * 实例化provider，如未配置则取默认全路径进行实例化
 		 */
 		try {
-			Class<?> clazz = BaseMultielementRepositoryConfigurer.class.forName(providerInstancePath);
+			String providerImplementationClassPath = getProviderImplementationClassPath();
+			Class<?> clazz = BaseMultielementRepositoryConfigurer.class.forName(providerImplementationClassPath);
 			Constructor<?> noArgsConstructor = clazz.getDeclaredConstructor(new Class[]{});
 			noArgsConstructor.setAccessible(true);
 			provider = (BaseMultielementRepositoryProvider) noArgsConstructor.newInstance();
 		} catch (Exception e) {
-			throw new RuntimeException("Unrecognized base multielement repository provider settings", e);
+			log.error("Unrecognized base multielement repository provider settings", e);
 		}
 		return provider;
+	}
+
+	/**
+	 * application.yml配置文件中配置的BaseMultielementRepositoryProvider的全路径
+	 * 如未设置则获取默认的BaseMultielementRepositoryProvider实现类全路径
+	 */
+	private static String getProviderImplementationClassPath() {
+		String implementation = ConfigurationReader.getValue(DEFAULT_PROVIDER_INSTANCE_PATH, String.class);
+		if (implementation == null) {
+			implementation = DEFAULT_PROVIDER_INSTANCE;
+		}
+		return implementation;
 	}
 }
