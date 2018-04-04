@@ -26,6 +26,7 @@ public class SecretKeyAuthenticationProvider implements AuthenticationProvider {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	
 	/*
 	 * (非 Javadoc)  
 	 * <p>Title: authenticate</p>  

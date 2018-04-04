@@ -1,16 +1,10 @@
 package com.moraydata.general;
 
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.moraydata.general.primary.entity.InvitationCode;
-import com.moraydata.general.primary.service.InvitationCodeService;
 
 import junit.framework.TestCase;
 
@@ -54,5 +48,14 @@ public class CloudPortalApplicationTest extends TestCase {
 //			}
 //		});
 //		shardedJedis.setex("messageCode:" + "beamofsoul" + "#" + "18600574873", 5 * 60, String.valueOf(123456));
+	}
+	
+//	@Autowired
+//	private PermissionRepository permissionRepository;
+	
+	@Test
+	public void testtest() {
+//		List<Permission> relational = permissionRepository.getRelational(1L);
+//		relational.forEach(System.out::println);
 	}
 }

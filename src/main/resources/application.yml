@@ -10,6 +10,11 @@ spring:
     mode: HTML
     servlet:
       content-type: text/html; charset=utf-8
+      
+  security:
+    oauth2:
+      resource:
+        filter-order: 3
 
 swagger:
   api:
@@ -23,6 +28,7 @@ swagger:
       
 logging:
   config: classpath:logback.xml
+  
   
 project:
   user:
