@@ -171,6 +171,18 @@
 		    <version>${fastjson.version}</version>
 		</dependency>
 		
+		<!-- Alibaba SMS -->
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-core</artifactId>
+			<version>3.2.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		
 		<!-- Tools -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
