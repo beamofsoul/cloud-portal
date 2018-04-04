@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Implementation-Title: cloud-portal
-Implementation-Version: 0.0.1-SNAPSHOT
-Built-By: MingshuJian
-Implementation-Vendor-Id: com.moraydata.general
-Build-Jdk: 1.8.0_40
-Implementation-URL: http://maven.apache.org
-Created-By: Maven Integration for Eclipse
-
