@@ -28,7 +28,7 @@ import com.moraydata.general.management.util.HttpSessionUtils;
 public class RouteController {
 	
 	@GetMapping({"/" , "/index"})
-	public String index() {
+	public String index(HttpServletRequest request) {
 		return "index";
 	}
 	

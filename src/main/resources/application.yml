@@ -11,11 +11,6 @@ spring:
     servlet:
       content-type: text/html; charset=utf-8
       
-  security:
-    oauth2:
-      resource:
-        filter-order: 3
-
 swagger:
   api:
     title: Rabbit API Documentation
@@ -121,3 +116,7 @@ project:
       sendTimeout: 10000
       signName: 海鳗数据 # 签名
       verificationCodeTemplateCode: SMS_129763401 # 短信模板编码
+    oauth2:
+      enabled: true
+      resourceIds: open_api # 内容无所谓，但是数据库表oauth_client_details每条记录的resource_ids属性值必须与其一致，否则无法识别用户想要访问的资源
+      filterUrl: /open/** # 所有指向/open/**路径下资源的URL都将被要求进行认证，**通配符意味着任何形式
