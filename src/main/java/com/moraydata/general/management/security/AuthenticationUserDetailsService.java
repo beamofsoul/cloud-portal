@@ -54,7 +54,6 @@ public class AuthenticationUserDetailsService implements UserDetailsService {
 		return userExtension;
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	private User getUser(final String username) {
 		if (StringUtils.isBlank(username))
             throw new UsernameNotFoundException("Username is null");
