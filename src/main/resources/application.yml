@@ -13,12 +13,12 @@ spring:
       
 swagger:
   api:
-    title: Rabbit API Documentation
-    description: An Api documentation of an integrated development environment that based on Spring Boot
-    version: 1.0
+    title: Cloud-Portal Open API Documentation
+    description: 
+    version: 0.0.1-SNAPSHOT
     author:
       name: Mingshu Jian
-      url: https://github.com/beamofsoul/rabbit
+      url: https://github.com/beamofsoul/cloud-portal
       email: beamofsoul@sina.com
       
 logging:

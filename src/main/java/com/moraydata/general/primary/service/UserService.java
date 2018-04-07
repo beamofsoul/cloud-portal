@@ -25,11 +25,18 @@ public interface UserService {
 	User get(String username);
 	boolean isUsernameUnique(String username, Long userId);
 	boolean isNicknameUnique(String nickname, Long userId);
-
+	
 	boolean updatePassword(Long userId, String newPassword, String oldPassword);
 	boolean updatePassword(String key, String code, String newPassword);
 	boolean exists(String username, String phone);
 	String sendMessageCode(String username, String phone, long currentClientMilliseconds);
-	
 	boolean bindParent(String invitationCode, Long currentUserId);
+	
+	/*******************************************************************************************************/
+	
+	boolean updatePassword(Long userId, String newPassword) throws Exception;
+	boolean matchPassword(String rawPassword, String encodedPassword);
+	String sendMessageCode(String username, String phone, Long currentClientMilliseconds) throws Exception;
+	boolean matchPasswordCode(String key, String code) throws Exception;
+	boolean updatePassword(String key, String newPassword) throws Exception;
 }

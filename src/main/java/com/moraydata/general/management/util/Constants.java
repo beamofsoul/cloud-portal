@@ -17,4 +17,12 @@ public final class Constants {
 		public static final String SORT_BY_NAME = "sort";
 		public static final String SORT_DIRECTION_NAME = "direction";
 	}
+	
+	public static final class RESPONSE_ENTITY {
+		public static final String ERROR = "100001";
+		public static final String SUCCESS = "100000";
+		
+		public static final String OPERATION_FAILURE_CAUSED_BY_UNKNOWN_ERROR = "未知错误引起操作失败";
+		public static final String OPERATION_SUCCESS = "操作成功";
+	}
 }

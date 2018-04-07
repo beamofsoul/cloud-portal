@@ -70,11 +70,16 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 	@Transactional
 	@Override
 	public User create(User instance) {
-		final String base64Photo = instance.getPhoto();
-		if (StringUtils.isNotBlank(base64Photo)) {
-			serializeUserPhoto(instance, base64Photo);
+		try {
+			final String base64Photo = instance.getPhoto();
+			if (StringUtils.isNotBlank(base64Photo)) {
+				serializeUserPhoto(instance, base64Photo);
+			}
+			return userRepository.save(instance);
+		} catch (Exception e) {
+			log.error(String.format("An unknown error occurred, which caused persisting new user record failed", instance), e);
+			return null;
 		}
-		return userRepository.save(instance);
 	}
 
 	@Override
@@ -232,13 +237,17 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 	}
 	
 	private void loadPhotoString(User instance) {
-		String photoString = null;
-		if (StringUtils.isNotBlank(instance.getPhoto())) {
-			photoString = imageToBase64(generateImageFilePath(USER_PHOTO_PATH, instance.getPhoto()));
-			instance.setPhotoString(photoString);
+		try {
+			String photoString = null;
+			if (StringUtils.isNotBlank(instance.getPhoto())) {
+				photoString = imageToBase64(generateImageFilePath(USER_PHOTO_PATH, instance.getPhoto()));
+				instance.setPhotoString(photoString);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
-
+	
 	@Transactional(readOnly = false)
 	@Override
 	public boolean updatePassword(Long userId, String newPassword, String oldPassword) {
@@ -355,5 +364,69 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 			log.error(String.format("An unknown error occurred, that causes the operation of binding parent user by invitation code[%s] for current user[%s] failed", invitationCode, currentUserId));
 			return false;
 		}
+	}
+	
+	/*****************************************************************************************************************************************************************/
+
+	/**
+	 * For Open API
+	 * @param userId
+	 * @param newPassword
+	 * @return boolean
+	 * @exception Exception
+	 */
+	@Transactional(readOnly = false)
+	@Override
+	public boolean updatePassword(Long userId, String newPassword) throws Exception {
+		QUser $ = new QUser("User");
+		String encodedNewPassword = passwordEncoder.encode(newPassword);
+		return userRepository.update($.password, encodedNewPassword, $.id.eq(userId)) > 0;
+	}
+	
+	/**
+	 * For Open API
+	 * @param rawPassword
+	 * @param encodedPassword
+	 * @return boolean
+	 */
+	@Override
+	public boolean matchPassword(String rawPassword, String encodedPassword) {
+		return passwordEncoder.matches(rawPassword, encodedPassword);
+	}
+	
+	/**
+	 * For Open API
+	 * @param username
+	 * @param phone
+	 * @param currentClientMilliseconds
+	 * @return key
+	 * @throws Exception
+	 */
+	@Override
+	public String sendMessageCode(String username, String phone, Long currentClientMilliseconds) throws Exception {
+		Integer code = messageCodeManager.send(phone);
+		long expiredDate = messageCodeManager.getExpiredDate(currentClientMilliseconds);
+		String key = String.format("messageCode:%s#%s#%s", username, phone, expiredDate);
+		redisTemplate.opsForValue().set(key, code, messageCodeManager.getTime2Live(), messageCodeManager.getTimeUnit());
+		return key;
+	}
+
+	/**
+	 * For Open API
+	 * @param key
+	 * @param code
+	 * @return boolean
+	 */
+	@Override
+	public boolean matchPasswordCode(String key, String code) throws Exception {
+		Object storedCode = redisTemplate.opsForValue().get(key);
+		return (storedCode != null && storedCode.equals(code));
+	}
+	
+	@Override
+	public boolean updatePassword(String key, String newPassword) throws Exception {
+		QUser $ = QUser.user;
+		String[] keyParser = key.substring(key.indexOf(":")).split("#");
+		return userRepository.update($.password, newPassword, $.username.eq(keyParser[0]).and($.phone.eq(keyParser[1]))) > 0;
 	}
 }
