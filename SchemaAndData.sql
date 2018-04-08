@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50720
 File Encoding         : 65001
 
-Date: 2018-04-08 19:48:56
+Date: 2018-04-08 20:09:05
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -290,6 +290,14 @@ CREATE TABLE `t_user` (
   `creator` bigint(20) DEFAULT '0' COMMENT '创建者',
   `parent_id` bigint(20) DEFAULT '0' COMMENT '上级用户ID',
   `count_of_invitation_codes` smallint(6) DEFAULT '0' COMMENT '邀请码数量',
+  `company` varchar(20) COLLATE utf8_bin DEFAULT NULL COMMENT '所属企业',
+  `company_fax` varchar(20) COLLATE utf8_bin DEFAULT NULL COMMENT '企业传真',
+  `company_location` varchar(20) COLLATE utf8_bin DEFAULT NULL COMMENT '企业所在地',
+  `company_phone` varchar(20) COLLATE utf8_bin DEFAULT NULL COMMENT '企业联系电话',
+  `company_title` varchar(10) COLLATE utf8_bin DEFAULT NULL COMMENT '企业中职务',
+  `company_type` varchar(10) COLLATE utf8_bin DEFAULT NULL COMMENT '企业类型',
+  `open_id` varchar(64) COLLATE utf8_bin DEFAULT NULL COMMENT '微信openId',
+  `description` varchar(200) COLLATE utf8_bin DEFAULT NULL COMMENT '描述',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -297,9 +305,9 @@ CREATE TABLE `t_user` (
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES ('1', '2018-01-25 21:23:49', '2018-02-28 15:14:18', 'beamofsoul@sina.com', 'Justin', '$2a$10$ooB04XZxrLnGMroyXC0Qrua3Gvp4ZMOPwb6cH1gY.UQpEalE1HCAa', '1', 'beamofsoul', '18600574873', 'beamofsoul.jpeg', null, '0', '0', '0');
-INSERT INTO `t_user` VALUES ('12', '2018-02-01 20:14:33', '2018-03-01 23:32:28', 'tutou1@gmail.com', 'tutou1', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'testuser1', '13200000000', 'testuser1.jpeg', null, '0', '0', '0');
-INSERT INTO `t_user` VALUES ('21', '2018-03-25 18:24:03', '2018-03-25 18:24:03', null, 'Justin', '$2a$10$K1839SWbAxuscaBKcGu7uubJmD1tmDNK1PlWediqzG.tE8W1D0J3W', '1', 'od4PTw_ORXTmY8EESquabIhBIya4', null, null, 'http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLsib5qXNA3ADCQADapGuQsl4HUoELnp3uOfMxxaFsMnt6PeanVTmianFjiciaaicdeGZ9fQQMvZwKl5eQ/132', '0', '0', '0');
+INSERT INTO `t_user` VALUES ('1', '2018-01-25 21:23:49', '2018-02-28 15:14:18', 'beamofsoul@sina.com', 'Justin', '$2a$10$ooB04XZxrLnGMroyXC0Qrua3Gvp4ZMOPwb6cH1gY.UQpEalE1HCAa', '1', 'beamofsoul', '18600574873', 'beamofsoul.jpeg', null, '0', '0', '0', null, null, null, null, null, null, null, null);
+INSERT INTO `t_user` VALUES ('12', '2018-02-01 20:14:33', '2018-03-01 23:32:28', 'tutou1@gmail.com', 'tutou1', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'testuser1', '13200000000', 'testuser1.jpeg', null, '0', '0', '0', null, null, null, null, null, null, null, null);
+INSERT INTO `t_user` VALUES ('21', '2018-03-25 18:24:03', '2018-03-25 18:24:03', null, 'Justin', '$2a$10$K1839SWbAxuscaBKcGu7uubJmD1tmDNK1PlWediqzG.tE8W1D0J3W', '1', 'od4PTw_ORXTmY8EESquabIhBIya4', null, null, 'http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLsib5qXNA3ADCQADapGuQsl4HUoELnp3uOfMxxaFsMnt6PeanVTmianFjiciaaicdeGZ9fQQMvZwKl5eQ/132', '0', '0', '0', null, null, null, null, null, null, null, null);
 
 -- ----------------------------
 -- Table structure for `t_userconnection`

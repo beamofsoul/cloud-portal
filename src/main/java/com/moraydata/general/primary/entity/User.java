@@ -73,6 +73,30 @@ public class User extends BaseAbstractEntity {
 	@Column(columnDefinition = "smallint default 0 comment '邀请码数量'")
 	private Integer countOfInvitationCodes;
 	
+	@Column(columnDefinition = "varchar(20) comment '所属企业'")
+	private String company;
+	
+	@Column(columnDefinition = "varchar(10) comment '企业中职务'")
+	private String companyTitle;
+	
+	@Column(columnDefinition = "varchar(10) comment '企业类型'")
+	private String companyType;
+	
+	@Column(columnDefinition = "varchar(20) comment '企业所在地'")
+	private String companyLocation;
+	
+	@Column(columnDefinition = "varchar(20) comment '企业联系电话'")
+	private String companyPhone;
+	
+	@Column(columnDefinition = "varchar(20) comment '企业传真'")
+	private String companyFax;
+	
+	@Column(columnDefinition = "varchar(64) comment '微信openId'")
+	private String openId;
+	
+	@Column(columnDefinition = "varchar(200) comment '描述'")
+	private String description;
+	
 	@Transient
 	private String photoString;
 	
@@ -110,7 +134,11 @@ public class User extends BaseAbstractEntity {
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", username=" + username + ", password=" + password + ", nickname=" + nickname
-				+ ", email=" + email + ", phone=" + phone + ", photo=" + photo + ", avatarUrl" + avatarUrl + ", photoString=" + photoString
-				+ ", status=" + status + ", parentId=" + parentId + ", creator=" + creator + ", roles=" + roles + "]";
+				+ ", email=" + email + ", phone=" + phone + ", photo=" + photo + ", avatarUrl=" + avatarUrl
+				+ ", parentId=" + parentId + ", creator=" + creator + ", countOfInvitationCodes="
+				+ countOfInvitationCodes + ", company=" + company + ", companyTitle=" + companyTitle + ", companyType="
+				+ companyType + ", companyLocation=" + companyLocation + ", companyPhone=" + companyPhone
+				+ ", companyFax=" + companyFax + ", openId=" + openId + ", description=" + description
+				+ ", photoString=" + photoString + ", status=" + status + ", roles=" + roles + "]";
 	}
 }

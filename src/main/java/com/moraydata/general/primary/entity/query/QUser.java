@@ -10,7 +10,6 @@ import javax.annotation.Generated;
 import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -27,6 +26,18 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath avatarUrl = createString("avatarUrl");
 
+    public final StringPath company = createString("company");
+
+    public final StringPath companyFax = createString("companyFax");
+
+    public final StringPath companyLocation = createString("companyLocation");
+
+    public final StringPath companyPhone = createString("companyPhone");
+    
+    public final StringPath companyTitle = createString("companyTitle");
+
+    public final StringPath companyType = createString("companyType");
+
     public final NumberPath<Integer> countOfInvitationCodes = createNumber("countOfInvitationCodes", Integer.class);
 
     //inherited
@@ -34,11 +45,15 @@ public class QUser extends EntityPathBase<User> {
 
     public final NumberPath<Long> creator = createNumber("creator", Long.class);
 
+    public final StringPath description = createString("description");
+
     public final StringPath email = createString("email");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath nickname = createString("nickname");
+    
+    public final StringPath openId = createString("openId");
 
     public final NumberPath<Long> parentId = createNumber("parentId", Long.class);
 
