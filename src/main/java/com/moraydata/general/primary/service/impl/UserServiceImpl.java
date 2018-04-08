@@ -47,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service("userService")
-public class UserServiceImpl extends BaseAbstractService implements UserService {
+public class UserServiceImpl implements UserService {
 	
 	@Property("project.user.photo-path")
 	private static String USER_PHOTO_PATH;
@@ -344,7 +344,7 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 	@Override
 	public boolean bindParent(String invitationCode, Long currentUserId) {
 		// 1. Get invitationCode information
-		InvitationCode instance = invitationCodeService.get(invitationCode, Type.BIND_PARENT_USER_ID);
+		InvitationCode instance = getBindParentInvitationCode(invitationCode);
 		if (instance == null) {
 			log.error(String.format("Invalid invitation code[%s]", invitationCode));
 			return false;
@@ -403,7 +403,24 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 	 * @throws Exception
 	 */
 	@Override
-	public String sendMessageCode(String username, String phone, Long currentClientMilliseconds) throws Exception {
+	public String sendMessageCode4RetakingPassword(String username, String phone, Long currentClientMilliseconds) throws Exception {
+		Integer code = messageCodeManager.send(phone);
+		long expiredDate = messageCodeManager.getExpiredDate(currentClientMilliseconds);
+		String key = String.format("messageCode:%s#%s#%s", username, phone, expiredDate);
+		redisTemplate.opsForValue().set(key, code, messageCodeManager.getTime2Live(), messageCodeManager.getTimeUnit());
+		return key;
+	}
+	
+	/**
+	 * For Open API
+	 * @param username
+	 * @param phone
+	 * @param currentClientMilliseconds
+	 * @return key
+	 * @throws Exception
+	 */
+	@Override
+	public String sendMessageCode4ChangingPhone(String username, String phone, Long currentClientMilliseconds) throws Exception {
 		Integer code = messageCodeManager.send(phone);
 		long expiredDate = messageCodeManager.getExpiredDate(currentClientMilliseconds);
 		String key = String.format("messageCode:%s#%s#%s", username, phone, expiredDate);
@@ -416,6 +433,7 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 	 * @param key
 	 * @param code
 	 * @return boolean
+	 * @throws Exception
 	 */
 	@Override
 	public boolean matchPasswordCode(String key, String code) throws Exception {
@@ -423,10 +441,84 @@ public class UserServiceImpl extends BaseAbstractService implements UserService 
 		return (storedCode != null && storedCode.equals(code));
 	}
 	
+	/**
+	 * For Open API
+	 * @param key
+	 * @param newPassword
+	 * @return boolean
+	 * @throws Exception
+	 */
 	@Override
 	public boolean updatePassword(String key, String newPassword) throws Exception {
 		QUser $ = QUser.user;
 		String[] keyParser = key.substring(key.indexOf(":")).split("#");
 		return userRepository.update($.password, newPassword, $.username.eq(keyParser[0]).and($.phone.eq(keyParser[1]))) > 0;
+	}
+	
+	/**
+	 * For Open API
+	 * @param key
+	 * @param phone
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean updatePhone(String key, String phone) throws Exception {
+		QUser $ = QUser.user;
+		String[] keyParser = key.substring(key.indexOf(":")).split("#");
+		return userRepository.update($.phone, phone, $.username.eq(keyParser[0]).and($.phone.eq(keyParser[1]))) > 0;
+	}
+	
+	/**
+	 * For Open API
+	 * @param user
+	 * @param originalUser
+	 * @return User
+	 * @throws Expcetion
+	 */
+	@Override
+	public User update(User user, User originalUser) throws Exception {
+		user.setRoles(originalUser.getRoles());
+		BeanUtils.copyProperties(user, originalUser);
+		return userRepository.save(originalUser);
+	}
+	
+	/**
+	 * For Open API
+	 * @param invitationCode
+	 * @return InvitationCode
+	 * @throws Exception
+	 */
+	@Override
+	public InvitationCode getBindParentInvitationCode(String invitationCode) {
+		return invitationCodeService.get(invitationCode, Type.BIND_PARENT_USER_ID);
+	}
+	
+	/**
+	 * For Open API
+	 * @param instance
+	 * @param currentUserId
+	 * @return long
+	 * @throws Exception
+	 */
+	@Override
+	public long bindParentByInvitationCode(InvitationCode instance, Long currentUserId) throws Exception {
+		QUser $ = QUser.user;
+		Long parentUserId = instance.getUserId();
+		long updatedRecords = userRepository.update($.parentId, parentUserId, $.id.eq(currentUserId));
+		return updatedRecords;
+	}
+	
+	/**
+	 * For Open API
+	 * @param userId
+	 * @param username
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean updateUsername(Long userId, String username) throws Exception {
+		QUser $ = QUser.user;
+		return userRepository.update($.username, username, $.id.eq(userId)) > 0;
 	}
 }

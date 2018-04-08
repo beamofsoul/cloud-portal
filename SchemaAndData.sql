@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : MySQL
-Source Server Version : 50548
+Source Server         : localhost
+Source Server Version : 50720
 Source Host           : localhost:3306
 Source Database       : rabbit
 
 Target Server Type    : MYSQL
-Target Server Version : 50548
+Target Server Version : 50720
 File Encoding         : 65001
 
-Date: 2018-04-07 18:03:13
+Date: 2018-04-08 19:48:56
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -253,6 +253,23 @@ INSERT INTO `t_role_permission` VALUES ('11', '1', '11', '2018-02-26 00:44:59', 
 INSERT INTO `t_role_permission` VALUES ('12', '1', '12', '2018-02-26 00:44:59', '2018-02-26 00:44:59');
 INSERT INTO `t_role_permission` VALUES ('13', '1', '13', '2018-02-26 00:44:59', '2018-02-26 00:44:59');
 INSERT INTO `t_role_permission` VALUES ('14', '1', '14', '2018-02-26 00:44:59', '2018-02-26 00:44:59');
+
+-- ----------------------------
+-- Table structure for `t_service`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_service`;
+CREATE TABLE `t_service` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_date` datetime DEFAULT NULL COMMENT '最后修改时间',
+  `updated_date` datetime DEFAULT NULL COMMENT '创建时间',
+  `available` bit(1) DEFAULT b'1' COMMENT '是否可用',
+  `name` varchar(50) COLLATE utf8_bin NOT NULL COMMENT '服务名称',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_service
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `t_user`

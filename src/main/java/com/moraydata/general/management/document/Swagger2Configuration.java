@@ -64,7 +64,7 @@ public class Swagger2Configuration {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.select()
 				.apis(RequestHandlerSelectors.basePackage("com.moraydata.general.primary.controller.openapi"))
-				.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+//				.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
 				.build()
 				.globalOperationParameters(parameters)
 				.apiInfo(apiInfo());
