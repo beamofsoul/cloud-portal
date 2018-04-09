@@ -2,13 +2,16 @@ package com.moraydata.general.primary.controller.openapi;
 
 import static com.moraydata.general.management.util.RegexUtils.match;
 
+import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,10 +19,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
+import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.management.util.PageUtils;
 import com.moraydata.general.management.util.ResponseEntity;
 import com.moraydata.general.primary.entity.InvitationCode;
+import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
+import com.moraydata.general.primary.service.RoleService;
 import com.moraydata.general.primary.service.UserService;
 
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +36,44 @@ public class OpenUserController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private RoleService roleService;
+	
+	/**
+	 * 主用户创建子用户
+	 * @param user 子用户的注册信息
+	 * @return 注册后的子用户信息
+	 */
+	@SuppressWarnings("serial")
+	@PostMapping("/addingSlave")
+	public ResponseEntity addingSlave(@RequestBody User user) {
+		Assert.notNull(user, "ADDING_SLAVE_USER_IS_NULL");
+		
+		if (!OpenUserController.validatePassword(user.getUsername())) {
+			return ResponseEntity.error("用户名格式有误");
+		}
+		if (!userService.isUsernameUnique(user.getUsername(), null)) {
+			return ResponseEntity.error("用户名已被使用");
+		}
+		if (!OpenUserController.validatePassword(user.getPassword())) {
+			return ResponseEntity.error("密码格式有误");
+		}
+		if (StringUtils.isNotBlank(user.getPhone())) {
+			if (!OpenUserController.validatePhone(user.getPhone())) {
+				return ResponseEntity.error("手机号码格式有误");
+			}
+		}
+		user.setRoles(new HashSet<Role>() {{
+			add(roleService.get(Constants.ROLE.SLAVE_ROLE_NAME));
+		}});
+		User data = userService.create(user);
+		if (data == null) {
+			return ResponseEntity.UNKNOWN_ERROR;
+		} else {
+			return ResponseEntity.success("用户注册成功", data);
+		}
+	}
 	
 	/**
 	 * 用户登录
@@ -94,68 +138,6 @@ public class OpenUserController {
 				} else {
 					return ResponseEntity.UNKNOWN_ERROR;
 				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.UNKNOWN_ERROR;
-		}
-	}
-	
-	/**
-	 * 找回密码 - 步骤1：输入用户名、手机号码和客户端时间戳，用户手机收到找回密码短信验证码，该接口返回找回密码验证码redis中对应的key
-	 * @param username 用户名
-	 * @param phone 用户手机号码
-	 * @param currentClientMilliseconds 客户端时间戳
-	 * @return key 下个步骤传回后台用以从redis中获取对应的验证码
-	 */
-	@GetMapping("keyOfRetakingPassword")
-	public ResponseEntity keyOfRetakingPassword(@RequestParam String username, @RequestParam String phone, @RequestParam Long currentClientMilliseconds) {
-		Assert.notNull(username, "KEY_OF_RETAKING_PASSWORD_USERNAME_IS_NULL");
-		Assert.notNull(phone, "KEY_OF_RETAKING_PASSWORD_PHONE_IS_NULL");
-		Assert.notNull(currentClientMilliseconds, "KEY_OF_RETAKING_PASSWORD_CURRENT_CLIENT_MILLISECONDS_IS_NULL");
-		
-		try {
-			boolean exists = userService.exists(username, phone);
-			if (!exists) {
-				return ResponseEntity.error("未能通过用户名和手机找到任何用户信息");
-			} else {
-				String data = userService.sendMessageCode4RetakingPassword(username, phone, currentClientMilliseconds);
-				return ResponseEntity.success("找回密码验证码已经发送至用户手机", data);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.UNKNOWN_ERROR;
-		}
-	}
-	
-	/**
-	 * 找回密码 - 步骤2：输入key、验证码code和新密码
-	 * @param key 找回密码验证码redis中对应的key
-	 * @param code 找回密码验证码
-	 * @param newPassword 新的密码
-	 * @return boolean 密码是否修改成功
-	 */
-	@PutMapping("retakingPassword")
-	public ResponseEntity retakingPassword(@RequestParam String key, @RequestParam String code, @RequestParam String newPassword) {
-		Assert.notNull(key, "RETAKING_PASSWORD_KEY_IS_NULL");
-		Assert.notNull(code, "RETAKING_PASSWORD_CODE_IS_NULL");
-		Assert.notNull(newPassword, "RETAKING_PASSWORD_NEW_PASSWORD_IS_NULL");
-		
-		try {
-			boolean validated = validatePassword(newPassword);
-			if (!validated) {
-				return ResponseEntity.error("密码格式有误");
-			}
-			boolean matched = userService.matchPasswordCode(key, code);
-			if (matched) {
-				boolean updated = userService.updatePassword(key, newPassword);
-				if (updated) {
-					return ResponseEntity.success("修改密码成功", updated);
-				} else {
-					return ResponseEntity.UNKNOWN_ERROR;
-				}
-			} else {
-				return ResponseEntity.error("验证码错误或已经过期");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -420,6 +402,26 @@ public class OpenUserController {
 	}
 	
 	/**
+	 * 更新用户服务订单细则编号
+	 * @param orderItemIds 新的用户服务订单细则编号
+	 * @param userId 目标用户
+	 * @return boolean 是否更新成功
+	 */
+	@PutMapping("changingOrderItemIds")
+	public ResponseEntity changingOrderItemIds(@RequestParam String orderItemIds, @RequestParam Long userId) {
+		Assert.notNull(orderItemIds, "CHANGING_ORDER_ITEM_IDS_ORDER_ITEM_IDS_IS_NULL");
+		Assert.notNull(userId, "CHANGING_ORDER_ITEM_IDS_USER_ID_IS_NULL");
+		
+		try {
+			boolean data = userService.updateOrderItemIds(userId, orderItemIds);
+			return ResponseEntity.success("更新用户服务订单细则编号成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
 	 * 获取符合查询后的分页用户数据
 	 * @param conditions 每个key对应属性，每个value对应搜索内容
 	 * @param pageable key可以有page、size、sort和direction，具体value针对每个属性值
@@ -449,5 +451,13 @@ public class OpenUserController {
 	static boolean validatePassword(String password) {
 		String regex = "^[a-zA-Z][a-zA-Z0-9]{5,15}$";
 		return match(password, regex);
+	}
+	
+	static boolean validateNickname(String nickname) {
+		if (StringUtils.isBlank(nickname)) {
+			return true;
+		}
+		String regex = "^[\\u4E00-\\u9FA5]{0,10}$";
+		return match(nickname, regex);
 	}
 }

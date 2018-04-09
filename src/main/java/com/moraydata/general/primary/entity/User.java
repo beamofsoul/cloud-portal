@@ -49,7 +49,7 @@ public class User extends BaseAbstractEntity {
 	@Column(columnDefinition = "varchar(100) not null comment '密码'")
 	private String password;
 	
-	@Column(columnDefinition = "varchar(50) not null comment '昵称'")
+	@Column(columnDefinition = "varchar(50) comment '昵称'")
 	private String nickname;
 	
 	@Column(columnDefinition = "varchar(20) comment '电子邮箱'")
@@ -94,8 +94,11 @@ public class User extends BaseAbstractEntity {
 	@Column(columnDefinition = "varchar(64) comment '微信openId'")
 	private String openId;
 	
-	@Column(columnDefinition = "varchar(200) comment '描述'")
+	@Column(columnDefinition = "varchar(20) comment '描述'")
 	private String description;
+	
+	@Column(columnDefinition = "varchar(256) comment '可用服务订单细则编号'")
+	private String orderItemIds;
 	
 	@Transient
 	private String photoString;

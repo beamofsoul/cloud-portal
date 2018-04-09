@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50720
 File Encoding         : 65001
 
-Date: 2018-04-08 20:09:05
+Date: 2018-04-09 18:50:07
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -53,7 +53,7 @@ CREATE TABLE `t_invitation_code` (
   `type` tinyint(4) DEFAULT '1' COMMENT '邀请码类型 - 1:绑定父账户邀请码',
   `user_id` bigint(20) NOT NULL COMMENT '持有用户',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_invitation_code
@@ -63,6 +63,11 @@ INSERT INTO `t_invitation_code` VALUES ('2', '2018-04-04 22:11:12', '2018-04-04 
 INSERT INTO `t_invitation_code` VALUES ('3', '2018-04-04 22:11:12', '2018-04-04 22:11:12', '', 'D26966C96C3E496590B076CE740F9DA3', null, '1', '1');
 INSERT INTO `t_invitation_code` VALUES ('4', '2018-04-04 22:11:12', '2018-04-04 22:11:12', '', '48FAE1EB531046E3BEC9635D77AEC299', null, '1', '1');
 INSERT INTO `t_invitation_code` VALUES ('5', '2018-04-04 22:11:12', '2018-04-04 22:11:12', '', '115A0DE1C5414AC6AC6BFB7EB74CA5F3', null, '1', '1');
+INSERT INTO `t_invitation_code` VALUES ('6', '2018-04-09 09:39:56', '2018-04-09 09:39:56', '', 'CD5D755C97D04A4C91C03C0C0D20E47F', null, '1', '1');
+INSERT INTO `t_invitation_code` VALUES ('7', '2018-04-09 09:39:56', '2018-04-09 09:39:56', '', '6B75D78A551445ACA8F34C347C4D521B', null, '1', '1');
+INSERT INTO `t_invitation_code` VALUES ('8', '2018-04-09 09:39:56', '2018-04-09 09:39:56', '', '4385B5CC176F4607861E4FD5C960F593', null, '1', '1');
+INSERT INTO `t_invitation_code` VALUES ('9', '2018-04-09 09:39:56', '2018-04-09 09:39:56', '', '49128CD3DD274CB18A7313FFC5502605', null, '1', '1');
+INSERT INTO `t_invitation_code` VALUES ('10', '2018-04-09 09:39:56', '2018-04-09 09:39:56', '', '9D9CDCD10FE64DBD94DEFE8ABFC7D7B0', null, '1', '1');
 
 -- ----------------------------
 -- Table structure for `t_login`
@@ -82,7 +87,7 @@ CREATE TABLE `t_login` (
   PRIMARY KEY (`id`),
   KEY `FKqbwhd8ffw00hdkekquhhm7g7c` (`user_id`),
   CONSTRAINT `FKqbwhd8ffw00hdkekquhhm7g7c` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_login
@@ -154,6 +159,35 @@ INSERT INTO `t_login` VALUES ('66', '2018-04-05 02:12:10', '2018-04-05 02:12:10'
 INSERT INTO `t_login` VALUES ('67', '2018-04-05 02:24:15', '2018-04-05 02:24:15', null, 'Firefox-57.0', '169.254.177.225', null, 'Windows', null, '1');
 INSERT INTO `t_login` VALUES ('68', '2018-04-05 02:24:21', '2018-04-05 02:24:21', null, 'Firefox-57.0', '169.254.177.225', null, 'Windows', null, '1');
 INSERT INTO `t_login` VALUES ('69', '2018-04-06 01:24:28', '2018-04-06 01:24:28', null, 'Firefox-57.0', '169.254.177.225', null, 'Windows', null, '1');
+INSERT INTO `t_login` VALUES ('70', '2018-04-09 09:43:06', '2018-04-09 09:43:06', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
+
+-- ----------------------------
+-- Table structure for `t_order`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_order`;
+CREATE TABLE `t_order` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_date` datetime DEFAULT NULL COMMENT '最后修改时间',
+  `updated_date` datetime DEFAULT NULL COMMENT '创建时间',
+  `agent` varchar(100) COLLATE utf8_bin DEFAULT NULL COMMENT '代理商',
+  `amount` decimal(12,2) DEFAULT NULL COMMENT '订单金额',
+  `amount_for_agent` decimal(12,2) DEFAULT NULL COMMENT '代理商结算金额',
+  `code` varchar(20) COLLATE utf8_bin NOT NULL COMMENT '订单编号',
+  `description` varchar(100) COLLATE utf8_bin DEFAULT NULL COMMENT '备注',
+  `operator` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '运维人员',
+  `service_begin_time` datetime DEFAULT NULL COMMENT '服务开始时间',
+  `service_end_time` datetime DEFAULT NULL COMMENT '服务开始时间',
+  `service_ids` varchar(256) COLLATE utf8_bin NOT NULL COMMENT '具体服务',
+  `status` int(11) DEFAULT '1' COMMENT '订单状态 - 1:新建,2:生效,3:过期',
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+  PRIMARY KEY (`id`),
+  KEY `FKho2r4qgj3txpy8964fnla95ub` (`user_id`),
+  CONSTRAINT `FKho2r4qgj3txpy8964fnla95ub` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_order
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for `t_permission`
@@ -210,7 +244,7 @@ CREATE TABLE `t_role` (
   `updated_date` datetime DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_role
@@ -218,6 +252,9 @@ CREATE TABLE `t_role` (
 INSERT INTO `t_role` VALUES ('1', '', 'admin', '0', '2018-01-25 23:16:22', '2018-01-25 23:16:25');
 INSERT INTO `t_role` VALUES ('2', '', 'manager', '1', '2018-01-25 23:16:59', '2018-01-25 23:17:02');
 INSERT INTO `t_role` VALUES ('3', '', 'normal', '99', '2018-01-25 23:17:36', '2018-02-25 23:26:41');
+INSERT INTO `t_role` VALUES ('4', '', 'trial', '99', '2018-04-09 09:26:38', '2018-04-09 09:26:41');
+INSERT INTO `t_role` VALUES ('5', '', 'master', '97', '2018-04-09 09:28:28', '2018-04-09 09:28:30');
+INSERT INTO `t_role` VALUES ('6', '', 'slave', '98', '2018-04-09 09:28:48', '2018-04-09 09:28:50');
 
 -- ----------------------------
 -- Table structure for `t_role_permission`
@@ -255,6 +292,24 @@ INSERT INTO `t_role_permission` VALUES ('13', '1', '13', '2018-02-26 00:44:59', 
 INSERT INTO `t_role_permission` VALUES ('14', '1', '14', '2018-02-26 00:44:59', '2018-02-26 00:44:59');
 
 -- ----------------------------
+-- Table structure for `t_sequence`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_sequence`;
+CREATE TABLE `t_sequence` (
+  `name` varchar(50) COLLATE utf8_bin NOT NULL,
+  `min` int(11) NOT NULL,
+  `max` int(11) NOT NULL,
+  `current` int(11) NOT NULL,
+  `increment` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_sequence
+-- ----------------------------
+INSERT INTO `t_sequence` VALUES ('order_code', '100001', '199999', '100002', '1');
+
+-- ----------------------------
 -- Table structure for `t_service`
 -- ----------------------------
 DROP TABLE IF EXISTS `t_service`;
@@ -280,7 +335,7 @@ CREATE TABLE `t_user` (
   `created_date` datetime DEFAULT NULL COMMENT '最后修改时间',
   `updated_date` datetime DEFAULT NULL COMMENT '创建时间',
   `email` varchar(20) COLLATE utf8_bin DEFAULT NULL COMMENT '电子邮箱',
-  `nickname` varchar(50) COLLATE utf8_bin NOT NULL COMMENT '昵称',
+  `nickname` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '昵称',
   `password` varchar(100) COLLATE utf8_bin NOT NULL COMMENT '密码',
   `status` int(11) DEFAULT '1' COMMENT '用户状态 - 1:正常,0:冻结,-1:删除',
   `username` varchar(50) COLLATE utf8_bin NOT NULL COMMENT '用户名',
@@ -297,17 +352,18 @@ CREATE TABLE `t_user` (
   `company_title` varchar(10) COLLATE utf8_bin DEFAULT NULL COMMENT '企业中职务',
   `company_type` varchar(10) COLLATE utf8_bin DEFAULT NULL COMMENT '企业类型',
   `open_id` varchar(64) COLLATE utf8_bin DEFAULT NULL COMMENT '微信openId',
-  `description` varchar(200) COLLATE utf8_bin DEFAULT NULL COMMENT '描述',
+  `description` varchar(20) COLLATE utf8_bin DEFAULT NULL COMMENT '描述',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES ('1', '2018-01-25 21:23:49', '2018-02-28 15:14:18', 'beamofsoul@sina.com', 'Justin', '$2a$10$ooB04XZxrLnGMroyXC0Qrua3Gvp4ZMOPwb6cH1gY.UQpEalE1HCAa', '1', 'beamofsoul', '18600574873', 'beamofsoul.jpeg', null, '0', '0', '0', null, null, null, null, null, null, null, null);
-INSERT INTO `t_user` VALUES ('12', '2018-02-01 20:14:33', '2018-03-01 23:32:28', 'tutou1@gmail.com', 'tutou1', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'testuser1', '13200000000', 'testuser1.jpeg', null, '0', '0', '0', null, null, null, null, null, null, null, null);
+INSERT INTO `t_user` VALUES ('1', '2018-01-25 21:23:49', '2018-02-28 15:14:18', 'beamofsoul@sina.com', 'Justin', '$2a$10$ooB04XZxrLnGMroyXC0Qrua3Gvp4ZMOPwb6cH1gY.UQpEalE1HCAa', '1', 'beamofsoul', '18600574873', '', null, '0', '0', '0', null, null, null, null, null, null, null, null);
+INSERT INTO `t_user` VALUES ('12', '2018-02-01 20:14:33', '2018-03-01 23:32:28', 'tutou1@gmail.com', 'tutou1', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'testuser1', '13200000000', '', null, '0', '0', '0', null, null, null, null, null, null, null, null);
 INSERT INTO `t_user` VALUES ('21', '2018-03-25 18:24:03', '2018-03-25 18:24:03', null, 'Justin', '$2a$10$K1839SWbAxuscaBKcGu7uubJmD1tmDNK1PlWediqzG.tE8W1D0J3W', '1', 'od4PTw_ORXTmY8EESquabIhBIya4', null, null, 'http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLsib5qXNA3ADCQADapGuQsl4HUoELnp3uOfMxxaFsMnt6PeanVTmianFjiciaaicdeGZ9fQQMvZwKl5eQ/132', '0', '0', '0', null, null, null, null, null, null, null, null);
+INSERT INTO `t_user` VALUES ('22', '2018-04-09 15:03:10', '2018-04-09 15:03:13', null, 'zhangsan', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'zhangsan', '13200000000', null, null, '0', '0', '0', null, null, null, null, null, null, null, 'zhangsan');
 
 -- ----------------------------
 -- Table structure for `t_userconnection`
@@ -349,15 +405,42 @@ CREATE TABLE `t_user_role` (
   KEY `FKq5un6x7ecoef5w1n39cop66kl` (`user_id`),
   CONSTRAINT `FKa9c8iiy6ut0gnx491fqx4pxam` FOREIGN KEY (`role_id`) REFERENCES `t_role` (`id`),
   CONSTRAINT `FKq5un6x7ecoef5w1n39cop66kl` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_user_role
 -- ----------------------------
 INSERT INTO `t_user_role` VALUES ('1', '2018-02-01 16:39:25', '2018-02-01 16:39:27', '1', '1');
+INSERT INTO `t_user_role` VALUES ('2', '2018-04-09 15:03:54', '2018-04-09 15:03:57', '1', '22');
 
 -- ----------------------------
 -- View structure for `v_user_role_combine_role`
 -- ----------------------------
 DROP VIEW IF EXISTS `v_user_role_combine_role`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_user_role_combine_role` AS select `tu`.`id` AS `id`,`tu`.`id` AS `user_id`,`tu`.`username` AS `username`,`tu`.`nickname` AS `nickname`,ifnull(group_concat(`tur`.`role_id` order by `tur`.`role_id` ASC separator ','),0) AS `role_id`,ifnull(group_concat(`tr`.`name` order by `tr`.`name` ASC separator ','),'') AS `role_name` from ((`t_user` `tu` left join `t_user_role` `tur` on((`tur`.`user_id` = `tu`.`id`))) left join `t_role` `tr` on((`tr`.`id` = `tur`.`role_id`))) group by `tu`.`id` ;
+
+-- ----------------------------
+-- Procedure structure for `getNextSequenceValue`
+-- ----------------------------
+DROP PROCEDURE IF EXISTS `getNextSequenceValue`;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getNextSequenceValue`(IN name varchar(50), OUT code int)
+BEGIN
+	declare _cur int;  
+	declare _maxvalue int;  -- 接收最大值  
+	declare _increment int; -- 接收增长步数  
+	set _increment = (select ts.increment from t_sequence ts where ts.name = name);  
+	set _maxvalue = (select ts.max from t_sequence ts where ts.name = name);  
+	set _cur = (select ts.current from t_sequence ts where ts.name = name);    
+	update t_sequence                      -- 更新当前值  
+	 set current = _cur + increment    
+	 where name = name ;    
+	if(_cur + _increment >= _maxvalue) then  -- 判断是都达到最大值  
+				update t_sequence    
+					set current = minvalue    
+					where name = name ;  
+	end if;  
+	set code = _cur;
+END
+;;
+DELIMITER ;

@@ -25,4 +25,13 @@ public final class Constants {
 		public static final String OPERATION_FAILURE_CAUSED_BY_UNKNOWN_ERROR = "未知错误引起操作失败";
 		public static final String OPERATION_SUCCESS = "操作成功";
 	}
+	
+	public static final class ROLE {
+		public static final String TRIAL_ROLE_NAME = "trial";
+		public static final String SLAVE_ROLE_NAME = "slave";
+	}
+	
+	public static final class ORDER {
+		public static final String CODE_SEQUENCE_NAME = "order_code";
+	}
 }

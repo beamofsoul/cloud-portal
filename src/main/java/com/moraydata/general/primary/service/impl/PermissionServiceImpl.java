@@ -222,4 +222,19 @@ public class PermissionServiceImpl extends BaseAbstractService implements Permis
 	public boolean hasPermission(String action) {
 		return SpringUtils.getBean(SecurityPermissionEvaluator.class).hasPermission(SecurityContextHolder.getContext().getAuthentication(), null, action);
 	}
+	
+	/*******************************************************************************************************************/
+	
+	/**
+	 * For Open API
+	 * @param permission
+	 * @param originalPermission
+	 * @return Permission
+	 * @throws Expcetion
+	 */
+	@Override
+	public Permission update(Permission permission, Permission originalPermission) throws Exception {
+		BeanUtils.copyProperties(permission, originalPermission);
+		return permissionRepository.save(originalPermission);
+	}
 }

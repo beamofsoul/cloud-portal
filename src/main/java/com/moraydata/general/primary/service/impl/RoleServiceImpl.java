@@ -206,4 +206,19 @@ public class RoleServiceImpl extends BaseAbstractService implements RoleService 
 	public boolean isUsedRoles(Long... roleIds) {
 		return userRoleRepository.exists(new QUserRole("userRole").role.id.in(roleIds));
 	}
+
+	/*******************************************************************************************************************/
+	
+	/**
+	 * For Open API
+	 * @param role
+	 * @param originalRole
+	 * @return Role
+	 * @throws Expcetion
+	 */
+	@Override
+	public Role update(Role role, Role originalRole) throws Exception {
+		BeanUtils.copyProperties(role, originalRole);
+		return roleRepository.save(originalRole);
+	}
 }

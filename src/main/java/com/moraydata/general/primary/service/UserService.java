@@ -46,4 +46,5 @@ public interface UserService {
 	InvitationCode getBindParentInvitationCode(String invitationCode) throws Exception;
 	long bindParentByInvitationCode(InvitationCode instance, Long currentUserId) throws Exception;
 	boolean updateUsername(Long userId, String username) throws Exception;
+	boolean updateOrderItemIds(Long userId, String orderItemIds) throws Exception;
 }

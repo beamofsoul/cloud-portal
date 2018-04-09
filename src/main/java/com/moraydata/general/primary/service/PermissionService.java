@@ -31,4 +31,8 @@ public interface PermissionService {
 	
 	boolean hasPermission(String action);
 	List<Permission> getRelational(Long parentPermissionId);
+	
+	/*******************************************************************************************************************/
+	
+	Permission update(Permission permission, Permission originalPermission) throws Exception;
 }

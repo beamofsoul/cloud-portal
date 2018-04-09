@@ -521,4 +521,17 @@ public class UserServiceImpl implements UserService {
 		QUser $ = QUser.user;
 		return userRepository.update($.username, username, $.id.eq(userId)) > 0;
 	}
+	
+	/**
+	 * For Open API
+	 * @param userId
+	 * @param orderItemIds
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean updateOrderItemIds(Long userId, String orderItemIds) throws Exception {
+		QUser $ = QUser.user;
+		return userRepository.update($.orderItemIds, orderItemIds, $.id.eq(userId)) > 0;
+	}
 }

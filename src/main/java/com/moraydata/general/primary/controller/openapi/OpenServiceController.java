@@ -33,7 +33,7 @@ public class OpenServiceController {
 	 * @return Service 添加后的服务信息
 	 */
 	@PostMapping("/addition")
-	public ResponseEntity registration(@RequestBody Service service) {
+	public ResponseEntity addition(@RequestBody Service service) {
 		Assert.notNull(service, "ADDITION_SERVICE_IS_NULL");
 		
 		Service data = serviceService.create(service);
@@ -156,6 +156,9 @@ public class OpenServiceController {
 	 */
 	@GetMapping("/page")
 	public ResponseEntity page(@RequestParam JSONObject conditions, @RequestParam JSONObject pageable) {
+		Assert.notNull(conditions, "PAGE_CONDITIONS_IS_NULL");
+		Assert.notNull(pageable, "PAGE_PAGEABLE_IS_NULL");
+		
 		try {
 			Page<Service> data =  serviceService.get(PageUtils.parsePageable(pageable), serviceService.search(conditions));
 			return ResponseEntity.success("获取分页服务信息成功", data);
