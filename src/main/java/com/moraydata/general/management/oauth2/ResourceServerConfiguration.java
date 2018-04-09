@@ -29,10 +29,12 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     public void configure(ResourceServerSecurityConfigurer resources) {
         resources.resourceId(resourceIds).stateless(false);
     }
- 
+    
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
+        	.csrf()
+        		.disable()
         	.anonymous()
         		.disable()
 	        .requestMatchers()
