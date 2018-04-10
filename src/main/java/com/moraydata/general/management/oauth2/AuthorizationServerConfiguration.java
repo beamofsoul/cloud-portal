@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 
+import com.moraydata.general.management.security.AuthenticationUserDetailsService;
 import com.moraydata.general.management.security.SecretKeyAuthenticationProvider;
 
 /**
@@ -30,6 +31,9 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	@Autowired
 	private SecretKeyAuthenticationProvider secretKeyAuthenticationProvider;
 	
+	@Autowired
+	private AuthenticationUserDetailsService authenticationUserDetailsService;
+	
     @Autowired
     private RedisConnectionFactory redisConnectionFactory; // Using Redis to store OAuth2 access information, including access_token and refresh_token
     
@@ -46,7 +50,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         endpoints
                 .tokenStore(new ApplicableRedisTokenStore(redisConnectionFactory))
                 .authenticationManager(authentication -> secretKeyAuthenticationProvider.authenticate(authentication))
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
+                .userDetailsService(authenticationUserDetailsService)
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST, HttpMethod.PUT, HttpMethod.DELETE);
     }
 
     @Override
