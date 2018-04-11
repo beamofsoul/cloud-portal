@@ -20,7 +20,6 @@ import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.social.security.SpringSocialConfigurer;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -34,7 +33,6 @@ import com.moraydata.general.primary.service.UserService;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@CrossOrigin(origins = "*")
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -106,7 +104,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.defaultSuccessUrl(props.getDefaultLoginSuccessUrl(), props.isAlwaysUseDefaultSuccessUrl())
 				.successHandler(authenticationSuccessHandler())
 				.and()
-				.logout()
+			.logout()
 				.logoutUrl(props.getLogoutUrl())
 				.logoutSuccessUrl(props.getDefaultLogoutSuccessUrl())
 				.and()

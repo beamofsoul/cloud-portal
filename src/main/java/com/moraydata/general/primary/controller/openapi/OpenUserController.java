@@ -2,7 +2,6 @@ package com.moraydata.general.primary.controller.openapi;
 
 import static com.moraydata.general.management.util.RegexUtils.match;
 
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,12 +22,9 @@ import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.management.util.PageUtils;
 import com.moraydata.general.management.util.ResponseEntity;
 import com.moraydata.general.primary.entity.InvitationCode;
-import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.service.RoleService;
 import com.moraydata.general.primary.service.UserService;
-
-import io.swagger.annotations.ApiOperation;
 
 @RequestMapping("/open/user")
 @RestController
@@ -45,7 +41,6 @@ public class OpenUserController {
 	 * @param user 子用户的注册信息
 	 * @return 注册后的子用户信息
 	 */
-	@SuppressWarnings("serial")
 	@PostMapping("/addingSlave")
 	public ResponseEntity addingSlave(@RequestBody User user) {
 		Assert.notNull(user, "ADDING_SLAVE_USER_IS_NULL");
@@ -64,14 +59,12 @@ public class OpenUserController {
 				return ResponseEntity.error("手机号码格式有误");
 			}
 		}
-		user.setRoles(new HashSet<Role>() {{
-			add(roleService.get(Constants.ROLE.SLAVE_ROLE_NAME));
-		}});
-		User data = userService.create(user);
-		if (data == null) {
-			return ResponseEntity.UNKNOWN_ERROR;
-		} else {
+		try {
+			User data = userService.create(user, roleService.get(Constants.ROLE.SLAVE_ROLE_NAME));
 			return ResponseEntity.success("用户注册成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
 		}
 	}
 	
@@ -81,21 +74,33 @@ public class OpenUserController {
 	 * @param password 密码
 	 * @return 用户信息
 	 */
-	@ApiOperation(value = "用户登录", notes = "根据用户名、密码获取用户信息")
 	@GetMapping("login")
 	public ResponseEntity login(@RequestParam String username, @RequestParam String password) {
 		Assert.notNull(username, "LOGIN_USERNAME_IS_NULL");
 		Assert.notNull(password, "LOGIN_PASSWORD_IS_NULL");
 		
 		try {
-			User data = userService.get(username);
-			if (data == null) {
+			// 判断是否通过微信扫码登录，提供的username实际为openId，两者区分暂时根据字符串长度界定
+			if (username.length() > Constants.WECHAT.SCAN_LOGIN_OPEN_ID_MIN_LENGTH) {
+				User data = userService.getByOpenId(username);
+				if (data != null) {
+					// 微信扫码登录，不需要检查用户真实密码，但是需要检查借由参数password传入的场景值sceneId
+					if (password.equals(Constants.WECHAT.SCAN_LOGIN_SCENE_ID)) {
+						return ResponseEntity.success("登录成功", data);
+					}
+					return ResponseEntity.error("微信扫码登录场景值错误");
+				}
 				return ResponseEntity.error("用户不存在");
 			} else {
-				if (!userService.matchPassword(password, data.getPassword())) {
-					return ResponseEntity.error("用户名和密码不匹配");
+				User data = userService.get(username);
+				if (data == null) {
+					return ResponseEntity.error("用户不存在");
 				} else {
-					return ResponseEntity.success("登录成功", data);
+					if (!userService.matchPassword(password, data.getPassword())) {
+						return ResponseEntity.error("用户名和密码不匹配");
+					} else {
+						return ResponseEntity.success("登录成功", data);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -444,7 +449,7 @@ public class OpenUserController {
 	}
 	
 	static boolean validatePhone(String phone) {
-		String regex = "^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$";
+		String regex = "^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\\d{8}$";
 		return match(phone, regex);
 	}
 	
@@ -459,5 +464,13 @@ public class OpenUserController {
 		}
 		String regex = "^[\\u4E00-\\u9FA5]{0,10}$";
 		return match(nickname, regex);
+	}
+	
+	static boolean validateSize(String string, int size) {
+		if (StringUtils.isBlank(string)) {
+			return true;
+		}
+		String regex = String.format("^.{1,%s}$", size);
+		return match(string, regex);
 	}
 }

@@ -103,11 +103,14 @@ public class User extends BaseAbstractEntity {
 	@Transient
 	private String photoString;
 	
+	@Transient
+	private String sceneId; // 2018-04-10 When user using Wechat scanning QR code to login the system, open id is its' user-name and scene id is its' password. The default scene id for scanning QR code to login is 911
+	
 	@Column(columnDefinition = "int default 1 comment '用户状态 - 1:正常,0:锁定'")
 	private Integer status;
 	
 	@Builder.Default
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.LAZY)
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.ALL, CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.LAZY)
 	@JoinTable(name = "T_USER_ROLE", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
 	private Set<Role> roles = new HashSet<Role>(0);
 	

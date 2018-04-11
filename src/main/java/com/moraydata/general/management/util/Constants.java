@@ -1,7 +1,7 @@
 package com.moraydata.general.management.util;
 
 public final class Constants {
-
+	
 	public static final class CURRENT {
 		public static final String USER = "CURRENT_USER";
 		public static final String LOGIN = "CURRENT_LOGIN";
@@ -33,5 +33,17 @@ public final class Constants {
 	
 	public static final class ORDER {
 		public static final String CODE_SEQUENCE_NAME = "order_code";
+	}
+	
+	public static final class WECHAT {
+		public static final String SCAN_LOGIN_SCENE_ID = "911";
+		public static final int SCAN_LOGIN_OPEN_ID_MIN_LENGTH = 20;
+		public static final String SCAN_LOGIN_WEB_SOCKET_COMMAND = "AUTOMATIC_LOGIN";
+		public static final String SCAN_LOGIN_DEFAULT_SEPARATOR = "####";
+	}
+	
+	public static final class SENDING_MESSAGE_CODE {
+		public static final String DEFAULT_MESSAGE_CODE_FORMAT = "messageCode:%s#%s#%s"; 
+		public static final String REGISTRATION_KEY_PREFIX = "registration";
 	}
 }

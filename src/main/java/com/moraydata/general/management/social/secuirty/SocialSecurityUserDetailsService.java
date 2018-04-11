@@ -29,7 +29,7 @@ public class SocialSecurityUserDetailsService implements SocialUserDetailsServic
 		User user = userService.get(Long.valueOf(userId)); // getUserById
 		if (user != null) {
 			SocialUserExtension socialUserExtension = new SocialUserExtension(
-					user.getId(), user.getUsername(), user.getPassword(), user.getNickname(), user.getPhotoString(),
+					user.getId(), user.getUsername(), user.getPassword(), user.getNickname(), user.getPhotoString(), user.getSceneId(),
 	                true, // if enable is true, otherwise false.
 	                true, // if accountNonExpired is true, otherwise false. 
 	                true, // if credentialsNonExpired is true, otherwise false.

@@ -1,7 +1,8 @@
 package com.moraydata.general.primary.controller.openapi;
 
-import java.util.HashSet;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.management.util.ResponseEntity;
-import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.service.RoleService;
 import com.moraydata.general.primary.service.UserService;
@@ -30,38 +30,71 @@ public class OpenNoAuthenticationController {
 	private RoleService roleService;
 	
 	/**
-	 * 用户注册
+	 * 用户注册 - 步骤1：用户注册时填写手机号码后，点击获取验证码，用户手机收到验证码，该接口返回用户注册验证码redis中对应的key
+	 * @param phone 注册用户的手机号码
+	 * @param currentClientMilliseconds 客户端时间戳
+	 * @return key 下个步骤传回后台用以从redis中获取对应的验证码
+	 */
+	@GetMapping("/keyOfRegistration")
+	public ResponseEntity keyOfRegistration(@RequestParam String phone, @RequestParam Long currentClientMilliseconds) {
+		Assert.notNull(phone, "KEY_OF_REGISTRATION_PHONE_IS_NULL");
+
+		try {
+			boolean validated = OpenUserController.validatePhone(phone);
+			if (!validated) {
+				return ResponseEntity.error("手机号码格式无效");
+			}
+			boolean exists = userService.exists(phone);
+			if (exists) {
+				return ResponseEntity.error("该手机号码已被使用");
+			}
+			String data = userService.sendMessageCode4Registration(phone, currentClientMilliseconds);
+			return ResponseEntity.success("注册账号验证码已经发送至用户手机", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 用户注册 - 步骤2：验证后注册用户信息
 	 * @param user 用户的注册信息
 	 * @return 注册后的用户信息
 	 */
-	@SuppressWarnings("serial")
 	@PostMapping("/registration")
-	public ResponseEntity registration(@RequestBody User user) {
+	public ResponseEntity registration(@RequestBody User user, HttpServletRequest request) {
 		Assert.notNull(user, "REGISTRATION_USER_IS_NULL");
 		
-		if (!OpenUserController.validatePassword(user.getUsername())) {
-			return ResponseEntity.error("用户名格式有误");
-		}
-		if (!userService.isUsernameUnique(user.getUsername(), null)) {
-			return ResponseEntity.error("用户名已被使用");
-		}
-		if (!OpenUserController.validatePassword(user.getPassword())) {
-			return ResponseEntity.error("密码格式有误");
-		}
-		if (!OpenUserController.validatePhone(user.getPhone())) {
-			return ResponseEntity.error("手机号码格式有误");
-		}
-		if (!OpenUserController.validateNickname(user.getNickname())) {
-			return ResponseEntity.error("姓名格式有误");
-		}
-		user.setRoles(new HashSet<Role>() {{
-			add(roleService.get(Constants.ROLE.TRIAL_ROLE_NAME));
-		}});
-		User data = userService.create(user);
-		if (data == null) {
-			return ResponseEntity.UNKNOWN_ERROR;
-		} else {
+		try {
+			if (!OpenUserController.validateSize(user.getCompany(), 20)) {
+				return ResponseEntity.error("公司/单位名称格式错误");
+			}
+			if (!OpenUserController.validateUsername(user.getUsername())) {
+				return ResponseEntity.error("用户名格式有误");
+			}
+			if (!userService.isUsernameUnique(user.getUsername(), null)) {
+				return ResponseEntity.error("用户名已被使用");
+			}
+			if (!OpenUserController.validatePassword(user.getPassword())) {
+				return ResponseEntity.error("密码格式有误");
+			}
+			if (!OpenUserController.validatePhone(user.getPhone())) {
+				return ResponseEntity.error("手机号码格式有误");
+			}
+			String key = request.getHeader("MESSAGE_KEY");
+			String code = request.getHeader("MESSAGE_CODE");
+			if (StringUtils.isBlank(key) || StringUtils.isBlank(code)) {
+				return ResponseEntity.error("手机验证码或对应的键格式错误");
+			}
+			boolean matched = userService.matchRegistrationCode(key, code);
+			if (!matched) {
+				return ResponseEntity.error("手机验证码错误或已过期");
+			}
+			User data = userService.create(user, roleService.get(Constants.ROLE.TRIAL_ROLE_NAME));
 			return ResponseEntity.success("用户注册成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
 		}
 	}
 	

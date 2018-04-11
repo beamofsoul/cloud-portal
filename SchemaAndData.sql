@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50720
 File Encoding         : 65001
 
-Date: 2018-04-09 18:50:07
+Date: 2018-04-11 16:46:45
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -87,7 +87,7 @@ CREATE TABLE `t_login` (
   PRIMARY KEY (`id`),
   KEY `FKqbwhd8ffw00hdkekquhhm7g7c` (`user_id`),
   CONSTRAINT `FKqbwhd8ffw00hdkekquhhm7g7c` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_login
@@ -160,6 +160,8 @@ INSERT INTO `t_login` VALUES ('67', '2018-04-05 02:24:15', '2018-04-05 02:24:15'
 INSERT INTO `t_login` VALUES ('68', '2018-04-05 02:24:21', '2018-04-05 02:24:21', null, 'Firefox-57.0', '169.254.177.225', null, 'Windows', null, '1');
 INSERT INTO `t_login` VALUES ('69', '2018-04-06 01:24:28', '2018-04-06 01:24:28', null, 'Firefox-57.0', '169.254.177.225', null, 'Windows', null, '1');
 INSERT INTO `t_login` VALUES ('70', '2018-04-09 09:43:06', '2018-04-09 09:43:06', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
+INSERT INTO `t_login` VALUES ('71', '2018-04-10 11:41:02', '2018-04-10 11:41:02', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
+INSERT INTO `t_login` VALUES ('72', '2018-04-10 17:24:10', '2018-04-10 17:24:10', null, 'Chrome-65.0.3325.181', '192.168.31.98', null, 'Mac', null, '1');
 
 -- ----------------------------
 -- Table structure for `t_order`
@@ -187,6 +189,27 @@ CREATE TABLE `t_order` (
 
 -- ----------------------------
 -- Records of t_order
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `t_order_item`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_order_item`;
+CREATE TABLE `t_order_item` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `created_date` datetime DEFAULT NULL COMMENT '最后修改时间',
+  `updated_date` datetime DEFAULT NULL COMMENT '创建时间',
+  `description` varchar(100) COLLATE utf8_bin DEFAULT NULL COMMENT '备注',
+  `service_begin_time` datetime DEFAULT NULL COMMENT '服务开始时间',
+  `service_end_time` datetime DEFAULT NULL COMMENT '服务开始时间',
+  `service_id` bigint(20) NOT NULL COMMENT '服务ID',
+  `status` int(11) DEFAULT '1' COMMENT '订单状态 - 1:新建,2:生效,3:过期',
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_order_item
 -- ----------------------------
 
 -- ----------------------------
@@ -353,17 +376,22 @@ CREATE TABLE `t_user` (
   `company_type` varchar(10) COLLATE utf8_bin DEFAULT NULL COMMENT '企业类型',
   `open_id` varchar(64) COLLATE utf8_bin DEFAULT NULL COMMENT '微信openId',
   `description` varchar(20) COLLATE utf8_bin DEFAULT NULL COMMENT '描述',
+  `order_item_ids` varchar(256) COLLATE utf8_bin DEFAULT NULL COMMENT '可用服务订单细则编号',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES ('1', '2018-01-25 21:23:49', '2018-02-28 15:14:18', 'beamofsoul@sina.com', 'Justin', '$2a$10$ooB04XZxrLnGMroyXC0Qrua3Gvp4ZMOPwb6cH1gY.UQpEalE1HCAa', '1', 'beamofsoul', '18600574873', '', null, '0', '0', '0', null, null, null, null, null, null, null, null);
-INSERT INTO `t_user` VALUES ('12', '2018-02-01 20:14:33', '2018-03-01 23:32:28', 'tutou1@gmail.com', 'tutou1', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'testuser1', '13200000000', '', null, '0', '0', '0', null, null, null, null, null, null, null, null);
-INSERT INTO `t_user` VALUES ('21', '2018-03-25 18:24:03', '2018-03-25 18:24:03', null, 'Justin', '$2a$10$K1839SWbAxuscaBKcGu7uubJmD1tmDNK1PlWediqzG.tE8W1D0J3W', '1', 'od4PTw_ORXTmY8EESquabIhBIya4', null, null, 'http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLsib5qXNA3ADCQADapGuQsl4HUoELnp3uOfMxxaFsMnt6PeanVTmianFjiciaaicdeGZ9fQQMvZwKl5eQ/132', '0', '0', '0', null, null, null, null, null, null, null, null);
-INSERT INTO `t_user` VALUES ('22', '2018-04-09 15:03:10', '2018-04-09 15:03:13', null, 'zhangsan', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'zhangsan', '13200000000', null, null, '0', '0', '0', null, null, null, null, null, null, null, 'zhangsan');
+INSERT INTO `t_user` VALUES ('1', '2018-01-25 21:23:49', '2018-02-28 15:14:18', 'beamofsoul@sina.com', 'Justin', '$2a$10$ooB04XZxrLnGMroyXC0Qrua3Gvp4ZMOPwb6cH1gY.UQpEalE1HCAa', '1', 'beamofsoul', '18600574873', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null);
+INSERT INTO `t_user` VALUES ('12', '2018-02-01 20:14:33', '2018-03-01 23:32:28', 'tutou1@gmail.com', 'tutou1', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'testuser1', '13200000000', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null);
+INSERT INTO `t_user` VALUES ('21', '2018-03-25 18:24:03', '2018-03-25 18:24:03', null, 'Justin', '$2a$10$K1839SWbAxuscaBKcGu7uubJmD1tmDNK1PlWediqzG.tE8W1D0J3W', '1', 'od4PTw_ORXTmY8EESquabIhBIya4', null, null, 'http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLsib5qXNA3ADCQADapGuQsl4HUoELnp3uOfMxxaFsMnt6PeanVTmianFjiciaaicdeGZ9fQQMvZwKl5eQ/132', '0', '0', '0', null, null, null, null, null, null, null, null, null);
+INSERT INTO `t_user` VALUES ('22', '2018-04-09 15:03:10', '2018-04-09 15:03:13', null, 'zhangsan', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'zhangsan', '13200000000', null, null, '0', '0', '0', null, null, null, null, null, null, null, 'zhangsan', null);
+INSERT INTO `t_user` VALUES ('28', '2018-04-11 10:47:01', '2018-04-11 10:47:01', null, null, '$2a$10$YYGcVxOysRkP4c7Ox3mOVu/PS1Z/bacsNCUM.1F1psu/AqDbvmkXO', '1', 'ovJ_C1J964Y_BKS08GyMN7jXa5eI', null, null, null, null, null, null, null, null, null, null, null, null, 'ovJ_C1J964Y_BKS08GyMN7jXa5eI', null, null);
+INSERT INTO `t_user` VALUES ('29', '2018-04-11 11:15:36', '2018-04-11 11:15:36', null, null, '$2a$10$W7ghh8rQ0eGpdyF5NatST.QAL4e9/0MDt0ia/iylK8m0NH39530Zi', '1', 'ovJ_C1PSS5OHMtnZ08jT8Ko8nYl4', null, null, null, null, null, null, null, null, null, null, null, null, 'ovJ_C1PSS5OHMtnZ08jT8Ko8nYl4', null, null);
+INSERT INTO `t_user` VALUES ('30', '2018-04-11 11:43:34', '2018-04-11 11:43:34', null, null, '$2a$10$Y9G27aka.ytfFVyViCMYLu8ge7.aDvBDNSIi9PnJN2eBhBvVk.a1a', '1', 'ovJ_C1LJlrm5Xl42ObHTI_u1IlLM', null, null, null, null, null, null, null, null, null, null, null, null, 'ovJ_C1LJlrm5Xl42ObHTI_u1IlLM', null, null);
+INSERT INTO `t_user` VALUES ('31', '2018-04-11 15:48:34', '2018-04-11 15:48:34', null, null, '$2a$10$FpjfAnsa2e6FKneiX6roROWLwxR3GnihrvO0MxHrJrFox5/ckvbzW', '1', 'ovJ_C1NMVsJ4AjrEglyj2lDn2gh4', null, null, null, null, null, null, null, null, null, null, null, null, 'ovJ_C1NMVsJ4AjrEglyj2lDn2gh4', null, null);
 
 -- ----------------------------
 -- Table structure for `t_userconnection`
@@ -405,13 +433,20 @@ CREATE TABLE `t_user_role` (
   KEY `FKq5un6x7ecoef5w1n39cop66kl` (`user_id`),
   CONSTRAINT `FKa9c8iiy6ut0gnx491fqx4pxam` FOREIGN KEY (`role_id`) REFERENCES `t_role` (`id`),
   CONSTRAINT `FKq5un6x7ecoef5w1n39cop66kl` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_user_role
 -- ----------------------------
 INSERT INTO `t_user_role` VALUES ('1', '2018-02-01 16:39:25', '2018-02-01 16:39:27', '1', '1');
 INSERT INTO `t_user_role` VALUES ('2', '2018-04-09 15:03:54', '2018-04-09 15:03:57', '1', '22');
+INSERT INTO `t_user_role` VALUES ('3', '2018-04-11 10:47:01', '2018-04-11 10:47:01', '4', '28');
+INSERT INTO `t_user_role` VALUES ('4', '2018-04-11 11:15:36', '2018-04-11 11:15:36', '4', '29');
+INSERT INTO `t_user_role` VALUES ('5', '2018-04-11 11:15:37', '2018-04-11 11:15:37', '4', '29');
+INSERT INTO `t_user_role` VALUES ('6', '2018-04-11 11:43:34', '2018-04-11 11:43:34', '4', '30');
+INSERT INTO `t_user_role` VALUES ('7', '2018-04-11 11:43:34', '2018-04-11 11:43:34', '4', '30');
+INSERT INTO `t_user_role` VALUES ('8', '2018-04-11 15:48:34', '2018-04-11 15:48:34', '4', '31');
+INSERT INTO `t_user_role` VALUES ('9', '2018-04-11 15:48:34', '2018-04-11 15:48:34', '4', '31');
 
 -- ----------------------------
 -- View structure for `v_user_role_combine_role`

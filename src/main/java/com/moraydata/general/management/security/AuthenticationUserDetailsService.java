@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.entity.dto.UserExtension;
@@ -45,7 +46,7 @@ public class AuthenticationUserDetailsService implements UserDetailsService {
 	
 	protected static UserExtension convertToUserExtension(final User user) {
 		UserExtension userExtension = new UserExtension(
-                user.getId(), user.getUsername(), user.getPassword(), user.getNickname(), user.getPhotoString(),
+                user.getId(), user.getUsername(), user.getPassword(), user.getNickname(), user.getPhotoString(), user.getSceneId(),
                 true, // if enable is true, otherwise false.
                 true, // if accountNonExpired is true, otherwise false. 
                 true, // if credentialsNonExpired is true, otherwise false.
@@ -60,7 +61,7 @@ public class AuthenticationUserDetailsService implements UserDetailsService {
         User user = getUser0(username);
         if (user == null)
 			throw new UsernameNotFoundException("User cannot found");
-        if (user.getStatus().equals(User.Status.LOCKED))
+        if (user.getStatusEnum().equals(User.Status.LOCKED))
         	throw new UsernameNotFoundException("User has been locked");
         if (user.getRoles() == null || user.getRoles().size() == 0)
         	throw new UsernameNotFoundException("User has not been allotted any roles");
@@ -68,6 +69,17 @@ public class AuthenticationUserDetailsService implements UserDetailsService {
 	}
 	
 	protected User getUser0(final String username) {
+		if (username.length() > Constants.WECHAT.SCAN_LOGIN_OPEN_ID_MIN_LENGTH) {
+			try {
+				// 2018-04-10 Addition support of using open id as user-name when user using QR code to scan to login the system
+				// The default length of user-name is between 6 and 16
+				// Ensured that current user is using open id as its' user-name
+				User targetUser = userService.getByOpenId(username);
+				targetUser.setSceneId(Constants.WECHAT.SCAN_LOGIN_SCENE_ID);
+			} catch (Exception e) {
+				throw new UsernameNotFoundException(e.getMessage());
+			}
+		}
 		return userService.get(username);
 	}
 

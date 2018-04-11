@@ -31,12 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSONObject;
 import com.moraydata.general.management.annotation.Property;
 import com.moraydata.general.management.message.MessageCodeManager;
+import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.primary.entity.InvitationCode;
 import com.moraydata.general.primary.entity.InvitationCode.Type;
+import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
+import com.moraydata.general.primary.entity.UserRole;
 import com.moraydata.general.primary.entity.query.QUser;
 import com.moraydata.general.primary.repository.UserRepository;
 import com.moraydata.general.primary.service.InvitationCodeService;
+import com.moraydata.general.primary.service.RoleService;
+import com.moraydata.general.primary.service.UserRoleService;
 import com.moraydata.general.primary.service.UserService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
@@ -67,6 +72,12 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private InvitationCodeService invitationCodeService;
 	
+	@Autowired
+	private RoleService roleService;
+	
+	@Autowired
+	private UserRoleService userRoleService;
+	
 	@Transactional
 	@Override
 	public User create(User instance) {
@@ -75,7 +86,26 @@ public class UserServiceImpl implements UserService {
 			if (StringUtils.isNotBlank(base64Photo)) {
 				serializeUserPhoto(instance, base64Photo);
 			}
-			return userRepository.save(instance);
+			User savedUser = userRepository.save(instance);
+			if (savedUser != null) {
+				userRoleService.create(new UserRole(savedUser, roleService.get(Constants.ROLE.TRIAL_ROLE_NAME)));
+			}
+			return savedUser;
+		} catch (Exception e) {
+			log.error(String.format("An unknown error occurred, which caused persisting new user record failed", instance), e);
+			return null;
+		}
+	}
+	
+	@Transactional
+	@Override
+	public User create(User instance, Role role) throws Exception {
+		try {
+			User savedUser = userRepository.save(instance);
+			if (savedUser != null) {
+				userRoleService.create(new UserRole(savedUser, role));
+			}
+			return savedUser;
 		} catch (Exception e) {
 			log.error(String.format("An unknown error occurred, which caused persisting new user record failed", instance), e);
 			return null;
@@ -406,7 +436,7 @@ public class UserServiceImpl implements UserService {
 	public String sendMessageCode4RetakingPassword(String username, String phone, Long currentClientMilliseconds) throws Exception {
 		Integer code = messageCodeManager.send(phone);
 		long expiredDate = messageCodeManager.getExpiredDate(currentClientMilliseconds);
-		String key = String.format("messageCode:%s#%s#%s", username, phone, expiredDate);
+		String key = String.format(Constants.SENDING_MESSAGE_CODE.DEFAULT_MESSAGE_CODE_FORMAT, username, phone, expiredDate);
 		redisTemplate.opsForValue().set(key, code, messageCodeManager.getTime2Live(), messageCodeManager.getTimeUnit());
 		return key;
 	}
@@ -423,7 +453,23 @@ public class UserServiceImpl implements UserService {
 	public String sendMessageCode4ChangingPhone(String username, String phone, Long currentClientMilliseconds) throws Exception {
 		Integer code = messageCodeManager.send(phone);
 		long expiredDate = messageCodeManager.getExpiredDate(currentClientMilliseconds);
-		String key = String.format("messageCode:%s#%s#%s", username, phone, expiredDate);
+		String key = String.format(Constants.SENDING_MESSAGE_CODE.DEFAULT_MESSAGE_CODE_FORMAT, username, phone, expiredDate);
+		redisTemplate.opsForValue().set(key, code, messageCodeManager.getTime2Live(), messageCodeManager.getTimeUnit());
+		return key;
+	}
+	
+	/**
+	 * For Open API
+	 * @param phone
+	 * @param currentClientMilliseconds
+	 * @return key
+	 * @throws Exception
+	 */
+	@Override
+	public String sendMessageCode4Registration(String phone, Long currentClientMilliseconds) throws Exception {
+		Integer code = messageCodeManager.send(phone);
+		long expiredDate = messageCodeManager.getExpiredDate(currentClientMilliseconds);
+		String key = String.format(Constants.SENDING_MESSAGE_CODE.DEFAULT_MESSAGE_CODE_FORMAT, Constants.SENDING_MESSAGE_CODE.REGISTRATION_KEY_PREFIX, phone, expiredDate);
 		redisTemplate.opsForValue().set(key, code, messageCodeManager.getTime2Live(), messageCodeManager.getTimeUnit());
 		return key;
 	}
@@ -437,6 +483,19 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public boolean matchPasswordCode(String key, String code) throws Exception {
+		Object storedCode = redisTemplate.opsForValue().get(key);
+		return (storedCode != null && storedCode.equals(code));
+	}
+	
+	/**
+	 * For Open API
+	 * @param key
+	 * @param code
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean matchRegistrationCode(String key, String code) throws Exception {
 		Object storedCode = redisTemplate.opsForValue().get(key);
 		return (storedCode != null && storedCode.equals(code));
 	}
@@ -533,5 +592,29 @@ public class UserServiceImpl implements UserService {
 	public boolean updateOrderItemIds(Long userId, String orderItemIds) throws Exception {
 		QUser $ = QUser.user;
 		return userRepository.update($.orderItemIds, orderItemIds, $.id.eq(userId)) > 0;
+	}
+
+	/**
+	 * For Open API -> Wechat
+	 * @param openId
+	 * @return User
+	 * @throws Exception
+	 */
+	@Override
+	public User getByOpenId(String openId) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.findOneByPredicate($.openId.eq(openId));
+	}
+	
+	/**
+	 * For Open API
+	 * @param phone
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean exists(String phone) throws Exception {
+		QUser $ = QUser.user;
+		return userRepository.exists($.phone.eq(phone)); 
 	}
 }

@@ -9,6 +9,7 @@ import org.springframework.social.connect.ConnectionSignUp;
 import org.springframework.social.connect.UserProfile;
 
 import com.moraydata.general.management.social.wechat.api.WeChatUser;
+import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.service.UserService;
 
@@ -62,6 +63,7 @@ public class SocialSecurityConnectionSignUp implements ConnectionSignUp {
 				.email(userInfo.getEmail())
 				.avatarUrl(userInfo.getHeadimgurl())
 				.status(User.Status.NORMAL.getValue())
+				.sceneId(Constants.WECHAT.SCAN_LOGIN_SCENE_ID)
 				.build());
 			log.info(String.format("A new user instance that is via scanning qrcode of third party authorization has been created. Its' unique id is %s, and username is %s", user.getId(), user.getUsername()));
 		} else {

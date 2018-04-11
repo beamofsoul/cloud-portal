@@ -40,7 +40,7 @@ public class SocialAuthenticationSuccessHandler extends SavedRequestAwareAuthent
 		if (!isCurrentUserExist(request.getSession())) {
 			SocialUserExtension sue = (SocialUserExtension) authentication.getPrincipal();
 			UserExtension userExtension = new UserExtension(
-					Long.valueOf(sue.getUserId()), sue.getUsername(), sue.getPassword(), 
+					Long.valueOf(sue.getUserId()), sue.getUsername(), sue.getPassword(), sue.getSceneId(),
 					sue.getNickname(), sue.getPhotoString(), sue.isEnabled(), 
 					sue.isAccountNonExpired(), sue.isCredentialsNonExpired(), 
 					sue.isAccountNonLocked(), sue.getAuthorities());

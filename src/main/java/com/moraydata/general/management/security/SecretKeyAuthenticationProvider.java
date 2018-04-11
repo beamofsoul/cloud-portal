@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.primary.entity.dto.UserExtension;
 
 /**
@@ -46,15 +47,41 @@ public class SecretKeyAuthenticationProvider implements AuthenticationProvider {
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		final UserDetails user = authenticationUserDetailsService.loadUserByUsername(authentication.getName());
 		
-		// whether login by remember-me functionality
+		// Whether login by remember-me functionality
 		final UsernameNotFoundException wrongPasswordException = new UsernameNotFoundException("Password is wrong");
 		if (authentication.getPrincipal() instanceof UserExtension) {
-			if (!passwordEncoder.matches(((UserExtension) authentication.getPrincipal()).getPassword(), user.getPassword()))
+			UserExtension userExtension = (UserExtension) authentication.getPrincipal();
+			// Whether login by openId which is by scanning QR code.
+			// If the length of principal is longer than 20, it will be automatically identified as login by scanning WeChat QR code
+			if (userExtension.getUsername().length() > Constants.WECHAT.SCAN_LOGIN_OPEN_ID_MIN_LENGTH) {
+				// 2018-04-10 It represents that current user is login successfully if scene id is correct when user using scan to login the system
+				if (!userExtension.getSceneId().equals(Constants.WECHAT.SCAN_LOGIN_SCENE_ID)) {
+					throw wrongPasswordException;
+				}
+			} else if (!passwordEncoder.matches(userExtension.getPassword(), user.getPassword())) {
 				throw wrongPasswordException;
-		} else if (!passwordEncoder.matches(authentication.getCredentials().toString(), user.getPassword())) {
-			throw wrongPasswordException;
+			}
+		} else if (authentication.getPrincipal() instanceof String) {
+			// Whether login by openId which is by scanning QR code.
+			// If the length of principal is longer than 20, it will be automatically identified as login by scanning WeChat QR code
+			String principal = authentication.getPrincipal().toString();
+			if (principal.length() > Constants.WECHAT.SCAN_LOGIN_OPEN_ID_MIN_LENGTH) {
+				// 2018-04-10 It represents that current user is login successfully if scene id is correct when user using scan to login the system
+				if (!(authentication.getCredentials() != null && authentication.getCredentials().equals(Constants.WECHAT.SCAN_LOGIN_SCENE_ID))) {
+					throw wrongPasswordException;
+				}
+			} else {
+				if (!passwordEncoder.matches(authentication.getCredentials().toString(), user.getPassword())) {
+					throw wrongPasswordException;
+				}
+			}
 		}
+		
+		UsernamePasswordAuthenticationToken result = parseToAuthenticationToken(user);
+		return result;
+	}
 
+	private UsernamePasswordAuthenticationToken parseToAuthenticationToken(final UserDetails user) {
 		UsernamePasswordAuthenticationToken result = 
 				new UsernamePasswordAuthenticationToken(
 				user.getUsername(), 

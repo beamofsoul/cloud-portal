@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.alibaba.fastjson.JSONObject;
 import com.moraydata.general.primary.entity.InvitationCode;
+import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -39,7 +40,9 @@ public interface UserService {
 	boolean matchPassword(String rawPassword, String encodedPassword);
 	String sendMessageCode4RetakingPassword(String username, String phone, Long currentClientMilliseconds) throws Exception;
 	String sendMessageCode4ChangingPhone(String username, String phone, Long currentClientMilliseconds) throws Exception;
+	String sendMessageCode4Registration(String phone, Long currentClientMilliseconds) throws Exception;
 	boolean matchPasswordCode(String key, String code) throws Exception;
+	boolean matchRegistrationCode(String key, String code) throws Exception;
 	boolean updatePassword(String key, String newPassword) throws Exception;
 	boolean updatePhone(String key, String phone) throws Exception;
 	User update(User instance, User originalUser) throws Exception;
@@ -47,4 +50,7 @@ public interface UserService {
 	long bindParentByInvitationCode(InvitationCode instance, Long currentUserId) throws Exception;
 	boolean updateUsername(Long userId, String username) throws Exception;
 	boolean updateOrderItemIds(Long userId, String orderItemIds) throws Exception;
+	User getByOpenId(String openId) throws Exception;
+	boolean exists(String phone) throws Exception;
+	User create(User instance, Role role) throws Exception;
 }
