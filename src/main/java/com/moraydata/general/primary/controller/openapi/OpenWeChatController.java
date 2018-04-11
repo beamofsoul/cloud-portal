@@ -122,7 +122,7 @@ public class OpenWeChatController {
      * @throws IOException
      */
     @GetMapping("/wechat/callback")
-    public void callback(@RequestBody(required=false) String body, HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void callback(@RequestBody(required=false) String body, HttpServletRequest request, HttpServletResponse response) throws IOException {
 //    	String signature = request.getParameter("signature");
 //    	String timestamp = request.getParameter("timestamp");
 //    	String nonce = request.getParameter("nonce");
