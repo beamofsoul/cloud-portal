@@ -5,7 +5,7 @@ server:
 
 spring:
   redis:
-    database: 0
+    database: 0 # 正式库11
     host: 127.0.0.1
     port: 6379
     password: 
@@ -24,7 +24,7 @@ spring:
       type: com.zaxxer.hikari.HikariDataSource
       jdbcUrl: jdbc:mysql://localhost:3306/rabbit?characterEncoding=utf-8&useSSL=true&generateSimpleParameterMetadata=true
       username: root
-      password: 
+      password: root
       driver-class-name: com.mysql.jdbc.Driver
       poolName: PrimaryDatabaseConnectionPool
       maxLifetime: 1765000 #一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，建议设置比数据库超时时长少30秒，参考MySQL wait_timeout参数（show variables like '%timeout%';）
@@ -36,7 +36,7 @@ spring:
       type: com.zaxxer.hikari.HikariDataSource
       jdbc-url: jdbc:mysql://localhost:3306/rabbit_secondary?characterEncoding=utf-8&useSSL=true
       username: root
-      password: 
+      password: root
       driver-class-name: com.mysql.jdbc.Driver
       pool-name: SecondaryDatabaseConnectionPool
       max-lifetime: 1765000 #一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，建议设置比数据库超时时长少30秒，参考MySQL wait_timeout参数（show variables like '%timeout%';）

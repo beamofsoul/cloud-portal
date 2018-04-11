@@ -2,8 +2,10 @@ package com.moraydata.general;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import junit.framework.TestCase;
@@ -57,5 +59,15 @@ public class CloudPortalApplicationTest extends TestCase {
 	public void testtest() {
 //		List<Permission> relational = permissionRepository.getRelational(1L);
 //		relational.forEach(System.out::println);
+	}
+	
+	@Test
+	public void testRedisKeySet() {
+//		Long count = redisTemplate.opsForSet().add("wechat:scan:login:set", "test_open_id3");
+//		Boolean isMemeber = redisTemplate.opsForSet().isMember("wechat:scan:login:set", "test_open_id2");
+//		System.out.println(count);
+//		System.out.println(isMemeber);
+//		Long removed = redisTemplate.opsForSet().remove("wechat:scan:login:set", "test_open_id2");
+//		System.out.println(removed);
 	}
 }
