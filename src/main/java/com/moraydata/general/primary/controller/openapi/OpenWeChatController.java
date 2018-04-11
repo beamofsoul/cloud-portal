@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -66,15 +67,78 @@ public class OpenWeChatController {
 	// 微信服务号appSecret
 	private String appSecret = "3889e726e00f19662e8b7e9cde4b5599";
 	
+	
+	
+
+	/************************************************************** 发送模板消息 ****************************************************************/
+	
+	private String send_template_message_path = "https://api.weixin.qq.com/cgi-bin/message/template/send";
+	
+	@SuppressWarnings({ "serial", "unchecked", "rawtypes" })
+	@GetMapping("/wechat/sendTemplateMessage")
+	public boolean sendTemplateMessage(@RequestParam String openId) {
+		
+		if (StringUtils.isBlank(openId)) {
+			return false;
+		}
+		
+		Map<String, Object> response = getAccessTokenResponse();
+		String accessToken = response.get("access_token").toString();
+		String integratedUrl = HttpUrlUtils.integrate(send_template_message_path, new HashMap<String, Object>() {{
+        	put("access_token", accessToken);
+        }});
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("touser", openId); // 接收者openId
+		parameters.put("template_id", "A8DciNBr821A0jtVEBNBHCG6Lzu0Iz4iiRSKCotgqhw"); // 模板Id
+		parameters.put("url", "http://www.baidu.com");
+		parameters.put("data", new HashMap<String, Map<String, String>>() {{
+			put("first", new HashMap<String, String>() {{
+				put("value", "恭喜你被骗成功!");
+				put("color", "#173177");
+			}});
+			put("keyword1", new HashMap<String, String>() {{
+				put("value", "比特币");
+				put("color", "#173177");
+			}});
+			put("keyword2", new HashMap<String, String>() {{
+				put("value", "No.000001");
+				put("color", "#173177");
+			}});
+			put("keyword3", new HashMap<String, String>() {{
+				put("value", "99.98元");
+				put("color", "#173177");
+			}});
+			put("keyword4", new HashMap<String, String>() {{
+				put("value", "2018年04月11日");
+				put("color", "#173177");
+			}});
+			put("remark", new HashMap<String, String>() {{
+				put("value", "欢迎再次上当!");
+				put("color", "#173177");
+			}});
+		}});
+		JSONObject jsonResponse = getRestTemplate().postForObject(integratedUrl, new HttpEntity(parameters, new HttpHeaders()), JSONObject.class);
+		System.out.println(jsonResponse.toJSONString());
+		return jsonResponse.getString("errmsg").equals("ok");
+	}
+	
+	
+	/************************************************************** 关注服务号并且自动登录系统 ****************************************************************/
+	
 	@SuppressWarnings({ "unchecked", "serial" })
-	@GetMapping("/wechat/getQRCode")
-    public String getQrcode(@RequestParam(value = "sceneId") int sceneId) throws Exception{
+	private Map<String, Object> getAccessTokenResponse() {
 		String integratedUrl = HttpUrlUtils.integrate(access_token_url, new HashMap<String, Object>() {{
 			put("grant_type", "client_credential");
 			put("appid", appId);
 			put("secret", appSecret);
 		}});
 		Map<String, Object> response = getRestTemplate().getForObject(integratedUrl, Map.class);
+		return response;
+	}
+	
+	@GetMapping("/wechat/getQRCode")
+    public String getQrcode(@RequestParam(value = "sceneId") int sceneId) throws Exception{
+		Map<String, Object> response = getAccessTokenResponse();
         String ticket = createTempTicket(response.get("access_token").toString(),response.get("expires_in").toString(),sceneId);
         return ticket;
     }
@@ -245,6 +309,8 @@ public class OpenWeChatController {
 					// 已关注公众号的扫码行为
 					processScanLoginScene(eventKey, fromUserName);
 					responseNothing(response);
+				} else if (event.equals("TEMPLATESENDJOBFINISH")) {
+					// template send job finish => 模板消息发送结束
 				} else {
 					throw new RuntimeException(String.format("未知的微信扫码事件类型: %s", event));
 				}

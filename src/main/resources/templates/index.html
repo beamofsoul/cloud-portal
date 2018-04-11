@@ -4,19 +4,38 @@
         <title>Rabbit Index</title>
         <script th:src="@{/static/jquery/js/jquery-3.2.1.min.js}"></script>
     	<script th:src="@{/static/WEBSOCKET/js/sockjs-1.1.2.min.js}"></script>
-    </head>  
-    <body>  
+    </head>
+    <body>
         <div th:replace="fragment/header"></div>
         <h1 style="text-align: center;">Rabbit  1.0.1</h1>
         <hr>
         
-		<a href="javascript:getQRCodeUrl()">GetQRCode</a>
+		<a href="javascript:getQRCodeUrl()">GetQRCode</a> | 
+		<a href="javascript:sendTemplateMessage()">SendTemplateMessage</a>
 		<hr>
 		<img id="qrcode" style="widows: 400px;height: 400px;border: 1px solid black;">
     </body>
     
     <script type="text/javascript">
-    // 该段JS主要用户帮助用户在扫码成功后关注服务号，并能够实现自动登录网站
+   	//该段JS主要用于给特定用户发送特定模板消息
+   	// 1. 获取需要接受消息的用户，并获取其openId
+   	// 2. 判断选用模板Id
+   	// 3. 调用后台程序进行发送，返回boolean类型结果，是否发送成功
+    	var openId = "ovJ_C1LJlrm5Xl42ObHTI_u1IlLM";
+		// ovJ_C1J964Y_BKS08GyMN7jXa5eI 蹇
+    	// ovJ_C1LJlrm5Xl42ObHTI_u1IlLM 韩
+    	// ovJ_C1NMVsJ4AjrEglyj2lDn2gh4   王
+    	
+    	function sendTemplateMessage() {
+	    	$.get(hostUrl + "wechat/sendTemplateMessage?openId=" + openId, null, function(data) {
+    			alert(data ? 'succeed!' : 'failed!');
+    		});
+    	}
+    
+    </script>
+    
+    <script type="text/javascript">
+    // 该段JS主要用于帮助用户在扫码成功后关注服务号，并能够实现自动登录网站
  	// 1. 用户加载登录页面，JS自动生成unicode，并且2秒钟后自动发送给websocket服务器将unicode存储在WebSocketSession中
 	// 2. 用户点击微信扫码按钮，将unicode用作sceneId随机生成二维码，并在当前页面不跳转的情况下显示给当前用户
 	// 3. 用户扫码后，微信服务号后台获取到unicode作为的sceneId，通知websocket服务器，让它给有session中unicode值与传给它的unicode的值一致的session发送特定消息，将自动登录命令和openId一同发送过去
