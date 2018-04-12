@@ -86,9 +86,16 @@ project:
       ignoringMatchers:
         - /static/**
         - /**/favicon.ico
-    social:
+    wechat:
+      service: # 支持微信服务号
+        appId: wx7a2ffdf99b8bd18c
+        appSecret: 7332143e8d281cc7588e510ae615cea5
+        accessTokenUrl: https://api.weixin.qq.com/cgi-bin/token # 获取access_token的url
+        ticketUrl: https://api.weixin.qq.com/cgi-bin/qrcode/create # 创建二维码ticket的url
+        showQRCodeUrl: https://mp.weixin.qq.com/cgi-bin/showqrcode # 显示二维码的url
+    social: # 现在只支持微信开放平台OAuth2方式扫码登录系统
       # Make Spring Social component enabled or not
-      enabled: true
+      enabled: false
       repository:
         # The table prefix string of userconnection table given by Spring Social
         tablePrefix: T_
@@ -100,9 +107,9 @@ project:
       # Authorization service provider  
       provider: weixin
       client:
-        # Third party application id registered by authorization service provider
+        # Third party application id registered by authorization service provider 微信开放平台appId
         appId: wxd99431bbff8305a0
-        # Third party application secret registered by authorization service provider
+        # Third party application secret registered by authorization service provider 微信开放平台appSecret
         appSecret: 60f78681d063590a469f1b297feff3c4
       user:
         # Default password of new user which logged in by scanning qrcode

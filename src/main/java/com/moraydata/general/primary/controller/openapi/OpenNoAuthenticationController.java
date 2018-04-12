@@ -81,6 +81,9 @@ public class OpenNoAuthenticationController {
 			if (!OpenUserController.validatePhone(user.getPhone())) {
 				return ResponseEntity.error("手机号码格式有误");
 			}
+			if (!userService.isPhoneUnique(user.getPhone(), null)) {
+				return ResponseEntity.error("手机号码已被使用");
+			}
 			String key = request.getHeader("MESSAGE_KEY");
 			String code = request.getHeader("MESSAGE_CODE");
 			if (StringUtils.isBlank(key) || StringUtils.isBlank(code)) {
@@ -99,7 +102,7 @@ public class OpenNoAuthenticationController {
 	}
 	
 	/**
-	 * 找回密码 - 步骤1：输入用户名、手机号码和客户端时间戳，用户手机收到找回密码短信验证码，该接口返回找回密码验证码redis中对应的key
+	 * 找回密码 - 步骤1：输入手机号码(手机号码唯一)和客户端时间戳，用户手机收到找回密码短信验证码，该接口返回找回密码验证码redis中对应的key
 	 * @param username 用户名
 	 * @param phone 用户手机号码
 	 * @param currentClientMilliseconds 客户端时间戳

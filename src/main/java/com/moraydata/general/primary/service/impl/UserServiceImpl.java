@@ -511,7 +511,7 @@ public class UserServiceImpl implements UserService {
 	public boolean updatePassword(String key, String newPassword) throws Exception {
 		QUser $ = QUser.user;
 		String[] keyParser = key.substring(key.indexOf(":")).split("#");
-		return userRepository.update($.password, newPassword, $.username.eq(keyParser[0]).and($.phone.eq(keyParser[1]))) > 0;
+		return userRepository.update($.password, passwordEncoder.encode(newPassword), $.username.eq(keyParser[0]).and($.phone.eq(keyParser[1]))) > 0;
 	}
 	
 	/**
@@ -616,5 +616,20 @@ public class UserServiceImpl implements UserService {
 	public boolean exists(String phone) throws Exception {
 		QUser $ = QUser.user;
 		return userRepository.exists($.phone.eq(phone)); 
+	}
+	
+	/**
+	 * For Open API
+	 * @param phone
+	 * @param userId
+	 * @throws Exception
+	 */
+	@Override
+	public boolean isPhoneUnique(String phone, Long userId) {
+		BooleanExpression predicate = QUser.user.phone.eq(phone);
+		if (userId != null) {
+			predicate = predicate.and(QUser.user.id.ne(userId));
+		}
+		return userRepository.count(predicate) == 0;
 	}
 }

@@ -53,4 +53,5 @@ public interface UserService {
 	User getByOpenId(String openId) throws Exception;
 	boolean exists(String phone) throws Exception;
 	User create(User instance, Role role) throws Exception;
+	boolean isPhoneUnique(String phone, Long userId) throws Exception;
 }
