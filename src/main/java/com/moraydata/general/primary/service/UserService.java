@@ -42,6 +42,7 @@ public interface UserService {
 	String sendMessageCode4ChangingPhone(String username, String phone, Long currentClientMilliseconds) throws Exception;
 	String sendMessageCode4Registration(String phone, Long currentClientMilliseconds) throws Exception;
 	boolean matchPasswordCode(String key, String code) throws Exception;
+	boolean matchPhoneCode(String key, String code) throws Exception;
 	boolean matchRegistrationCode(String key, String code) throws Exception;
 	boolean updatePassword(String key, String newPassword) throws Exception;
 	boolean updatePhone(String key, String phone) throws Exception;
@@ -52,6 +53,7 @@ public interface UserService {
 	boolean updateOrderItemIds(Long userId, String orderItemIds) throws Exception;
 	User getByOpenId(String openId) throws Exception;
 	boolean exists(String phone) throws Exception;
+	boolean existsByUsername(String username) throws Exception;
 	User create(User instance, Role role) throws Exception;
 	boolean isPhoneUnique(String phone, Long userId) throws Exception;
 }

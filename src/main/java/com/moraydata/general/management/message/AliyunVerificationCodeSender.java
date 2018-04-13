@@ -69,7 +69,10 @@ public class AliyunVerificationCodeSender implements MessageCodeSender {
 	boolean doSend(IAcsClient acsClient, SendSmsRequest request) throws ServerException, ClientException {
 		SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
 		boolean sent = sendSmsResponse.getCode() != null && sendSmsResponse.getCode().equals("OK");
-//		log.info(String.format("The response of sending varification codes is %s", JSON.toJSONString(sendSmsResponse)));
+		if (!sent) {
+			throw new RuntimeException("发送手机验证码失败，原因为：" + JSON.toJSONString(sendSmsResponse));
+			// log.info(String.format("The response of sending varification codes is %s", JSON.toJSONString(sendSmsResponse)));
+		}
 		return sent;
 	}
 

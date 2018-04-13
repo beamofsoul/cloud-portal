@@ -45,7 +45,7 @@ public class OpenUserController {
 	public ResponseEntity addingSlave(@RequestBody User user) {
 		Assert.notNull(user, "ADDING_SLAVE_USER_IS_NULL");
 		
-		if (!OpenUserController.validatePassword(user.getUsername())) {
+		if (!OpenUserController.validateUsername(user.getUsername())) {
 			return ResponseEntity.error("用户名格式有误");
 		}
 		if (!userService.isUsernameUnique(user.getUsername(), null)) {
@@ -151,7 +151,8 @@ public class OpenUserController {
 	}
 	
 	/**
-	 * 更换手机 - 步骤1：输入新手机号码，用户新手机收到找回密码短信验证码，该接口返回找回密码验证码redis中对应的key
+	 * 更换手机 - 步骤1：输入新手机号码，用户新手机收到更新手机短信验证码，该接口返回更新手机验证码redis中对应的key
+	 * @param username 用户名
 	 * @param phone 用户新手机号码
 	 * @return key 下个步骤传回后台用以从redis中获取对应的验证码
 	 */
@@ -166,7 +167,7 @@ public class OpenUserController {
 			if (!validated) {
 				return ResponseEntity.error("手机号码格式无效");
 			}
-			boolean exists = userService.exists(username, phone);
+			boolean exists = userService.existsByUsername(username);
 			if (!exists) {
 				return ResponseEntity.error("未能通过用户名和手机找到任何用户信息");
 			} else {
@@ -197,11 +198,11 @@ public class OpenUserController {
 			if (!validated) {
 				return ResponseEntity.error("手机号码格式无效");
 			}
-			boolean matched = userService.matchPasswordCode(key, code);
+			boolean matched = userService.matchPhoneCode(key, code);
 			if (matched) {
 				boolean updated = userService.updatePhone(key, phone);
 				if (updated) {
-					return ResponseEntity.success("更换手机成功", updated);
+					return ResponseEntity.success("更换手机号码成功", updated);
 				} else {
 					return ResponseEntity.UNKNOWN_ERROR;
 				}
@@ -444,6 +445,9 @@ public class OpenUserController {
 	}
 	
 	static boolean validateUsername(String username) {
+		if (StringUtils.isBlank(username)) {
+			return false;
+		}
 		String regex = "^[\\u4E00-\\u9FA5a-zA-Z][\\u4E00-\\u9FA5a-zA-Z0-9]{5,15}$";
 		return match(username, regex);
 	}

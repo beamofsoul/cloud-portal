@@ -101,6 +101,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User create(User instance, Role role) throws Exception {
 		try {
+			instance.setPassword(passwordEncoder.encode(instance.getPassword()));
 			User savedUser = userRepository.save(instance);
 			if (savedUser != null) {
 				userRoleService.create(new UserRole(savedUser, role));
@@ -317,6 +318,12 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
+	public boolean existsByUsername(String username) {
+		QUser $ = QUser.user;
+		return userRepository.exists($.username.eq(username)); 
+	}
+	
+	@Override
 	public String sendMessageCode(String username, String phone, long currentClientMilliseconds) {
 		// 1. Check whether username and phone are matched
 		boolean exists = exists(username, phone);
@@ -435,6 +442,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String sendMessageCode4RetakingPassword(String username, String phone, Long currentClientMilliseconds) throws Exception {
 		Integer code = messageCodeManager.send(phone);
+		if (code == null) {
+			// 发送失败，可能是由于流量控制或其他原因
+			return null;
+		}
 		long expiredDate = messageCodeManager.getExpiredDate(currentClientMilliseconds);
 		String key = String.format(Constants.SENDING_MESSAGE_CODE.DEFAULT_MESSAGE_CODE_FORMAT, username, phone, expiredDate);
 		redisTemplate.opsForValue().set(key, code, messageCodeManager.getTime2Live(), messageCodeManager.getTimeUnit());
@@ -484,7 +495,20 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean matchPasswordCode(String key, String code) throws Exception {
 		Object storedCode = redisTemplate.opsForValue().get(key);
-		return (storedCode != null && storedCode.equals(code));
+		return (storedCode != null && storedCode.toString().equals(code));
+	}
+	
+	/**
+	 * For Open API
+	 * @param key
+	 * @param code
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean matchPhoneCode(String key, String code) throws Exception {
+		Object storedCode = redisTemplate.opsForValue().get(key);
+		return (storedCode != null && storedCode.toString().equals(code));
 	}
 	
 	/**
@@ -497,7 +521,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean matchRegistrationCode(String key, String code) throws Exception {
 		Object storedCode = redisTemplate.opsForValue().get(key);
-		return (storedCode != null && storedCode.equals(code));
+		return (storedCode != null && storedCode.toString().equals(code));
 	}
 	
 	/**
@@ -507,10 +531,11 @@ public class UserServiceImpl implements UserService {
 	 * @return boolean
 	 * @throws Exception
 	 */
+	@Transactional(readOnly = false)
 	@Override
 	public boolean updatePassword(String key, String newPassword) throws Exception {
-		QUser $ = QUser.user;
-		String[] keyParser = key.substring(key.indexOf(":")).split("#");
+		QUser $ = new QUser("User");
+		String[] keyParser = key.substring(key.indexOf(":") + 1).split("#");
 		return userRepository.update($.password, passwordEncoder.encode(newPassword), $.username.eq(keyParser[0]).and($.phone.eq(keyParser[1]))) > 0;
 	}
 	
@@ -521,10 +546,11 @@ public class UserServiceImpl implements UserService {
 	 * @return boolean
 	 * @throws Exception
 	 */
+	@Transactional(readOnly = false)
 	@Override
 	public boolean updatePhone(String key, String phone) throws Exception {
-		QUser $ = QUser.user;
-		String[] keyParser = key.substring(key.indexOf(":")).split("#");
+		QUser $ = new QUser("User");
+		String[] keyParser = key.substring(key.indexOf(":") + 1).split("#");
 		return userRepository.update($.phone, phone, $.username.eq(keyParser[0]).and($.phone.eq(keyParser[1]))) > 0;
 	}
 	

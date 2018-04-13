@@ -10,8 +10,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Component
 public final class WeChatTokenHelper {
@@ -26,13 +31,13 @@ public final class WeChatTokenHelper {
 	private String accessTokenUrl;
 	
 	@Autowired
-	private RedisTemplate<Object, Object> redisTemplate;
+	private RedisTemplate<String, String> redisTemplate;
 	
 	public Token getToken() {
 		// 判断redis中是否有微信服务号的access_token，如果有则直接返回
 		Object tokenObject = redisTemplate.opsForValue().get(Constants.WECHAT.SERVICE_ACCESS_TOKEN);
 		if (tokenObject != null) {
-			return (Token) tokenObject;
+			return JSONObject.parseObject(tokenObject.toString(), Token.class);
 		}
 		// 如果没有则通过url取一个
 		Token token = getAccessTokenResponse();
@@ -41,7 +46,7 @@ public final class WeChatTokenHelper {
 	}
 	
 	private void saveToken(Token token) {
-		redisTemplate.opsForValue().set(Constants.WECHAT.SERVICE_ACCESS_TOKEN, token, token.getExpiresIn(), TimeUnit.SECONDS);
+		redisTemplate.opsForValue().set(Constants.WECHAT.SERVICE_ACCESS_TOKEN, JSON.toJSONString(token), token.getExpiresIn(), TimeUnit.SECONDS);
 	}
 	
 	@SuppressWarnings({ "unchecked", "serial" })
@@ -55,6 +60,8 @@ public final class WeChatTokenHelper {
 		return Token.builder().accessToken(response.get("access_token").toString()).expiresIn(Long.valueOf(response.get("expires_in").toString())).maketime(new Date().getTime()).build(); 
 	}
 	
+	@AllArgsConstructor
+	@NoArgsConstructor
 	@Data
 	@Builder
 	public static final class Token {

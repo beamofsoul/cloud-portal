@@ -2,10 +2,8 @@ package com.moraydata.general;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import junit.framework.TestCase;
@@ -69,5 +67,31 @@ public class CloudPortalApplicationTest extends TestCase {
 //		System.out.println(isMemeber);
 //		Long removed = redisTemplate.opsForSet().remove("wechat:scan:login:set", "test_open_id2");
 //		System.out.println(removed);
+	}
+	
+//	@Autowired
+//	private UserService userService;
+	
+	@Test
+	public void testUpdatePhone() {
+//		try {
+//			boolean updatePhone = userService.updatePassword("messageCode:beamofsoul#18600574873#1523616098452", "Justin1987.");
+////			boolean updatePhone = userService.updatePhone("messageCode:beamofsoul#18600574873#1523616098452", "15806660675");
+//			System.out.println(updatePhone);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			e.printStackTrace();
+//		}
+	}
+	
+	@Test
+	public void testExistsByUsername() {
+//		try {
+//			boolean flag = userService.existsByUsername("beamofsoul");
+//			System.out.println(flag);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			e.printStackTrace();
+//		}
 	}
 }
