@@ -55,7 +55,7 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
 		
 		public Login saveLoginRecord(User currentUser, HttpServletRequest request, HttpServletResponse response) {
 			Login login = new Login();
-	        login.setUser(currentUser);
+	        login.setUserId(currentUser.getId());
 	        
 	        try {
 				login.setIpAddress(ClientInformationUtils.getIpAddress(request));

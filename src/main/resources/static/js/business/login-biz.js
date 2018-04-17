@@ -21,8 +21,8 @@ parseValuesOnTableEachRow = obj => ({
 });
 
 [queryFormItemName, queryFormItemKey, queryFormItemType] = [
-	['ID','用户','电子邮箱','操作系统','浏览器','IP地址','品牌','型号','屏幕尺寸'],
-	['id','user','email','operatingSystem','browser','ipAddress','brand','model','screenSize'],
+	['ID','用户编号','电子邮箱','操作系统','浏览器','IP地址','品牌','型号','屏幕尺寸'],
+	['id','userId','email','operatingSystem','browser','ipAddress','brand','model','screenSize'],
 	['string','string','string','string','string','string','string','string','string']
 ];
 

@@ -1,17 +1,14 @@
 package com.moraydata.general.primary.entity.query;
 
-import static com.querydsl.core.types.PathMetadataFactory.forVariable;
+import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.querydsl.core.types.dsl.*;
+
+import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
 
 import com.moraydata.general.primary.entity.Login;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.PathMetadata;
-import com.querydsl.core.types.dsl.DateTimePath;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.core.types.dsl.NumberPath;
-import com.querydsl.core.types.dsl.PathInits;
-import com.querydsl.core.types.dsl.StringPath;
 
 
 /**
@@ -20,9 +17,7 @@ import com.querydsl.core.types.dsl.StringPath;
 @Generated("com.querydsl.codegen.EntitySerializer")
 public class QLogin extends EntityPathBase<Login> {
 
-    private static final long serialVersionUID = -1515165546L;
-
-    private static final PathInits INITS = PathInits.DIRECT2;
+    private static final long serialVersionUID = 1092173241L;
 
     public static final QLogin login = new QLogin("login");
 
@@ -48,27 +43,18 @@ public class QLogin extends EntityPathBase<Login> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedDate = _super.updatedDate;
 
-    public final QUser user;
+    public final NumberPath<Long> userId = createNumber("userId", Long.class);
 
     public QLogin(String variable) {
-        this(Login.class, forVariable(variable), INITS);
+        super(Login.class, forVariable(variable));
     }
 
     public QLogin(Path<? extends Login> path) {
-        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
+        super(path.getType(), path.getMetadata());
     }
 
     public QLogin(PathMetadata metadata) {
-        this(metadata, PathInits.getFor(metadata, INITS));
-    }
-
-    public QLogin(PathMetadata metadata, PathInits inits) {
-        this(Login.class, metadata, inits);
-    }
-
-    public QLogin(Class<? extends Login> type, PathMetadata metadata, PathInits inits) {
-        super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new QUser(forProperty("user")) : null;
+        super(Login.class, metadata);
     }
 
 }

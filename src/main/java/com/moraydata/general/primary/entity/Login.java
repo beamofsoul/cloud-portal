@@ -4,8 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -28,9 +26,8 @@ public class Login extends BaseAbstractEntity {
 	@GeneratedValue
 	protected Long id;
 	
-	@ManyToOne
-    @JoinColumn(name = "user_id", columnDefinition = "bigint(20) not null comment '登录用户ID'")
-	private User user;
+	@Column(columnDefinition = "bigint(20) not null comment '登录用户ID'")
+	private Long userId;
 	
 	@Column(columnDefinition = "varchar(20) comment 'IP地址'")
 	private String ipAddress;
