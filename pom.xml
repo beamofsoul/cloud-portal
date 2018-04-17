@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.moraydata.general</groupId>
-	<artifactId>cloud-portal</artifactId>
+	<artifactId>cloud-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>cloud-portal</name>
+	<name>cloud-backend</name>
 	<url>http://maven.apache.org</url>
 	
 	<parent>
