@@ -28,6 +28,7 @@ public final class Constants {
 	
 	public static final class ROLE {
 		public static final String TRIAL_ROLE_NAME = "trial";
+		public static final String MASTER_ROLE_NAME = "master";
 		public static final String SLAVE_ROLE_NAME = "slave";
 	}
 	

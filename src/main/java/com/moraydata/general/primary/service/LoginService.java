@@ -21,4 +21,6 @@ public interface LoginService {
 	Page<Login> get(Pageable pageable, Predicate predicate);
 	List<Login> get();
 	BooleanExpression search(JSONObject conditions);
+	
+	long deleteByUserIds(Long... userIds);
 }

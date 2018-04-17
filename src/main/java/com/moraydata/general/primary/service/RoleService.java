@@ -25,7 +25,7 @@ public interface RoleService {
 	
 	Role get(String name);
 
-	boolean isRoleNameUnique(String roleName, Long roleId);
+	boolean isNameUnique(String roleName, Long roleId);
 	boolean isUsedRoles(Long... roleIds);
 	Role update(Role role, Role originalRole) throws Exception;
 }

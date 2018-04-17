@@ -5,13 +5,6 @@ import static com.moraydata.general.management.util.BooleanExpressionUtils.like;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.toInteger;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.toLocalDateTime;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.toLong;
-import static com.moraydata.general.management.util.ImageUtils.deletePhotoFile;
-import static com.moraydata.general.management.util.ImageUtils.generateImageFilePath;
-import static com.moraydata.general.management.util.ImageUtils.getClearPhotoString;
-import static com.moraydata.general.management.util.ImageUtils.getPhotoType;
-import static com.moraydata.general.management.util.ImageUtils.imageToBase64;
-import static com.moraydata.general.management.util.ImageUtils.makePathEndWithDoubleSalsh;
-import static com.moraydata.general.management.util.ImageUtils.serializeImageFromBase64;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
-import com.moraydata.general.management.annotation.Property;
 import com.moraydata.general.management.message.MessageCodeManager;
 import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.primary.entity.InvitationCode;
@@ -41,6 +33,7 @@ import com.moraydata.general.primary.entity.UserRole;
 import com.moraydata.general.primary.entity.query.QUser;
 import com.moraydata.general.primary.repository.UserRepository;
 import com.moraydata.general.primary.service.InvitationCodeService;
+import com.moraydata.general.primary.service.LoginService;
 import com.moraydata.general.primary.service.RoleService;
 import com.moraydata.general.primary.service.UserRoleService;
 import com.moraydata.general.primary.service.UserService;
@@ -56,9 +49,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service("userService")
 public class UserServiceImpl implements UserService {
 	
-	@Property("project.user.photo-path")
-	private static String USER_PHOTO_PATH;
-
 	@Autowired
 	private UserRepository userRepository;
 	
@@ -80,14 +70,14 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserRoleService userRoleService;
 	
+	@Autowired
+	private LoginService loginService;
+	
 	@Transactional
 	@Override
 	public User create(User instance) {
 		try {
-			final String base64Photo = instance.getPhoto();
-			if (StringUtils.isNotBlank(base64Photo)) {
-				serializeUserPhoto(instance, base64Photo);
-			}
+			instance.setPassword(passwordEncoder.encode(instance.getPassword()));
 			User savedUser = userRepository.save(instance);
 			if (savedUser != null) {
 				userRoleService.create(new UserRole(savedUser, roleService.get(Constants.ROLE.TRIAL_ROLE_NAME)));
@@ -118,41 +108,16 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User update(User instance) {
 		User originalInstance = get(instance.getId());
-		
-		// if the updated user still has a photo
-		final String base64Photo = instance.getPhotoString();
-		if (StringUtils.isNotBlank(base64Photo)) {
-			serializeUserPhoto(instance, base64Photo);
-		} else {
-			// delete photo image file once the updated user's photo has been removed by updating
-			String originalInstancePhoto = originalInstance.getPhoto();
-			if (StringUtils.isNotBlank(originalInstancePhoto)) {
-				deletePhotoFile(generateImageFilePath(USER_PHOTO_PATH, originalInstancePhoto));
-			}
-		}
-		
 		instance.setRoles(originalInstance.getRoles());
 		BeanUtils.copyProperties(instance, originalInstance);
 		return userRepository.save(originalInstance);
 	}
 
-	private void serializeUserPhoto(User instance, final String base64Photo) {
-		String photoContent = getClearPhotoString(base64Photo);
-		String photoType = getPhotoType(base64Photo);
-		String photoPath = generateImageFilePath(USER_PHOTO_PATH, instance.getUsername(), photoType);
-		if (serializeImageFromBase64(photoContent, photoPath)) {
-			instance.setPhoto(photoPath.replace(makePathEndWithDoubleSalsh(USER_PHOTO_PATH), ""));
-			instance.setPhotoString(base64Photo);
-		} else {
-			throw new RuntimeException("failed to generage user's photo when trying to convert base64 code to image");
-		}
-	}
-
-	@Transactional
+	@Transactional(readOnly = false)
 	@Override
 	public long delete(Long... instanceIds) {
-		List<User> users = this.get(instanceIds);
-		users.stream().filter(e -> StringUtils.isNotBlank(e.getPhoto())).forEach(e -> deletePhotoFile(generateImageFilePath(USER_PHOTO_PATH, e.getPhoto())));
+		// 删除所有用户登录记录
+		loginService.deleteByUserIds(instanceIds);
         return userRepository.deleteByIds(instanceIds);
 	}
 
@@ -162,7 +127,6 @@ public class UserServiceImpl implements UserService {
 		User one = userRepository.findOne(instanceId);
 		if (one != null) {
 			Hibernate.initialize(one.getRoles());
-			loadPhotoString(one);
 		}
 		return one;
 	}
@@ -234,7 +198,6 @@ public class UserServiceImpl implements UserService {
 		User currentUser = userRepository.findByUsername(username);
 		if (currentUser != null) {
 			Hibernate.initialize(currentUser.getRoles());
-			loadPhotoString(currentUser);
 		}
 		return currentUser;
 	}
@@ -267,18 +230,6 @@ public class UserServiceImpl implements UserService {
 			predicate = predicate.and(QUser.user.id.ne(userId));
 		}
 		return userRepository.count(predicate) == 0;
-	}
-	
-	private void loadPhotoString(User instance) {
-		try {
-			String photoString = null;
-			if (StringUtils.isNotBlank(instance.getPhoto())) {
-				photoString = imageToBase64(generateImageFilePath(USER_PHOTO_PATH, instance.getPhoto()));
-				instance.setPhotoString(photoString);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 	@Transactional(readOnly = false)
@@ -565,6 +516,9 @@ public class UserServiceImpl implements UserService {
 	 */
 	@Override
 	public User update(User user, User originalUser) throws Exception {
+		// if password is new, encode new password
+		// if password is null, this means the password is still the old one
+		user.setPassword(user.getPassword() != null ? passwordEncoder.encode(user.getPassword()) : originalUser.getPassword());
 		user.setRoles(originalUser.getRoles());
 		BeanUtils.copyProperties(user, originalUser);
 		return userRepository.save(originalUser);

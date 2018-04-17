@@ -44,8 +44,8 @@ public class RolePermissionServiceImpl extends BaseAbstractService implements Ro
 	public boolean updateRolePermissionMapping(RolePermissionMappingDTO dto) {
 		try {
 			// 1. get the original role permission mappings
-			final List<Long> originalIdList = rolePermissionRepository.findByPredicate(QRole.role.id.eq(dto.getRoleId())).stream().map(e -> e.getPermission().getId()).collect(Collectors.toList());
 			final Long roleId = dto.getRoleId();
+			final List<Long> originalIdList = rolePermissionRepository.findByPredicate(QRole.role.id.eq(roleId)).stream().map(e -> e.getPermission().getId()).collect(Collectors.toList());
 			final Set<Long> permissionIds = dto.getPermissionIds();
 			// 2. get all mappings which should be added
 			List<RolePermission> neededList = permissionIds.stream().filter(e -> !originalIdList.contains(e)).map(e -> new RolePermission(roleService.get(roleId), permissionService.get(e))).collect(Collectors.toList());

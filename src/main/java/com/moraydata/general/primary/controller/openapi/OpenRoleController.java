@@ -1,6 +1,9 @@
 package com.moraydata.general.primary.controller.openapi;
 
+import static com.moraydata.general.management.util.RegexUtils.match;
+
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.moraydata.general.management.util.PageUtils;
 import com.moraydata.general.management.util.ResponseEntity;
 import com.moraydata.general.primary.entity.Role;
@@ -36,6 +39,7 @@ public class OpenRoleController {
 	
 	@Autowired
 	private RolePermissionService rolePermissionService;
+	
 	/**
 	 * 角色添加
 	 * @param role 新角色信息
@@ -45,11 +49,21 @@ public class OpenRoleController {
 	public ResponseEntity addition(@RequestBody Role role) {
 		Assert.notNull(role, "ADDITION_ROLE_IS_NULL");
 
-		Role data = roleService.create(role);
-		if (data == null) {
-			return ResponseEntity.UNKNOWN_ERROR;
-		} else {
+		try {
+			if (!OpenRoleController.validateName(role.getName())) {
+				return ResponseEntity.error("角色名称格式错误");
+			}
+			if (!roleService.isNameUnique(role.getName(), null)) {
+				return ResponseEntity.error("角色名称已被使用");
+			}
+			if (role.getPriority() <= 0) {
+				return ResponseEntity.error("角色优先级格式错误");
+			}
+			Role data = roleService.create(role);
 			return ResponseEntity.success("角色添加成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
 		}
 	}
 	
@@ -115,7 +129,7 @@ public class OpenRoleController {
 	 * @param role 更新前的角色信息
 	 * @return Role 更新后的角色信息
 	 */
-	@PutMapping("update")
+	@PutMapping("updating")
 	public ResponseEntity update(@RequestBody Role role) {
 		Assert.notNull(role, "UPDATE_ROLE_IS_NULL");
 		
@@ -127,6 +141,15 @@ public class OpenRoleController {
 			Role originalRole = roleService.get(roleId);
 			if (originalRole == null) {
 				return ResponseEntity.error("角色不存在");
+			}
+			if (!OpenRoleController.validateName(role.getName())) {
+				return ResponseEntity.error("角色名称格式错误");
+			}
+			if (!roleService.isNameUnique(role.getName(), roleId)) {
+				return ResponseEntity.error("角色名称已被使用");
+			}
+			if (role.getPriority() <= 0) {
+				return ResponseEntity.error("角色优先级格式错误");
 			}
 			Role data = roleService.update(role, originalRole);
 			return ResponseEntity.success("更新角色成功", data);
@@ -159,17 +182,17 @@ public class OpenRoleController {
 	
 	/**
 	 * 获取符合查询后的分页角色数据
-	 * @param conditions 每个key对应属性，每个value对应搜索内容
-	 * @param pageable key可以有page、size、sort和direction，具体value针对每个属性值
-	 * @return Page<Order> 查询到的分页数据
+	 * @param map ->
+	 * 				conditions 每个key对应属性，每个value对应搜索内容
+	 * 				pageable key可以有page、size、sort和direction，具体value针对每个属性值
+	 * @return Page<Role> 查询到的分页数据
 	 */
 	@GetMapping("/page")
-	public ResponseEntity page(@RequestParam JSONObject conditions, @RequestParam JSONObject pageable) {
-		Assert.notNull(conditions, "PAGE_CONDITIONS_IS_NULL");
-		Assert.notNull(pageable, "PAGE_PAGEABLE_IS_NULL");
+	public ResponseEntity page(@RequestParam Map<String, Object> map) {
+		Assert.notNull(map, "PAGE_PAGE_IS_NULL");
 		
 		try {
-			Page<Role> data =  roleService.get(PageUtils.parsePageable(pageable), roleService.search(conditions));
+			Page<Role> data =  roleService.get(PageUtils.parsePageable(JSON.parseObject(map.get("pageable").toString())), roleService.search(JSON.parseObject(map.get("conditions").toString())));
 			return ResponseEntity.success("获取分页角色信息成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -184,13 +207,30 @@ public class OpenRoleController {
 	 * @return Page<UserRoleCombineRole> 查询到的分页数据
 	 */
 	@GetMapping("/pageOfUserRole")
-	public ResponseEntity pageOfUserRole(@RequestParam JSONObject conditions, @RequestParam JSONObject pageable) {
-		Assert.notNull(conditions, "PAGE_OF_USER_ROLE_CONDITIONS_IS_NULL");
-		Assert.notNull(pageable, "PAGE_OF_USER_ROLE_PAGEABLE_IS_NULL");
+	public ResponseEntity pageOfUserRole(@RequestParam Map<String, Object> map) {
+		Assert.notNull(map, "PAGE_OF_USER_ROLE_MAP_IS_NULL");
 		
 		try {
-			Page<UserRoleCombineRole> data =  userRoleSerivce.get(PageUtils.parsePageable(pageable), conditions);
+			Page<UserRoleCombineRole> data =  userRoleSerivce.get(PageUtils.parsePageable(JSON.parseObject(map.get("pageable").toString())), JSON.parseObject(map.get("conditions").toString()));
 			return ResponseEntity.success("获取分页用户角色映射信息成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 为某个用户更新用户角色映射
+	 * @param userRoleCombineRole 更新的用户角色对象
+	 * @return UserRoleCombineRole 更新后的用户角色对象
+	 */
+	@PutMapping("/updateOfUserRole")
+	public ResponseEntity updateUserRole(@RequestBody UserRoleCombineRole userRoleCombineRole) {
+		Assert.notNull(userRoleCombineRole, "UPDATE_OF_USER_ROLE_USER_ROLE_COMBINE_ROLE_IS_NULL");
+		
+		try {
+			UserRoleCombineRole data = userRoleSerivce.update(userRoleCombineRole);
+			return ResponseEntity.success("更新用户角色映射成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;
@@ -237,4 +277,9 @@ public class OpenRoleController {
     public void refreshRolePermissionMapping() {
         rolePermissionService.refreshRolePermissionMapping();
     }
+    
+    static boolean validateName(String name) {
+		String regex = "^[\\u4E00-\\u9FA5a-zA-Z][\\u4E00-\\u9FA5a-zA-Z0-9]{2,20}$";
+		return match(name, regex);
+	}
 }

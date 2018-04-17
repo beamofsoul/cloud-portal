@@ -7,15 +7,12 @@ import static com.moraydata.general.management.util.BooleanExpressionUtils.toInt
 import static com.moraydata.general.management.util.BooleanExpressionUtils.toLocalDateTime;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.toLong;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,11 +115,12 @@ public class RoleServiceImpl extends BaseAbstractService implements RoleService 
 	
 	@Override
 	public List<Role> getAllAvailable() {
-		QRole role = new QRole("Role");
-		return roleRepository.findByPredicateAndSort(role.available.eq(true), 
-				new Sort(Direction.ASC, 
-						Arrays.asList(role.priority.getMetadata().getName(),
-								role.id.getMetadata().getName())));
+		return roleRepository.findAllAvailable();
+//		QRole role = new QRole("Role");
+//		return roleRepository.findByPredicateAndSort(role.available.eq(true), 
+//				new Sort(Direction.ASC, 
+//						Arrays.asList(role.priority.getMetadata().getName(),
+//								role.id.getMetadata().getName())));
 	}
 
 	@Override
@@ -196,7 +194,7 @@ public class RoleServiceImpl extends BaseAbstractService implements RoleService 
 //	}
 
 	@Override
-	public boolean isRoleNameUnique(String roleName, Long roleId) {
+	public boolean isNameUnique(String roleName, Long roleId) {
 		BooleanExpression predicate = QRole.role.name.eq(roleName);
 		if (roleId != null) predicate = predicate.and(QRole.role.id.ne(roleId));
 		return !roleRepository.exists(predicate);

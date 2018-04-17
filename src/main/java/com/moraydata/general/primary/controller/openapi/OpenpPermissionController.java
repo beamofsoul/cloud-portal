@@ -1,6 +1,7 @@
 package com.moraydata.general.primary.controller.openapi;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.moraydata.general.management.util.PageUtils;
 import com.moraydata.general.management.util.ResponseEntity;
 import com.moraydata.general.primary.entity.Permission;
@@ -150,18 +151,18 @@ public class OpenpPermissionController {
 	
 	/**
 	 * 获取符合查询后的分页权限数据
-	 * @param conditions 每个key对应属性，每个value对应搜索内容
-	 * @param pageable key可以有page、size、sort和direction，具体value针对每个属性值
-	 * @return Page<Permission> 查询到的分页数据
+	 * @param map ->
+	 * 				conditions 每个key对应属性，每个value对应搜索内容
+	 * 				pageable key可以有page、size、sort和direction，具体value针对每个属性值
+	 * @return Page<Role> 查询到的分页数据
 	 */
 	@GetMapping("/page")
-	public ResponseEntity page(@RequestParam JSONObject conditions, @RequestParam JSONObject pageable) {
-		Assert.notNull(conditions, "PAGE_CONDITIONS_IS_NULL");
-		Assert.notNull(pageable, "PAGE_PAGEABLE_IS_NULL");
+	public ResponseEntity page(@RequestParam Map<String, Object> map) {
+		Assert.notNull(map, "PAGE_PAGE_IS_NULL");
 		
 		try {
-			Page<Permission> data =  permissionService.get(PageUtils.parsePageable(pageable), permissionService.search(conditions));
-			return ResponseEntity.success("获取分页权限信息成功", data);
+			Page<Permission> data =  permissionService.get(PageUtils.parsePageable(JSON.parseObject(map.get("pageable").toString())), permissionService.search(JSON.parseObject(map.get("conditions").toString())));
+			return ResponseEntity.success("获取分页角色信息成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;

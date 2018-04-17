@@ -32,12 +32,6 @@
 
 	<dependencies>
 	
-		<!-- WebScoket -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
-		</dependency>
-	
 		<!-- Spring Security OAuth2-->
         <dependency>
 			<groupId>org.springframework.security.oauth</groupId>
@@ -45,25 +39,6 @@
 			<version>${spring-security-oauth2.version}</version>
 		</dependency>
 	
-		<!-- social 第三方认证实现依赖 -->
-		<dependency>
-			<groupId>org.springframework.social</groupId>
-			<artifactId>spring-social-config</artifactId>
-			<version>${spring-social.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework.social</groupId>
-			<artifactId>spring-social-core</artifactId>
-			<version>${spring-social.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework.social</groupId>
-			<artifactId>spring-social-security</artifactId>
-			<version>${spring-social.version}</version>
-		</dependency>
-		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -107,17 +82,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
-		</dependency>
-		
-		<!-- Page Template Engine Thymeleaf -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-		
-		<dependency>
-		    <groupId>org.thymeleaf.extras</groupId>
-		    <artifactId>thymeleaf-extras-springsecurity4</artifactId>
 		</dependency>
 		
 		<!-- Spring Data JPA -->

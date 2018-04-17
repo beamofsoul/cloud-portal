@@ -80,12 +80,9 @@ public class LoginServiceImpl extends BaseAbstractService implements LoginServic
 		
 		String id = conditions.getString(login.id.getMetadata().getName());
 		exp = addExpression(id, exp, login.id.eq(toLong(id)));
-		
-		String nickname = conditions.getString(login.user.nickname.getMetadata().getName());
-		exp = addExpression(nickname, exp, login.user.nickname.like(like(nickname)));
-		
-		String email = conditions.getString(login.user.email.getMetadata().getName());
-		exp = addExpression(email, exp, login.user.email.like(like(email)));
+
+		String userId = conditions.getString(login.userId.getMetadata().getName());
+		exp = addExpression(userId, exp, login.userId.eq(toLong(userId)));
 		
 		String operatingSystem = conditions.getString(login.operatingSystem.getMetadata().getName());
 		exp = addExpression(operatingSystem, exp, login.operatingSystem.like(like(operatingSystem)));
@@ -106,5 +103,11 @@ public class LoginServiceImpl extends BaseAbstractService implements LoginServic
 		exp = addExpression(screenSize, exp, login.screenSize.like(like(screenSize)));
 		
 		return exp;
+	}
+
+	@Override
+	public long deleteByUserIds(Long... userIds) {
+		QLogin login = new QLogin("Login");
+		return this.loginRepository.deleteByPredicate(login.userId.in(userIds));
 	}
 }

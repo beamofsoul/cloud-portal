@@ -138,7 +138,7 @@ public class RoleController {
         Long roleId = params.containsKey(Constants.ENTITY.DEFAULT_PRIMARY_KEY) ? 
 				Long.valueOf(params.get(Constants.ENTITY.DEFAULT_PRIMARY_KEY).toString()) : 
 				null;
-        return roleService.isRoleNameUnique(roleName, roleId);
+        return roleService.isNameUnique(roleName, roleId);
     }
 
 	@ApiOperation(value="判断某些角色是否已经被用户使用", notes="根据一个或多个角色ID判断是否该角色ID所对应的用户角色映射被使用过")

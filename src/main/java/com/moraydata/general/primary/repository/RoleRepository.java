@@ -7,7 +7,7 @@ import com.moraydata.general.management.repository.BaseMultielementRepository;
 import com.moraydata.general.primary.entity.Role;
 
 @Repository
-public interface RoleRepository extends BaseMultielementRepository<Role,Long> {
+public interface RoleRepository extends BaseMultielementRepository<Role,Long>, RoleRepositoryCustom<Role, Long> {
 	
 	Role findByName(String name);
 }
