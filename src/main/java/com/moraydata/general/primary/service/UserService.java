@@ -56,4 +56,13 @@ public interface UserService {
 	boolean existsByUsername(String username) throws Exception;
 	User create(User instance, Role role) throws Exception;
 	boolean isPhoneUnique(String phone, Long userId) throws Exception;
+	boolean bindWeChat(String username, String openId) throws Exception;
+	boolean isOpenIdUnique(String openId) throws Exception;
+	boolean updateProfile(User user) throws Exception;
+	boolean exists(Long userId) throws Exception;
+	List<User> getByParentId(Long userId) throws Exception;
+	Integer getCountOfInvitationCodes(Long userId) throws Exception;
+	boolean decreaseCountOfInvitationCodes(Long userId, int many) throws Exception;
+	boolean update(Long userId, String password, String phone, String description) throws Exception;
+	boolean matchRelationship(Long userId, Long... userIds) throws Exception;
 }

@@ -96,6 +96,13 @@ public class QuerydslUtils {
 		return update;
 	}
 	
+	public static <S> JPAUpdateClause newUpdate(@NonNull EntityManager entityManager, @NonNull EntityPathBase<?> entityPath, @NonNull Path<S> path, Expression<S> exp, Predicate predicate) {
+		JPAUpdateClause update = newUpdate(entityManager, entityPath);
+		update.set(path, exp);
+		if (predicate != null) update.where(predicate);
+		return update;
+	}
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> JPAQuery<T> initQuery(@NonNull EntityManager entityManager, @NonNull EntityPathBase<?> entityPath,@NonNull Pageable pageable, Predicate predicate) {
 		/**
@@ -161,6 +168,10 @@ public class QuerydslUtils {
 	
 	public static <S> long doUpdate(@NonNull EntityManager entityManager, @NonNull EntityPathBase<?> entityPath, @NonNull List<? extends Path<?>> paths,@NonNull List<?> values, Predicate predicate) {
 		return newUpdate(entityManager, entityPath, paths, values, predicate).execute();
+	}
+	
+	public static <S> long doUpdate(@NonNull EntityManager entityManager, @NonNull EntityPathBase<?> entityPath, @NonNull Path<S> path, Expression<S> exp, Predicate predicate) {
+		return newUpdate(entityManager, entityPath, path, exp, predicate).execute();
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

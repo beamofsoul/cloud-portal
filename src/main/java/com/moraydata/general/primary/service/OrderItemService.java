@@ -26,4 +26,5 @@ public interface OrderItemService {
 	
 	OrderItem update(OrderItem orderItem, OrderItem originalOrderItem) throws Exception;
 	List<OrderItem> get(Long userId, Long... serviceIds) throws Exception;
+	List<OrderItem> getByUserId(Long userId) throws Exception;
 }

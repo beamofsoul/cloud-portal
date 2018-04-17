@@ -211,28 +211,35 @@ public class OpenWeChatController {
 		pw.close();
 	}
 	
-	@Transactional
+	@Transactional(readOnly = false)
 	private void processScanLoginScene(String sceneId, String fromUserName) throws Exception {
-		// 通过前台页面扫码登录
-		User targetUser = getTargetUser(fromUserName);
-		if (targetUser == null) {
-			// 该用户未在系统中注册，则创建用户账号
-			targetUser = User
-							.builder()
-							.username(fromUserName)
-							.password(passwordEncoder.encode(defaultPassword))
-							.openId(fromUserName)
-							.status(User.Status.NORMAL.getValue())
-							.build();
-			targetUser = createTargetUser(targetUser);
+		if (sceneId.endsWith(Constants.WECHAT.SCAN_LOGIN_SCENE_ID_FUNCTIONALITY_KEY)) {
+			// 通过前台页面扫码登录
+			User targetUser = getTargetUser(fromUserName);
 			if (targetUser == null) {
-				throw new RuntimeException("微信扫码登录过程中自动创建用户记录失败");
+				// 该用户未在系统中注册，则创建用户账号
+				targetUser = User
+								.builder()
+								.username(fromUserName)
+								.password(passwordEncoder.encode(defaultPassword))
+								.openId(fromUserName)
+								.status(User.Status.NORMAL.getValue())
+								.build();
+				targetUser = createTargetUser(targetUser);
+				if (targetUser == null) {
+					throw new RuntimeException("微信扫码登录过程中自动创建用户记录失败");
+				}
+			} else {
+				// 该用户已经是系统中用户
 			}
+			// 向前台登录页面发送websocket message，通知前端为用户自动登录
+			DefaultWebSocketHandler.sendMessageToAutomaticLogin(sceneId + Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR + fromUserName);
+		} else if (sceneId.endsWith(Constants.WECHAT.SCAN_BIND_WECHAT_SCENE_ID_FUNCTIONALITY_KEY)) {
+			// 通过前台个人中心扫码绑定微信
+			DefaultWebSocketHandler.sendMessageToBindWeChat(sceneId + Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR + fromUserName);
 		} else {
-			// 该用户已经是系统中用户
+			
 		}
-		// 向前台登录页面发送websocket message，通知前端为用户自动登录
-		DefaultWebSocketHandler.sendMessageToAutomaticLogin(sceneId + Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR + fromUserName);
 	}
 
 	private User createTargetUser(User targetUser) {

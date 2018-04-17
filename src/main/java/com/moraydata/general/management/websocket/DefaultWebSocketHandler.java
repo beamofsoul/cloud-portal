@@ -3,6 +3,7 @@ package com.moraydata.general.management.websocket;
 import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,8 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.moraydata.general.management.util.Constants;
+import com.moraydata.general.management.util.SpringUtils;
+import com.moraydata.general.primary.service.UserService;
 
 @Async
 @Component
@@ -36,14 +39,26 @@ public class DefaultWebSocketHandler implements WebSocketHandler {
 	@Override
 	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
 		if (session.isOpen()) {
-			String payload = message.getPayload().toString();
-			if (payload.startsWith("sendAll#")) {
-				sendMessageToAll(new TextMessage(payload.split("#")[1]));
-			} else {
-				// Set an attribute to current session for each login page on PC ends. 
-				// The value of payload from PC ends will be a random integer which will be used to ensure uniqueness of sceneId.
-				session.getAttributes().put("unicode", payload);
-				session.sendMessage(new TextMessage("Server has received message : " + payload));
+			synchronized (session) {
+				String payload = message.getPayload().toString();
+				if (payload.startsWith("sendAll#")) {
+					sendMessageToAll(new TextMessage(payload.split("#")[1]));
+				} else {
+					// 2018-04-16 addition to support binding WeChat by scanning QR code
+					if (payload.indexOf(Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR) > -1) {
+						if (payload.indexOf(Constants.WECHAT.SCAN_BIND_WECHAT_KEY) > -1) {
+							String[] mixedValues = payload.split(Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR);
+							String username = mixedValues[1];
+							session.getAttributes().put(Constants.WECHAT.SCAN_USERNAME_KEY, username);
+						}
+					} else {
+						// Set an attribute to current session for each login page on PC ends. 
+						// The value of payload from PC ends will be a random integer which will be used to ensure uniqueness of sceneId.
+						session.getAttributes().put(Constants.WECHAT.SCAN_SCENE_ID_KEY, payload);					
+					}
+	
+					session.sendMessage(new TextMessage("Server has received message : " + payload));
+				}
 			}
 		}
 	}
@@ -58,14 +73,14 @@ public class DefaultWebSocketHandler implements WebSocketHandler {
 		return false;
 	}
 	
-	public static void sendMessageToAutomaticLogin(String sceneId) {
+	public static void sendMessageToAutomaticLogin(String sceneId) throws Exception {
 		// The value of input parameter "sceneId" will be formatted as [unicode/sceneId + "####" + openId].
 		String[] mixedValues = sceneId.split(Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR);
 		String unicode = mixedValues[0];
 		String openId = mixedValues[1];
 		// Find out which web socket session has an attribute which is same as the last part of given sceneId.
 		// This is the PC end which is required to process scanning login functionality.
-		webSocketSet.stream().filter(e -> (e.getAttributes().containsKey("unicode") && e.getAttributes().get("unicode").equals(unicode))).forEach(e -> {
+		webSocketSet.stream().filter(findOutCurrentSession(unicode)).forEach(e -> {
 			if (e.isOpen()) {
 				try {
 					// Send a text message of openId to the PC end to make sure it has able to login automatically for the user.
@@ -75,6 +90,42 @@ public class DefaultWebSocketHandler implements WebSocketHandler {
 				}
 			}
 		});
+	}
+	
+	public static void sendMessageToBindWeChat(String sceneId) throws Exception {
+		// The value of input parameter "sceneId" will be formatted as [unicode/sceneId + "####" + openId].
+		String[] mixedValues = sceneId.split(Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR);
+		String unicode = mixedValues[0];
+		String openId = mixedValues[1];
+		// Find out which web socket session has an attribute which is same as the last part of given sceneId.
+		// This is the PC end which is required to process scanning binding WeChat functionality.
+		webSocketSet.stream().filter(findOutCurrentSession(unicode)).forEach(e -> {
+			if (e.isOpen()) {
+				try {
+					if (e.getAttributes().containsKey(Constants.WECHAT.SCAN_USERNAME_KEY) || e.getAttributes().get(Constants.WECHAT.SCAN_USERNAME_KEY) == null) {
+						Object usernameObject = e.getAttributes().get(Constants.WECHAT.SCAN_USERNAME_KEY);
+						UserService service = SpringUtils.getBean(UserService.class);
+						// Check whether given openId has been used
+						boolean openIdUnique = service.isOpenIdUnique(openId);
+						if (!openIdUnique) {
+							// If used, warn it
+							e.sendMessage(new TextMessage(Constants.WECHAT.SCAN_BIND_WECHAT_KEY + Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR + Constants.RESPONSE_ENTITY.ERROR));
+							return;
+						}
+						service.bindWeChat(usernameObject.toString(), openId);
+						e.sendMessage(new TextMessage(Constants.WECHAT.SCAN_BIND_WECHAT_KEY + Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR + openId));
+					} else {
+						throw new RuntimeException("Failed to bind WeChat for current login user, because its' username cannot be found in its' session");
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+	}
+
+	private static Predicate<? super WebSocketSession> findOutCurrentSession(String unicode) {
+		return e -> (e.getAttributes().containsKey(Constants.WECHAT.SCAN_SCENE_ID_KEY) && e.getAttributes().get(Constants.WECHAT.SCAN_SCENE_ID_KEY).equals(unicode));
 	}
 	
 	public static void sendMessageToAll(WebSocketMessage<?> message) {

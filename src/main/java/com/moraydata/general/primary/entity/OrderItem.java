@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -45,6 +46,9 @@ public class OrderItem extends BaseAbstractEntity {
 	@Column(columnDefinition = "bigint not null comment '服务ID'")
 	private Long serviceId;
 	
+	@Transient
+	private String serviceName;
+	
 	@Column(columnDefinition = "varchar(100) comment '备注'")
 	private String description;
 	
@@ -64,6 +68,9 @@ public class OrderItem extends BaseAbstractEntity {
 	private Integer status;
 	
 	public Status getStatusEnum() {
+		if (this.status == null) {
+			return null;
+		}
 		return Status.getInstance(status);
 	}
 	

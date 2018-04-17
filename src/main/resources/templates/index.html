@@ -11,7 +11,8 @@
         <hr>
         
 		<a href="javascript:getQRCodeUrl()">GetQRCode</a> | 
-		<a href="javascript:sendTemplateMessage()">SendTemplateMessage</a>
+		<a href="javascript:sendTemplateMessage()">SendTemplateMessage</a> |
+		<a href="javascript:getQRCodeUrl()">GetQRCode2BindWechat</a>
 		<hr>
 		<img id="qrcode" style="widows: 400px;height: 400px;border: 1px solid black;">
     </body>
@@ -59,9 +60,17 @@
 		    console.log('websocket: connection heartbeat...');
 		};
 		websocket.onmessage = function(e) {
-			if (e.data.indexOf("AUTOMATIC_LOGIN") != -1) {
-				websocket.onclose();
-				helpToLoginAutomatically(e);
+// 			if (e.data.indexOf("AUTOMATIC_LOGIN") != -1) {
+// 				websocket.onclose();
+// 				helpToLoginAutomatically(e);
+// 			} else 
+			if (e.data.indexOf("BIND_WECHAT####") != -1) {
+				console.log('websocket:', e.data)
+				// BIND_WECHAT####openId
+				// 前端获取到openId，将openId更新到当前用户cookie中
+				
+				// BIND_WECHAT####100001
+				// 绑定失败：当前openId已经被使用过，也是就说同一个微信不能绑定多个用户
 			} else {
 				console.log('websocket:', e.data);
 			}
@@ -69,8 +78,16 @@
 		
 		// 1. 用户加载登录页面，JS自动生成unicode，并且2秒钟后自动发送给websocket服务器将unicode存储在WebSocketSession中
 		$(function() {
-			unicode = Math.round(Math.random() * 1000000000);
+// 			// 为了将当前session绑定到websocket服务器中
+// 			unicode = Math.round(Math.random() * 100000000);
+// 			setTimeout("websocket.send("+unicode+"1)", 2000); // 向websocket服务器发送message，与websocket服务器存储的特定session进行绑定
+			
+			// 为了将当前session标识为已登录但是未绑定微信的用户在个人中心绑定微信
+			// 为了将当前session绑定到websocket服务器中
+			unicode = Math.round(Math.random() * 100000000) + "2";
 			setTimeout("websocket.send("+unicode+")", 2000); // 向websocket服务器发送message，与websocket服务器存储的特定session进行绑定
+			var username = "beamofsoul"; // 此处为已登录用户用户名
+			setTimeout("websocket.send('BIND_WECHAT####beamofsoul')", 2000);
 	    }); 
 		// 2. 用户点击微信扫码按钮，将unicode用作sceneId随机生成二维码，并在当前页面不跳转的情况下显示给当前用户
 		function getQRCodeUrl() {

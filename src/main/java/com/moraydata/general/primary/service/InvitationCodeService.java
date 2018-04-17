@@ -23,7 +23,7 @@ public interface InvitationCodeService {
 	
 	InvitationCode get(String code);
 	InvitationCode get(String code, Type type);
-	List<InvitationCode> create(Long userId, int numberOfCodes, Type type);
+	List<InvitationCode> create(Long userId, int numberOfCodes, Type type) throws Exception;
 	long delete(String code);
 	long updateAvailable(String code, boolean available);
 }

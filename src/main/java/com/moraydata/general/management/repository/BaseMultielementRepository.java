@@ -35,6 +35,7 @@ public interface BaseMultielementRepository<T, ID extends Serializable> extends 
 	<S> long update(Path<S> path, S value, Predicate predicate);
 	long update(List<? extends Path<?>> paths, List<?> values);
 	long update(List<? extends Path<?>> paths, List<?> values, Predicate predicate);
+	<S> long update(Path<S> path, Expression<S> exp, Predicate predicate);
 	Long deleteByPredicate(Predicate predicate);
 	QueryResults<ID> findPageableIds(Pageable pageable);
 	QueryResults<ID> findPageableIds(Pageable pageable, Predicate predicate);

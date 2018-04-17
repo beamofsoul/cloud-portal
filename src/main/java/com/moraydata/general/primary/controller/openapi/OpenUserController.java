@@ -45,23 +45,45 @@ public class OpenUserController {
 	public ResponseEntity addingSlave(@RequestBody User user) {
 		Assert.notNull(user, "ADDING_SLAVE_USER_IS_NULL");
 		
-		if (!OpenUserController.validateUsername(user.getUsername())) {
-			return ResponseEntity.error("用户名格式有误");
-		}
-		if (!userService.isUsernameUnique(user.getUsername(), null)) {
-			return ResponseEntity.error("用户名已被使用");
-		}
-		if (!OpenUserController.validatePassword(user.getPassword())) {
-			return ResponseEntity.error("密码格式有误");
-		}
-		if (StringUtils.isNotBlank(user.getPhone())) {
-			if (!OpenUserController.validatePhone(user.getPhone())) {
-				return ResponseEntity.error("手机号码格式有误");
-			}
-		}
 		try {
+			if (!OpenUserController.validateUsername(user.getUsername())) {
+				return ResponseEntity.error("用户名格式有误");
+			}
+			if (!userService.isUsernameUnique(user.getUsername(), null)) {
+				return ResponseEntity.error("用户名已被使用");
+			}
+			if (!OpenUserController.validatePassword(user.getPassword())) {
+				return ResponseEntity.error("密码格式有误");
+			}
+			if (StringUtils.isNotBlank(user.getPhone())) {
+				if (!OpenUserController.validatePhone(user.getPhone())) {
+					return ResponseEntity.error("手机号码格式有误");
+				}
+				if (!userService.isPhoneUnique(user.getPhone(), null)) {
+					return ResponseEntity.error("手机号码已被使用");
+				}
+			}
+		
 			User data = userService.create(user, roleService.get(Constants.ROLE.SLAVE_ROLE_NAME));
 			return ResponseEntity.success("用户注册成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 通过主用户userId获取子用户信息列表
+	 * @param userId 主用户userId
+	 * @return List<User> 获取到的子用户信息列表
+	 */
+	@GetMapping("slaves")
+	public ResponseEntity slaves(@RequestParam Long userId) {
+		Assert.notNull(userId, "SLAVES_USER_ID_IS_NULL");
+		
+		try {
+			List<User> data = userService.getByParentId(userId);
+			return ResponseEntity.success("获取子用户信息列表成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;
@@ -198,6 +220,9 @@ public class OpenUserController {
 			if (!validated) {
 				return ResponseEntity.error("手机号码格式无效");
 			}
+			if (userService.isPhoneUnique(phone, null)) {
+				return ResponseEntity.error("手机号码已被使用");
+			}
 			boolean matched = userService.matchPhoneCode(key, code);
 			if (matched) {
 				boolean updated = userService.updatePhone(key, phone);
@@ -326,6 +351,96 @@ public class OpenUserController {
 	}
 	
 	/**
+	 * 更新子账号信息
+	 * @param userId 子账号Id
+	 * @param password 子账号的新密码
+	 * @param phone 子账号的新手机号码
+	 * @param description 子账号的新描述信息
+	 * @return boolean 是否更新成功
+	 */
+	@PutMapping("updateSlave")
+	public ResponseEntity updateSlave(@RequestParam Long userId, @RequestParam(required = false) String password, @RequestParam(required = false) String phone, @RequestParam(required = false) String description) {
+		Assert.notNull(userId, "UPDATE_SLAVE_USER_IS_NULL");
+		
+		try {
+			if (password == phone && phone == description && password == null) {
+				return ResponseEntity.error("无效的更新参数");
+			}
+			if (StringUtils.isNotBlank(password)) {
+				if (!validatePassword(password)) {
+					return ResponseEntity.error("密码格式错误");
+				}
+			}
+			if (StringUtils.isNotBlank(phone)) {
+				if (!validatePhone(phone)) {
+					return ResponseEntity.error("手机号码格式错误");
+				}
+				if (!userService.isPhoneUnique(phone, userId)) {
+					return ResponseEntity.error("手机号码已被使用");
+				}
+			}
+			if (!validateSize(description, 20)) {
+				return ResponseEntity.error("描述格式错误");
+			}
+			boolean data = userService.update(userId, password, phone, description);
+			return ResponseEntity.success("更新子用户信息成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 更新特定用户信息(包括姓名和所有和公司有关的信息)
+	 * @param user 更新前的用户信息
+	 * @return boolean 是否成功更新
+	 */
+	@PutMapping("updateProfile")
+	public ResponseEntity updateProfile(@RequestBody User user) {
+		Assert.notNull(user, "UPDATE_PROFILE_USER_IS_NULL");
+		
+		try {
+			Long userId = user.getId();
+			if (userId == null || userId == 0) {
+				return ResponseEntity.error("更新用户简况时用户编号不存在");
+			}
+			if (!userService.exists(userId)) {
+				return ResponseEntity.error("用户不存在");
+			}
+			if (!(StringUtils.isNotBlank(user.getNickname()) && validateNickname(user.getNickname()))) {
+				return ResponseEntity.error("用户姓名格式错误");
+			}
+			if (user.getCompany() != null && !validateSize(user.getCompany(), 20)) {
+				return ResponseEntity.error("所属单位格式错误");
+			}
+			if (user.getCompanyTitle() != null && !validateSize(user.getCompanyTitle(), 10)) {
+				return ResponseEntity.error("职务格式错误");
+			}
+			if (user.getCompanyLocation() != null && !validateSize(user.getCompanyLocation(), 20)) {
+				return ResponseEntity.error("企业所在地格式错误");
+			}
+			if (user.getCompanyType() != null && !validateSize(user.getCompanyType(), 10)) {
+				return ResponseEntity.error("企业类型格式错误");
+			}
+			if (user.getCompanyPhone() != null && !validateSize(user.getCompanyPhone(), 20)) {
+				return ResponseEntity.error("企业联系电话格式错误");
+			}
+			if (user.getCompanyFax() != null && !validateSize(user.getCompanyFax(), 20)) {
+				return ResponseEntity.error("企业传真格式错误");
+			}
+			if (user.getDescription() != null && !validateSize(user.getDescription(), 20)) {
+				return ResponseEntity.error("描述格式错误");
+			}
+			
+			boolean data = userService.updateProfile(user);
+			return ResponseEntity.success("更新用户简况成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
 	 * 删除单个或多个用户信息
 	 * @param userIds 删除单个用户或多个以用户编号为数组的用户信息
 	 * @return long 有多少条用户信息被删除了
@@ -336,10 +451,36 @@ public class OpenUserController {
 		
 		try {
 			if (userIds.length == 0) {
-				return ResponseEntity.error("用户编号集合长度为0");
+				return ResponseEntity.error("用户编号数组长度为0");
 			}
 			long data = userService.delete(userIds);
-			return ResponseEntity.success("删除用户信息集合成功", data);
+			return ResponseEntity.success("删除用户信息成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 删除单个或多个子用户信息
+	 * @param userId 主账号用户Id
+	 * @param userIds 单个或子账号用户Id列表
+	 * @return long 有多少条用户信息被删除了
+	 */
+	@DeleteMapping("deletionSlaves")
+	public ResponseEntity deletionSlaves(@RequestParam Long userId, @RequestParam Long... userIds) {
+		Assert.notNull(userId, "DELETION_SLAVES_USER_ID_IS_NULL");
+		Assert.notNull(userIds, "DELETION_SLAVES_USER_IDS_IS_NULL");
+		
+		try {
+			if (userIds.length == 0) {
+				return ResponseEntity.error("子账号编号数组长度为0");
+			}
+			if (!userService.matchRelationship(userId, userIds)) {
+				return ResponseEntity.error("输入的主账号和子账号之间并无父子关系");
+			}
+			long data = userService.delete(userIds);
+			return ResponseEntity.success("删除子账号用户信息成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;
@@ -428,6 +569,31 @@ public class OpenUserController {
 	}
 	
 	/**
+	 * 更新子账号服务订单细则编号
+	 * @param orderItemIds 新的用户服务订单细则编号
+	 * @param masterUserId 目标用户的主账号Id
+	 * @param userId 目标用户
+	 * @return boolean 是否更新成功
+	 */
+	@PutMapping("updateSlaveOrderItems")
+	public ResponseEntity changingOrderItemIds(@RequestParam Long masterUserId, @RequestParam String orderItemIds, @RequestParam Long userId) {
+		Assert.notNull(orderItemIds, "CHANGING_ORDER_ITEM_IDS_ORDER_ITEM_IDS_IS_NULL");
+		Assert.notNull(userId, "CHANGING_ORDER_ITEM_IDS_USER_ID_IS_NULL");
+		Assert.notNull(masterUserId, "CHANGING_ORDER_ITEM_IDS_MASTER_USER_ID_IS_NULL");
+		
+		try {
+			if (!userService.matchRelationship(masterUserId, userId)) {
+				return ResponseEntity.error("输入的主账号和子账号之间并无父子关系");
+			}
+			boolean data = userService.updateOrderItemIds(userId, orderItemIds);
+			return ResponseEntity.success("更新子账号服务订单细则编号成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
 	 * 获取符合查询后的分页用户数据
 	 * @param conditions 每个key对应属性，每个value对应搜索内容
 	 * @param pageable key可以有page、size、sort和direction，具体value针对每个属性值
@@ -458,14 +624,14 @@ public class OpenUserController {
 	}
 	
 	static boolean validatePassword(String password) {
+		if (StringUtils.isBlank(password)) {
+			return false;
+		}
 		String regex = "^[a-zA-Z][a-zA-Z0-9]{5,15}$";
 		return match(password, regex);
 	}
 	
 	static boolean validateNickname(String nickname) {
-		if (StringUtils.isBlank(nickname)) {
-			return true;
-		}
 		String regex = "^[\\u4E00-\\u9FA5]{0,10}$";
 		return match(nickname, regex);
 	}

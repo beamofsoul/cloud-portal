@@ -6,6 +6,6 @@ import com.moraydata.general.management.repository.BaseMultielementRepository;
 import com.moraydata.general.primary.entity.OrderItem;
 
 @Repository
-public interface OrderItemRepository extends BaseMultielementRepository<OrderItem, Long> {
+public interface OrderItemRepository extends BaseMultielementRepository<OrderItem, Long>, OrderItemRepositoryCustom<OrderItem, Long> {
 
 }

@@ -13,6 +13,7 @@ import static com.moraydata.general.management.util.ImageUtils.imageToBase64;
 import static com.moraydata.general.management.util.ImageUtils.makePathEndWithDoubleSalsh;
 import static com.moraydata.general.management.util.ImageUtils.serializeImageFromBase64;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -45,6 +46,7 @@ import com.moraydata.general.primary.service.UserRoleService;
 import com.moraydata.general.primary.service.UserService;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
@@ -614,9 +616,10 @@ public class UserServiceImpl implements UserService {
 	 * @return boolean
 	 * @throws Exception
 	 */
+	@Transactional(readOnly = false)
 	@Override
 	public boolean updateOrderItemIds(Long userId, String orderItemIds) throws Exception {
-		QUser $ = QUser.user;
+		QUser $ = new QUser("User");
 		return userRepository.update($.orderItemIds, orderItemIds, $.id.eq(userId)) > 0;
 	}
 
@@ -657,5 +660,163 @@ public class UserServiceImpl implements UserService {
 			predicate = predicate.and(QUser.user.id.ne(userId));
 		}
 		return userRepository.count(predicate) == 0;
+	}
+
+	/**
+	 * For Open API
+	 * @param username
+	 * @param openId
+	 * @throws Exception
+	 */
+	@Transactional(readOnly = false)
+	@Override
+	public boolean bindWeChat(String username, String openId) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.update($.openId, openId, $.username.eq(username)) > 0;
+	}
+
+	/**
+	 * For Open API
+	 * @param openId
+	 * @throws Exception
+	 */
+	@Override
+	public boolean isOpenIdUnique(String openId) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.count($.openId.eq(openId)) == 0;
+	}
+
+	/**
+	 * For Open API
+	 * @param user
+	 * @throws Exception
+	 */
+	@Transactional(readOnly = false)
+	@Override
+	public boolean updateProfile(User user) throws Exception {
+		QUser $ = new QUser("User");
+		List<Path<?>> path = new ArrayList<>();
+		List<String> value = new ArrayList<>();
+		if (user.getNickname() != null) {
+			path.add($.nickname);
+			value.add(user.getNickname());
+		}
+		if (user.getCompany() != null) {
+			path.add($.company);
+			value.add(user.getCompany());
+		}
+		if (user.getCompanyTitle() != null) {
+			path.add($.companyTitle);
+			value.add(user.getCompanyTitle());
+		}
+		if (user.getCompanyLocation() != null) {
+			path.add($.companyLocation);
+			value.add(user.getCompanyLocation());
+		}
+		if (user.getCompanyType() != null) {
+			path.add($.companyType);
+			value.add(user.getCompanyType());
+		}
+		if (user.getCompanyPhone() != null) {
+			path.add($.companyPhone);
+			value.add(user.getCompanyPhone());
+		}
+		if (user.getCompanyFax() != null) {
+			path.add($.companyFax);
+			value.add(user.getCompanyFax());
+		}
+		if (user.getDescription() != null) {
+			path.add($.description);
+			value.add(user.getDescription());
+		}
+		return path.isEmpty() ? false : userRepository.update(path, value, $.id.eq(user.getId())) > 0;
+	}
+
+	@Override
+	public boolean exists(Long userId) throws Exception {
+		return userRepository.existsById(userId);
+	}
+
+	/**
+	 * For Open API
+	 * @param userId
+	 * @throws Exception
+	 */
+	@Override
+	public List<User> getByParentId(Long userId) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.findByPredicate($.parentId.eq(userId));
+	}
+	
+	/**
+	 * For Open API
+	 * @param userId
+	 * @return Integer
+	 * @throws Exception
+	 */
+	@Override
+	public Integer getCountOfInvitationCodes(Long userId) throws Exception {
+		User currentUser = this.get(userId);
+		if (currentUser == null) {
+			return null;
+		} else {
+			return currentUser.getCountOfInvitationCodes();
+		}
+	}
+
+	/**
+	 * For Open API
+	 * @param userId
+	 * @param many
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean decreaseCountOfInvitationCodes(Long userId, int many) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.update($.countOfInvitationCodes, $.countOfInvitationCodes.subtract(many), $.id.eq(userId)) > 0;
+	}
+	
+	/**
+	 * For Open API
+	 * @param userId
+	 * @param password
+	 * @param phone
+	 * @param description
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Transactional(readOnly = false)
+	@Override
+	public boolean update(Long userId, String password, String phone, String description) throws Exception {
+		QUser $ = new QUser("User");
+		List<Path<?>> path = new ArrayList<>();
+		List<String> value = new ArrayList<>();
+		if (StringUtils.isNotBlank(password)) {
+			path.add($.password);
+			value.add(passwordEncoder.encode(password));
+		}
+		if (StringUtils.isNotBlank(phone)) {
+			path.add($.phone);
+			value.add(phone);
+		}
+		if (StringUtils.isNotBlank(description)) {
+			path.add($.description);
+			value.add(description);
+		}
+		return userRepository.update(path, value, $.id.eq(userId)) > 0;
+	}
+
+	/**
+	 * For Open API
+	 * @param userId
+	 * @param userIds
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean matchRelationship(Long userId, Long... userIds) throws Exception {
+		QUser $ = QUser.user;
+		return userRepository.count($.id.in(userIds).and($.parentId.eq(userId))) == userIds.length; 
 	}
 }

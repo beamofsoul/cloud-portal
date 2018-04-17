@@ -23,6 +23,7 @@ import com.moraydata.general.primary.entity.InvitationCode.Type;
 import com.moraydata.general.primary.entity.query.QInvitationCode;
 import com.moraydata.general.primary.repository.InvitationCodeRepository;
 import com.moraydata.general.primary.service.InvitationCodeService;
+import com.moraydata.general.primary.service.UserService;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
@@ -31,6 +32,9 @@ public class InvitationCodeServiceImpl extends BaseAbstractService implements In
 
 	@Autowired
 	private InvitationCodeRepository invitationCodeRepository;
+	
+	@Autowired
+	private UserService userService;
 
 	@Override
 	@Transactional
@@ -102,13 +106,15 @@ public class InvitationCodeServiceImpl extends BaseAbstractService implements In
 		return invitationCodeRepository.findByCodeAndType(code, type.getValue());
 	}
 
+	@Transactional(readOnly = false)
 	@Override
-	public List<InvitationCode> create(Long userId, int numberOfCodes, Type type) {
+	public List<InvitationCode> create(Long userId, int numberOfCodes, Type type) throws Exception {
 		if (numberOfCodes > 0 && userId != null && userId.longValue() != 0L) {
 			List<InvitationCode> entities = new ArrayList<InvitationCode>();
 			for (int i = 0; i < numberOfCodes; i++) {
 				entities.add(new InvitationCode(null, userId, InvitationCodeUtils.generate(), null, true, type.getValue()));
 			}
+			userService.decreaseCountOfInvitationCodes(userId, numberOfCodes);
 			return invitationCodeRepository.saveAll(entities);
 		}
 		return new ArrayList<InvitationCode>(0);

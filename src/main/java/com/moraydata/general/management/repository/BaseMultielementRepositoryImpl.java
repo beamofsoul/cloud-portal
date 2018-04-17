@@ -264,7 +264,20 @@ public class BaseMultielementRepositoryImpl<T,ID extends Serializable> extends Q
 	@Override
 	public long update(List<? extends Path<?>> paths, List<?> values, Predicate predicate) {
 		return doUpdate(entityManager, entityPath, paths, values, predicate);
-	} 
+	}
+	
+	/**
+	 * @Title: update
+	 * @Description: 根据path与expression值批量修改数据库表中的记录
+	 * @param path 需要修改的字段
+	 * @param exp 修改后的表达式
+	 * @param predicate 修改的条件
+	 * @return long 修改了多少条记录
+	 */
+	@Override
+	public <S> long update(Path<S> path, Expression<S> exp, Predicate predicate) {
+		return doUpdate(entityManager, entityPath, path, exp, predicate);
+	}
 	
 	/**
 	 * @Title: deleteByPredicate  

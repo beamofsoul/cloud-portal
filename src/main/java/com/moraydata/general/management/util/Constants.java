@@ -42,6 +42,12 @@ public final class Constants {
 		public static final int SCAN_LOGIN_OPEN_ID_MIN_LENGTH = 20;
 		public static final String SCAN_LOGIN_WEB_SOCKET_COMMAND = "AUTOMATIC_LOGIN";
 		public static final String SCAN_LOGIN_DEFAULT_SEPARATOR = "####";
+		public static final String SCAN_BIND_WECHAT_KEY = "BIND_WECHAT";
+		public static final String SCAN_SCENE_ID_KEY = "unicode";
+		public static final String SCAN_USERNAME_KEY = "username";
+		
+		public static final String SCAN_LOGIN_SCENE_ID_FUNCTIONALITY_KEY = "1";
+		public static final String SCAN_BIND_WECHAT_SCENE_ID_FUNCTIONALITY_KEY = "2";
 	}
 	
 	public static final class SENDING_MESSAGE_CODE {

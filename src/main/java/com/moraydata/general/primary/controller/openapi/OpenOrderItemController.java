@@ -81,6 +81,24 @@ public class OpenOrderItemController {
 	}
 	
 	/**
+	 * 获取特定用户的所有订单细则信息
+	 * @param userId 特定的用户Id
+	 * @return List<OrderItem> 获取到的订单细则信息列表
+	 */
+	@GetMapping("all")
+	public ResponseEntity all(@RequestParam Long userId) {
+		Assert.notNull(userId, "ALL_USER_ID_IS_NULL");
+		
+		try {
+			List<OrderItem> list = orderItemService.getByUserId(userId);
+			return ResponseEntity.success("获取所有特定用户订单细节信息成功", list);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
 	 * 获取符合查询后的分页订单细则数据
 	 * @param conditions 每个key对应属性，每个value对应搜索内容
 	 * @param pageable key可以有page、size、sort和direction，具体value针对每个属性值

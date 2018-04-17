@@ -121,14 +121,25 @@ public class OrderItemServiceImpl extends BaseAbstractService implements OrderIt
 
 	/**
 	 * For Open API
-	 * @param serviceIds
 	 * @param userIds
+	 * @param serviceIds
 	 * @return List<OrderItem>
 	 * @throws Expcetion
 	 */
 	@Override
 	public List<OrderItem> get(Long userId, Long... serviceIds) throws Exception {
-		QOrderItem $ = QOrderItem.orderItem;
+		QOrderItem $ = new QOrderItem("OrderItem");
 		return orderItemRepository.findByPredicate($.userId.eq(userId).and($.serviceId.in(serviceIds)));
+	}
+	
+	/**
+	 * For Open API
+	 * @param userIds
+	 * @return List<OrderItem>
+	 * @throws Expcetion
+	 */
+	@Override
+	public List<OrderItem> getByUserId(Long userId) throws Exception {
+		return orderItemRepository.findAllByUserId(userId);
 	}
 }
