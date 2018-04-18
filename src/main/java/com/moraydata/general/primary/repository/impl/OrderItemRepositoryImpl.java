@@ -39,8 +39,8 @@ public class OrderItemRepositoryImpl implements OrderItemRepositoryCustom<OrderI
 										$1.status))
 									.from($1)
 									.rightJoin($2)
-									.on($1.serviceId.eq($2.id))
-									.where($2.available.eq(true).and($1.userId.eq(userId).or($1.userId.isNull())))
+									.on($1.serviceId.eq($2.id).and($1.userId.eq(userId)))
+									.where($2.available.eq(true))
 									.orderBy($2.id.asc())
 									.fetch();
 		return list;
