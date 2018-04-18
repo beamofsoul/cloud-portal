@@ -7,7 +7,7 @@ import com.moraydata.general.management.repository.BaseMultielementRepository;
 import com.moraydata.general.primary.entity.Order;
 
 @Repository
-public interface OrderRepository extends BaseMultielementRepository<Order, Long> {
+public interface OrderRepository extends BaseMultielementRepository<Order, Long>, OrderRepositoryCustom<Order, Long> {
 
 	@Procedure("getNextSequenceValue")
 	Integer nextSequenceValue(String name);

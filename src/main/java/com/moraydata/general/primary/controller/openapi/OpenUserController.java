@@ -305,6 +305,8 @@ public class OpenUserController {
 	 */
 	@GetMapping("/page")
 	public ResponseEntity page(@RequestParam Map<String, Object> map) {
+		Assert.notNull(map, "PAGE_MAP_IS_NULL");
+		
 		try {
 			Page<User> data =  userService.get(PageUtils.parsePageable(JSON.parseObject(map.get("pageable").toString())), userService.search(JSON.parseObject(map.get("conditions").toString())));
 			return ResponseEntity.success("获取分页用户信息成功", data);

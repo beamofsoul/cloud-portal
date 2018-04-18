@@ -189,7 +189,7 @@ public class OpenRoleController {
 	 */
 	@GetMapping("/page")
 	public ResponseEntity page(@RequestParam Map<String, Object> map) {
-		Assert.notNull(map, "PAGE_PAGE_IS_NULL");
+		Assert.notNull(map, "PAGE_MAP_IS_NULL");
 		
 		try {
 			Page<Role> data =  roleService.get(PageUtils.parsePageable(JSON.parseObject(map.get("pageable").toString())), roleService.search(JSON.parseObject(map.get("conditions").toString())));

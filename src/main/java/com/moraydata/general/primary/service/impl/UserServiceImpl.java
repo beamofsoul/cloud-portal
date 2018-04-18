@@ -115,9 +115,11 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional(readOnly = false)
 	@Override
-	public long delete(Long... instanceIds) {
+	public long delete(Long... instanceIds) throws Exception {
 		// 删除所有用户登录记录
 		loginService.deleteByUserIds(instanceIds);
+		// 删除所有邀请码记录
+		invitationCodeService.deleteByUserIds(instanceIds);
         return userRepository.deleteByIds(instanceIds);
 	}
 

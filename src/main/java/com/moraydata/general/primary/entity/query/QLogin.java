@@ -5,7 +5,6 @@ import static com.querydsl.core.types.PathMetadataFactory.forVariable;
 import javax.annotation.Generated;
 
 import com.moraydata.general.primary.entity.Login;
-import com.moraydata.general.primary.entity.QBaseAbstractEntity;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.PathMetadata;
 import com.querydsl.core.types.dsl.DateTimePath;

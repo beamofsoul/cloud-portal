@@ -1,7 +1,11 @@
 package com.moraydata.general.primary.controller.openapi;
 
-import java.util.List;
+import static com.moraydata.general.management.util.RegexUtils.match;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.util.Assert;
@@ -14,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.moraydata.general.management.util.PageUtils;
 import com.moraydata.general.management.util.ResponseEntity;
 import com.moraydata.general.primary.entity.Service;
@@ -36,11 +40,15 @@ public class OpenServiceController {
 	public ResponseEntity addition(@RequestBody Service service) {
 		Assert.notNull(service, "ADDITION_SERVICE_IS_NULL");
 		
-		Service data = serviceService.create(service);
-		if (data == null) {
-			return ResponseEntity.UNKNOWN_ERROR;
-		} else {
+		try {
+			if (!OpenServiceController.validateSize(service.getName(), 50)) {
+				return ResponseEntity.error("服务名称格式错误");
+			}
+			Service data = serviceService.create(service);
 			return ResponseEntity.success("服务添加成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
 		}
 	}
 	
@@ -106,11 +114,14 @@ public class OpenServiceController {
 	 * @param service 更新前的服务信息
 	 * @return Service 更新后的服务信息
 	 */
-	@PutMapping("update")
-	public ResponseEntity update(@RequestBody Service service) {
+	@PutMapping("updating")
+	public ResponseEntity updating(@RequestBody Service service) {
 		Assert.notNull(service, "UPDATE_SERVICE_IS_NULL");
 		
 		try {
+			if (!OpenServiceController.validateSize(service.getName(), 50)) {
+				return ResponseEntity.error("服务名称格式错误");
+			}
 			Long serviceId = service.getId();
 			if (serviceId == null || serviceId == 0) {
 				return ResponseEntity.error("服务编号不存在");
@@ -150,21 +161,29 @@ public class OpenServiceController {
 	
 	/**
 	 * 获取符合查询后的分页服务数据
-	 * @param conditions 每个key对应属性，每个value对应搜索内容
-	 * @param pageable key可以有page、size、sort和direction，具体value针对每个属性值
-	 * @return Page<Service>
+	 * @param map ->
+	 * 				conditions 每个key对应属性，每个value对应搜索内容
+	 * 				pageable key可以有page、size、sort和direction，具体value针对每个属性值
+	 * @return Page<Service> 查询到的分页数据
 	 */
 	@GetMapping("/page")
-	public ResponseEntity page(@RequestParam JSONObject conditions, @RequestParam JSONObject pageable) {
-		Assert.notNull(conditions, "PAGE_CONDITIONS_IS_NULL");
-		Assert.notNull(pageable, "PAGE_PAGEABLE_IS_NULL");
+	public ResponseEntity page(@RequestParam Map<String, Object> map) {
+		Assert.notNull(map, "PAGE_MAP_IS_NULL");
 		
 		try {
-			Page<Service> data =  serviceService.get(PageUtils.parsePageable(pageable), serviceService.search(conditions));
+			Page<Service> data =  serviceService.get(PageUtils.parsePageable(JSON.parseObject(map.get("pageable").toString())), serviceService.search(JSON.parseObject(map.get("conditions").toString())));
 			return ResponseEntity.success("获取分页服务信息成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;
 		}
+	}
+	
+	static boolean validateSize(String string, int size) {
+		if (StringUtils.isBlank(string)) {
+			return false;
+		}
+		String regex = String.format("^.{1,%s}$", size);
+		return match(string, regex);
 	}
 }

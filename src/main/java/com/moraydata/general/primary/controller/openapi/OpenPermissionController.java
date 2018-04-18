@@ -196,11 +196,11 @@ public class OpenPermissionController {
 	 * @param map ->
 	 * 				conditions 每个key对应属性，每个value对应搜索内容
 	 * 				pageable key可以有page、size、sort和direction，具体value针对每个属性值
-	 * @return Page<Role> 查询到的分页数据
+	 * @return Page<Permission> 查询到的分页数据
 	 */
 	@GetMapping("/page")
 	public ResponseEntity page(@RequestParam Map<String, Object> map) {
-		Assert.notNull(map, "PAGE_PAGE_IS_NULL");
+		Assert.notNull(map, "PAGE_MAP_IS_NULL");
 		
 		try {
 			Page<Permission> data =  permissionService.get(PageUtils.parsePageable(JSON.parseObject(map.get("pageable").toString())), permissionService.search(JSON.parseObject(map.get("conditions").toString())));

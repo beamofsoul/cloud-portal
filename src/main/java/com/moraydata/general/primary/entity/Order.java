@@ -9,8 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -45,9 +43,14 @@ public class Order extends BaseAbstractEntity {
 	@GeneratedValue
 	protected Long id;
 	
-	@ManyToOne
-    @JoinColumn(name = "user_id", columnDefinition = "bigint(20) not null comment '用户ID'")
-	private User user;
+//	@ManyToOne
+//	@JoinColumn(name = "user_id", columnDefinition = "bigint(20) not null comment '用户ID'")
+//	private User user;
+	@Column(columnDefinition = "bigint(20) not null comment '用户ID'")
+	private Long userId;
+	
+	@Transient
+	private String username;
 	
 	@Column(columnDefinition = "varchar(20) comment '订单编号'")
 	private String code;
@@ -89,7 +92,26 @@ public class Order extends BaseAbstractEntity {
 	private Integer status;
 	
 	public Status getStatusEnum() {
+		if (this.status == null) {
+			return null;
+		}
 		return Status.getInstance(status);
+	}
+	
+	public Order(Long id, Long userId, String username, String code, BigDecimal amount, String agent, BigDecimal amountForAgent, String operator, String serviceIds, String description, LocalDateTime serviceBeginTime, LocalDateTime serviceEndTime, Integer status) {
+		this.id = id;
+		this.userId = userId;
+		this.username = username;
+		this.code = code;
+		this.amount = amount;
+		this.agent = agent;
+		this.amountForAgent = amountForAgent;
+		this.operator = operator;
+		this.serviceIds = serviceIds;
+		this.description = description;
+		this.serviceBeginTime = serviceBeginTime;
+		this.serviceEndTime = serviceEndTime;
+		this.status = status;
 	}
 	
 	@RequiredArgsConstructor(access=AccessLevel.PROTECTED)
@@ -105,6 +127,9 @@ public class Order extends BaseAbstractEntity {
 		public static Status getInstance(int code) {
 			return codeValueMap.get(code);
 		}
+		public static boolean exists(int code) {
+			return codeValueMap.containsKey(code);
+		}
 	}
 
 	@Override
@@ -113,7 +138,7 @@ public class Order extends BaseAbstractEntity {
 		if (orderItems != null && orderItems.size() > 0) {
 			items = ", orderItems=" + JSON.toJSONString(orderItems);
 		}
-		String toString = "Order [id=" + id + ", user=" + user + ", code=" + code + ", amount=" + amount + ", agent=" + agent
+		String toString = "Order [id=" + id + ", userId=" + userId + ", code=" + code + ", amount=" + amount + ", agent=" + agent
 				+ ", amountForAgent=" + amountForAgent + ", operator=" + operator + ", serviceIds=" + serviceIds
 				+ ", description=" + description + ", serviceBeginTime=" + serviceBeginTime + ", serviceEndTime="
 				+ serviceEndTime + ", status=" + status + items + "]";
