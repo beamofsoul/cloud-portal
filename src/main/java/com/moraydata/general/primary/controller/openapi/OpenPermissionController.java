@@ -1,5 +1,7 @@
 package com.moraydata.general.primary.controller.openapi;
 
+import static com.moraydata.general.management.util.RegexUtils.match;
+
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +25,7 @@ import com.moraydata.general.primary.service.PermissionService;
 
 @RequestMapping("/open/permission")
 @RestController
-public class OpenpPermissionController {
+public class OpenPermissionController {
 	
 	@Autowired
 	private PermissionService permissionService;
@@ -35,13 +37,32 @@ public class OpenpPermissionController {
 	 */
 	@PostMapping("/addition")
 	public ResponseEntity addition(@RequestBody Permission permission) {
-		Assert.notNull(permission, "ADDITION_ROLE_IS_NULL");
+		Assert.notNull(permission, "ADDITION_PERMISSION_IS_NULL");
 
-		Permission data = permissionService.create(permission);
-		if (data == null) {
-			return ResponseEntity.UNKNOWN_ERROR;
-		} else {
+		try {
+			if (!OpenPermissionController.validateName(permission.getName())) {
+				return ResponseEntity.error("权限名称格式错误");
+			}
+			if (!OpenPermissionController.validateAction(permission.getAction())) {
+				return ResponseEntity.error("权限行为格式错误");
+			}
+			if (!Permission.ResourceType.exists(permission.getResourceType())) {
+				return ResponseEntity.error("资源类型格式错误");
+			}
+			if (permission.getParentId() < 0) {
+				return ResponseEntity.error("父节点Id格式错误");
+			}
+			if (!OpenPermissionController.validateGroup(permission.getGroup())) {
+				return ResponseEntity.error("权限分组格式错误");
+			}
+			if (permission.getSort() < 0) {
+				return ResponseEntity.error("权限排序格式错误");
+			}
+			Permission data = permissionService.create(permission);
 			return ResponseEntity.success("权限添加成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
 		}
 	}
 	
@@ -52,7 +73,7 @@ public class OpenpPermissionController {
 	 */
 	@GetMapping("single")
 	public ResponseEntity single(@RequestParam Long permissionId) {
-		Assert.notNull(permissionId, "SINGLE_ROLE_ID_IS_NULL");
+		Assert.notNull(permissionId, "SINGLE_PERMISSION_ID_IS_NULL");
 		
 		try {
 			if (permissionId == 0L) {
@@ -73,7 +94,7 @@ public class OpenpPermissionController {
 	 */
 	@GetMapping("multiple")
 	public ResponseEntity multiple(@RequestParam Long... permissionIds) {
-		Assert.notNull(permissionIds, "MULTIPLE_ROLE_IDS_IS_NULL");
+		Assert.notNull(permissionIds, "MULTIPLE_PERMISSION_IDS_IS_NULL");
 		
 		try {
 			if (permissionIds.length == 0) {
@@ -107,11 +128,29 @@ public class OpenpPermissionController {
 	 * @param permission 更新前的权限信息
 	 * @return Permission 更新后的权限信息
 	 */
-	@PutMapping("update")
-	public ResponseEntity update(@RequestBody Permission permission) {
-		Assert.notNull(permission, "UPDATE_ROLE_IS_NULL");
+	@PutMapping("updating")
+	public ResponseEntity updating(@RequestBody Permission permission) {
+		Assert.notNull(permission, "UPDATING_PERMISSION_IS_NULL");
 		
 		try {
+			if (!OpenPermissionController.validateName(permission.getName())) {
+				return ResponseEntity.error("权限名称格式错误");
+			}
+			if (!OpenPermissionController.validateAction(permission.getAction())) {
+				return ResponseEntity.error("权限行为格式错误");
+			}
+			if (!Permission.ResourceType.exists(permission.getResourceType())) {
+				return ResponseEntity.error("资源类型格式错误");
+			}
+			if (permission.getParentId() < 0) {
+				return ResponseEntity.error("父节点Id格式错误");
+			}
+			if (!OpenPermissionController.validateGroup(permission.getGroup())) {
+				return ResponseEntity.error("权限分组格式错误");
+			}
+			if (permission.getSort() < 0) {
+				return ResponseEntity.error("权限排序格式错误");
+			}
 			Long permissionId = permission.getId();
 			if (permissionId == null || permissionId == 0) {
 				return ResponseEntity.error("权限编号不存在");
@@ -135,14 +174,17 @@ public class OpenpPermissionController {
 	 */
 	@DeleteMapping("deletion")
 	public ResponseEntity deletion(@RequestParam Long... permissionIds) {
-		Assert.notNull(permissionIds, "DELETION_ROLE_IDS_IS_NULL");
+		Assert.notNull(permissionIds, "DELETION_PERMISSION_IDS_IS_NULL");
 		
 		try {
 			if (permissionIds.length == 0) {
-				return ResponseEntity.error("权限编号集合长度为0");
+				return ResponseEntity.error("权限编号长度为0");
+			}
+			if (permissionService.isUsedPermissions(permissionIds)) {
+				return ResponseEntity.error("权限正在被使用中");
 			}
 			long data = permissionService.delete(permissionIds);
-			return ResponseEntity.success("删除权限信息集合成功", data);
+			return ResponseEntity.success("删除权限信息成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;
@@ -182,5 +224,20 @@ public class OpenpPermissionController {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;
 		}
+	}
+    
+    static boolean validateName(String name) {
+		String regex = "^[\\u4E00-\\u9FA5a-zA-Z0-9]{2,20}$";
+		return match(name, regex);
+	}
+    
+    static boolean validateAction(String action) {
+		String regex = "^[\\u4E00-\\u9FA5a-zA-Z0-9-/.]{2,20}$";
+		return match(action, regex);
+	}
+    
+    static boolean validateGroup(String group) {
+		String regex = "^[\\u4E00-\\u9FA5a-zA-Z0-9]{2,20}$";
+		return match(group, regex);
 	}
 }
