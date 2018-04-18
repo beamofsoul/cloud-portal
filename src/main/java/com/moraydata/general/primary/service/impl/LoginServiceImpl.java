@@ -104,4 +104,10 @@ public class LoginServiceImpl extends BaseAbstractService implements LoginServic
 		
 		return exp;
 	}
+	
+	@Override
+	public long deleteByUserIds(Long... userIds) {
+		QLogin login = new QLogin("Login");
+		return this.loginRepository.deleteByPredicate(login.userId.in(userIds));
+	}
 }

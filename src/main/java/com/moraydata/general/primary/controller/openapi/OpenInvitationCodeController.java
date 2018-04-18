@@ -47,4 +47,17 @@ public class OpenInvitationCodeController {
 			return ResponseEntity.UNKNOWN_ERROR;
 		}
 	}
+	
+	@GetMapping("all")
+	public ResponseEntity all(@RequestParam Long userId) {
+		Assert.notNull(userId, "ALL_USER_ID_IS_NULL");
+		
+		try {
+			List<InvitationCode> data = invitationCodeService.getByUserId(userId);
+			return ResponseEntity.success("获取当前用户所有邀请码成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
 }

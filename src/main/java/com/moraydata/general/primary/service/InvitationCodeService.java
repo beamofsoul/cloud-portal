@@ -26,4 +26,6 @@ public interface InvitationCodeService {
 	List<InvitationCode> create(Long userId, int numberOfCodes, Type type) throws Exception;
 	long delete(String code);
 	long updateAvailable(String code, boolean available);
+	List<InvitationCode> getByUserId(Long userId) throws Exception;
+	long deleteByUserIds(Long... userIds) throws Exception;
 }

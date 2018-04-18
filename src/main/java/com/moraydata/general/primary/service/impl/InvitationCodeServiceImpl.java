@@ -131,4 +131,16 @@ public class InvitationCodeServiceImpl extends BaseAbstractService implements In
 		QInvitationCode $ = new QInvitationCode("InvitationCode");
 		return invitationCodeRepository.update($.available, available, $.code.eq(code));
 	}
+
+	@Override
+	public List<InvitationCode> getByUserId(Long userId) throws Exception {
+		QInvitationCode $ = new QInvitationCode("InvitationCode");
+		return invitationCodeRepository.findByPredicate($.userId.eq(userId));
+	}
+	
+	@Override
+	public long deleteByUserIds(Long... userIds) throws Exception {
+		QInvitationCode $ = new QInvitationCode("InvitationCode");
+		return invitationCodeRepository.deleteByPredicate($.userId.in(userIds));
+	}
 }

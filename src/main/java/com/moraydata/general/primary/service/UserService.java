@@ -16,7 +16,7 @@ public interface UserService {
 	
 	User create(User instance);
 	User update(User instance);
-	long delete(Long... instanceIds);
+	long delete(Long... instanceIds) throws Exception;
 	User get(Long instanceId);
 	List<User> get(Long... instanceIds);
 	Page<User> get(Pageable pageable);

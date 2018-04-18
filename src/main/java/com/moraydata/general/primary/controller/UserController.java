@@ -72,7 +72,7 @@ public class UserController {
 	@ApiOperation(value="删除一个或多个用户", notes="根据一个或多个用户ID删除对应的用户信息")
 	@PreAuthorize("authenticated and hasPermission('user','user:delete')")
 	@DeleteMapping("/delete/{ids}")
-	public long deleteUsers(@PathVariable Long... ids) {
+	public long deleteUsers(@PathVariable Long... ids) throws Exception {
 		return userService.delete(ids);
 	}
 	

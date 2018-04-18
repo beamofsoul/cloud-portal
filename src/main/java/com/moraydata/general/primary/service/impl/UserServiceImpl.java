@@ -41,6 +41,7 @@ import com.moraydata.general.primary.entity.UserRole;
 import com.moraydata.general.primary.entity.query.QUser;
 import com.moraydata.general.primary.repository.UserRepository;
 import com.moraydata.general.primary.service.InvitationCodeService;
+import com.moraydata.general.primary.service.LoginService;
 import com.moraydata.general.primary.service.RoleService;
 import com.moraydata.general.primary.service.UserRoleService;
 import com.moraydata.general.primary.service.UserService;
@@ -73,6 +74,9 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private InvitationCodeService invitationCodeService;
+	
+	@Autowired
+	private LoginService loginService;
 	
 	@Autowired
 	private RoleService roleService;
@@ -150,9 +154,13 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional
 	@Override
-	public long delete(Long... instanceIds) {
+	public long delete(Long... instanceIds) throws Exception {
 		List<User> users = this.get(instanceIds);
 		users.stream().filter(e -> StringUtils.isNotBlank(e.getPhoto())).forEach(e -> deletePhotoFile(generateImageFilePath(USER_PHOTO_PATH, e.getPhoto())));
+		// 删除所有用户登录记录
+		loginService.deleteByUserIds(instanceIds);
+		// 删除所有邀请码记录
+		invitationCodeService.deleteByUserIds(instanceIds);
         return userRepository.deleteByIds(instanceIds);
 	}
 
@@ -588,11 +596,16 @@ public class UserServiceImpl implements UserService {
 	 * @return long
 	 * @throws Exception
 	 */
+	@Transactional(readOnly = false)
 	@Override
 	public long bindParentByInvitationCode(InvitationCode instance, Long currentUserId) throws Exception {
-		QUser $ = QUser.user;
+		QUser $ = new QUser("User");
 		Long parentUserId = instance.getUserId();
 		long updatedRecords = userRepository.update($.parentId, parentUserId, $.id.eq(currentUserId));
+		if (updatedRecords > 0) {
+			// 删除已使用的邀请码
+			invitationCodeService.delete(instance.getCode());
+		}
 		return updatedRecords;
 	}
 	
@@ -603,9 +616,10 @@ public class UserServiceImpl implements UserService {
 	 * @return boolean
 	 * @throws Exception
 	 */
+	@Transactional
 	@Override
 	public boolean updateUsername(Long userId, String username) throws Exception {
-		QUser $ = QUser.user;
+		QUser $ = new QUser("User");
 		return userRepository.update($.username, username, $.id.eq(userId)) > 0;
 	}
 	
