@@ -58,6 +58,12 @@ public class OpenPermissionController {
 			if (permission.getSort() < 0) {
 				return ResponseEntity.error("权限排序格式错误");
 			}
+			if (!permissionService.isPermissionNameUnique(permission.getName(), null)) {
+				return ResponseEntity.error("权限名称已被使用");
+			}
+			if (!permissionService.isActionUnique(permission.getAction(), null)) {
+				return ResponseEntity.error("权限行为已被使用");
+			}
 			Permission data = permissionService.create(permission);
 			return ResponseEntity.success("权限添加成功", data);
 		} catch (Exception e) {
@@ -158,6 +164,12 @@ public class OpenPermissionController {
 			Permission originalPermission = permissionService.get(permissionId);
 			if (originalPermission == null) {
 				return ResponseEntity.error("权限不存在");
+			}
+			if (!permissionService.isPermissionNameUnique(permission.getName(), permissionId)) {
+				return ResponseEntity.error("权限名称已被使用");
+			}
+			if (!permissionService.isActionUnique(permission.getAction(), permissionId)) {
+				return ResponseEntity.error("权限行为已被使用");
 			}
 			Permission data = permissionService.update(permission, originalPermission);
 			return ResponseEntity.success("更新权限成功", data);
