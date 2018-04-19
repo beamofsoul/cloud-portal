@@ -207,6 +207,19 @@ public class PermissionServiceImpl extends BaseAbstractService implements Permis
 		if (instanceId != null) predicate = predicate.and(QPermission.permission.id.ne(instanceId));
 		return !permissionRepository.exists(predicate);
 	}
+	
+	/**
+	 * Determine whether the given permission action is unique in current database table.
+	 * @param action - action used to check unique action
+	 * @param instanceId - check unique action excluded the permission instance of the given instance id.
+	 * @return if the action is unique (excluded the permission instance of the given instance id) return true, otherwise return false.
+	 */
+	@Override
+	public boolean isActionUnique(String action, Long instanceId) {
+		BooleanExpression predicate = QPermission.permission.action.eq(action);
+		if (instanceId != null) predicate = predicate.and(QPermission.permission.id.ne(instanceId));
+		return !permissionRepository.exists(predicate);
+	}
 
 	/**
 	 * Determine whether any of the given instance ids is used in the database table of T_ROLE_PERMISSION.

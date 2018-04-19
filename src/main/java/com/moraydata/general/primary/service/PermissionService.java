@@ -27,6 +27,7 @@ public interface PermissionService {
 	Permission get(String name);
 
 	boolean isPermissionNameUnique(String name, Long instanceId);
+	boolean isActionUnique(String action, Long isntanceId);
 	boolean isUsedPermissions(Long... instanceId);
 	
 	boolean hasPermission(String action);
