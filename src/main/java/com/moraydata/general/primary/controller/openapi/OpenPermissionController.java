@@ -244,7 +244,7 @@ public class OpenPermissionController {
 	}
     
     static boolean validateAction(String action) {
-		String regex = "^[\\u4E00-\\u9FA5a-zA-Z0-9-/.]{2,20}$";
+		String regex = "^[a-z]+\\:{1}[a-z]{3,20}$";
 		return match(action, regex);
 	}
     
