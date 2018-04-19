@@ -25,4 +25,5 @@ public interface ServiceService {
 	/*******************************************************************************************************************/
 	
 	Service update(Service service, Service originalService) throws Exception;
+	boolean isUsedService(Long... serviceIds) throws Exception;
 }

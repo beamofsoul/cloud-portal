@@ -151,6 +151,9 @@ public class OpenServiceController {
 			if (serviceIds.length == 0) {
 				return ResponseEntity.error("服务编号集合长度为0");
 			}
+			if (serviceService.isUsedService(serviceIds)) {
+				return ResponseEntity.error("当前服务正被使用中");
+			}
 			long data = serviceService.delete(serviceIds);
 			return ResponseEntity.success("删除服务信息集合成功", data);
 		} catch (Exception e) {

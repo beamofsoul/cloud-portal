@@ -15,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
 import com.moraydata.general.primary.entity.Service;
+import com.moraydata.general.primary.entity.query.QOrderItem;
 import com.moraydata.general.primary.entity.query.QService;
+import com.moraydata.general.primary.repository.OrderItemRepository;
 import com.moraydata.general.primary.repository.ServiceRepository;
 import com.moraydata.general.primary.service.ServiceService;
 import com.querydsl.core.types.Predicate;
@@ -26,6 +28,9 @@ public class ServiceServiceImpl extends BaseAbstractService implements ServiceSe
 
 	@Autowired
 	private ServiceRepository serviceRepository;
+	
+	@Autowired
+	private OrderItemRepository orderItemRepository;
 
 	@Override
 	public Service create(Service instance) {
@@ -103,5 +108,17 @@ public class ServiceServiceImpl extends BaseAbstractService implements ServiceSe
 	public Service update(Service service, Service originalService) throws Exception {
 		BeanUtils.copyProperties(service, originalService);
 		return serviceRepository.save(originalService);
+	}
+
+	/**
+	 * For Open API
+	 * @param serviceIds
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean isUsedService(Long... serviceIds) throws Exception {
+		// 判断订单记录中是否有当前服务
+		return orderItemRepository.exists(new QOrderItem("OrderItem").serviceId.in(serviceIds)); 
 	}
 }
