@@ -94,4 +94,17 @@ public class CloudPortalApplicationTest extends TestCase {
 //			e.printStackTrace();
 //		}
 	}
+	
+//	@Autowired
+//	private JedisConnectionFactory jedisConnectionFactory;
+//	
+//	@Autowired
+//	private RedisTemplate<Object, Object> redisTemplate;
+	
+	@Test
+	public void testRedisDatabase() {
+//		System.out.println(jedisConnectionFactory.getDatabase());
+//		
+//		redisTemplate.opsForValue().set("adfadfad", "adfadfasd");
+	}
 }

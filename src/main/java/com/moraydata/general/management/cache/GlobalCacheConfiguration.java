@@ -13,7 +13,6 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisElementReader;
@@ -76,11 +75,12 @@ public class GlobalCacheConfiguration extends RedisAutoConfiguration {
 	    RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig().serializeValuesWith(serializationPairImplementation).entryTtl(Duration.ofSeconds(timeTolive));
 	    return new RedisCacheManager(redisCacheWriter, defaultCacheConfig);
 	}
-	
-	@Bean
-	public RedisConnectionFactory redisConnectionFactory() {
-		return new JedisConnectionFactory();
-	}
+
+// DO NOT FORGET TO SET DATABASE INDEX AND OTHER USEFUL PARAMETERS WHICH ARE FROM APPLICATION.YML, IF INSTANCE REDIS_CONNECTION_FACTORY YOURSELF
+//	@Bean
+//	public RedisConnectionFactory redisConnectionFactory() {
+//		return new JedisConnectionFactory();
+//	}
 	
 	@Override
 	public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) throws UnknownHostException {

@@ -1,18 +1,27 @@
 package com.moraydata.general.primary.controller.openapi;
 
-import java.util.List;
+import static com.moraydata.general.management.util.RegexUtils.match;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.moraydata.general.management.util.PageUtils;
 import com.moraydata.general.management.util.ResponseEntity;
+import com.moraydata.general.primary.entity.Order;
 import com.moraydata.general.primary.entity.OrderItem;
 import com.moraydata.general.primary.service.OrderItemService;
 
@@ -100,21 +109,134 @@ public class OpenOrderItemController {
 	
 	/**
 	 * 获取符合查询后的分页订单细则数据
-	 * @param conditions 每个key对应属性，每个value对应搜索内容
-	 * @param pageable key可以有page、size、sort和direction，具体value针对每个属性值
-	 * @return Page<OrderItem>
+	 * @param map ->
+	 * 				conditions 每个key对应属性，每个value对应搜索内容
+	 * 				pageable key可以有page、size、sort和direction，具体value针对每个属性值
+	 * @return Page<Order> 查询到的分页数据
 	 */
 	@GetMapping("/page")
-	public ResponseEntity page(@RequestParam JSONObject conditions, @RequestParam JSONObject pageable) {
-		Assert.notNull(conditions, "PAGE_CONDITIONS_IS_NULL");
-		Assert.notNull(pageable, "PAGE_PAGEABLE_IS_NULL");
+	public ResponseEntity page(@RequestParam Map<String, Object> map) {
+		Assert.notNull(map, "PAGE_MAP_IS_NULL");
 		
 		try {
-			Page<OrderItem> data =  orderItemService.get(PageUtils.parsePageable(pageable), orderItemService.search(conditions));
-			return ResponseEntity.success("获取分页订单细则信息成功", data);
+			Page<OrderItem> data =  orderItemService.get(PageUtils.parsePageable(JSON.parseObject(map.get("pageable").toString())), orderItemService.search(JSON.parseObject(map.get("conditions").toString())));
+			return ResponseEntity.success("获取分页订单信息成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;
 		}
+	}
+	
+	/**
+	 * 删除单个或多个订单细则信息
+	 * @param orderItemIds 删除单个订单细则或多个以订单细则编号为数组的订单细则信息
+	 * @return long 有多少条订单细则信息被删除了
+	 */
+	@DeleteMapping("deletion")
+	public ResponseEntity deletion(@RequestParam Long... orderItemIds) {
+		Assert.notNull(orderItemIds, "DELETION_ORDER_ITEM_IDS_IS_NULL");
+		
+		try {
+			if (orderItemIds.length == 0) {
+				return ResponseEntity.error("订单细则编号数组长度为0");
+			}
+			long data = orderItemService.delete(orderItemIds);
+			return ResponseEntity.success("删除订单细则信息成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 订单细则添加
+	 * @param orderItem 新订单细则信息
+	 * @return Order 添加后的订单细致信息
+	 */
+	@PostMapping("/addition")
+	public ResponseEntity addition(@RequestBody OrderItem orderItem) {
+		Assert.notNull(orderItem, "ADDITION_ORDER_ITEM_IS_NULL");
+		
+		try {
+			if (!(orderItem.getUserId() != null && orderItem.getUserId() > 0)) {
+				return ResponseEntity.error("用户编号格式错误");
+			}
+			if (orderItem.getServiceId() == null || orderItem.getServiceId() <= 0) {
+				return ResponseEntity.error("具体服务格式错误");
+			}
+			if (StringUtils.isNotBlank(orderItem.getDescription())) {
+				if (!validateSize(orderItem.getDescription(), 100)) {
+					return ResponseEntity.error("备注格式错误");
+				}
+			}
+			if (orderItem.getServiceBeginTime() == null) {
+				return ResponseEntity.error("服务开始时间格式错误");
+			}
+			if (orderItem.getServiceEndTime() == null) {
+				return ResponseEntity.error("服务结束时间格式错误");
+			}
+			if (orderItem.getStatus() == null || !Order.Status.exists(orderItem.getStatus().intValue())) {
+				return ResponseEntity.error("订单细则状态格式错误");
+			}
+			OrderItem data = orderItemService.create(orderItem);
+			return ResponseEntity.success("订单细则添加成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 更新特定订单细则信息
+	 * @param orderItem 更新前的订单细则信息
+	 * @return Order 更新后的订单细则信息
+	 */
+	@PutMapping("updating")
+	public ResponseEntity updating(@RequestBody OrderItem orderItem) {
+		Assert.notNull(orderItem, "UPDATE_ORDER_ITEM_IS_NULL");
+		
+		try {
+			if (!(orderItem.getUserId() != null && orderItem.getUserId() > 0)) {
+				return ResponseEntity.error("用户编号格式错误");
+			}
+			if (orderItem.getServiceId() == null || orderItem.getServiceId() <= 0) {
+				return ResponseEntity.error("具体服务格式错误");
+			}
+			if (StringUtils.isNotBlank(orderItem.getDescription())) {
+				if (!validateSize(orderItem.getDescription(), 100)) {
+					return ResponseEntity.error("备注格式错误");
+				}
+			}
+			if (orderItem.getServiceBeginTime() == null) {
+				return ResponseEntity.error("服务开始时间格式错误");
+			}
+			if (orderItem.getServiceEndTime() == null) {
+				return ResponseEntity.error("服务结束时间格式错误");
+			}
+			if (orderItem.getStatus() == null || !Order.Status.exists(orderItem.getStatus().intValue())) {
+				return ResponseEntity.error("订单状态格式错误");
+			}
+			Long orderItemId = orderItem.getId();
+			if (orderItemId == null || orderItemId == 0) {
+				return ResponseEntity.error("订单细则编号不存在");
+			}
+			OrderItem originalOrderItem = orderItemService.get(orderItemId);
+			if (originalOrderItem == null) {
+				return ResponseEntity.error("订单细则不存在");
+			}
+			OrderItem data = orderItemService.update(orderItem, originalOrderItem);
+			return ResponseEntity.success("更新订单细则成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	static boolean validateSize(String string, int size) {
+		if (StringUtils.isBlank(string)) {
+			return false;
+		}
+		String regex = String.format("^.{1,%s}$", size);
+		return match(string, regex);
 	}
 }
