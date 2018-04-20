@@ -58,7 +58,7 @@ public class OrderServiceImpl extends BaseAbstractService implements OrderServic
 
 	@Override
 	@Transactional
-	public long delete(Long... instanceIds) {
+	public long delete(Long... instanceIds) throws Exception {
 		return orderRepository.deleteByIds(instanceIds);
 	}
 
@@ -139,32 +139,22 @@ public class OrderServiceImpl extends BaseAbstractService implements OrderServic
 	 * @return Order
 	 * @throws Expcetion
 	 */
+	@Transactional(readOnly = false)
 	@Override
 	public Order update(Order order, Order originalOrder) throws Exception {
 		BeanUtils.copyProperties(order, originalOrder);
-		return orderRepository.save(originalOrder);
+		Order data =  orderRepository.save(originalOrder);
+		dealWithOrderItems(data);
+		return data;
 	}
 
 	/**
 	 * For Open API
-	 * @return integer
+	 * @param data
+	 * @return void
 	 * @throws Exception
 	 */
-	@Override
-	public Integer getNextOrderCode() throws Exception {
-		return orderRepository.nextSequenceValue(Constants.ORDER.CODE_SEQUENCE_NAME);
-	}
-
-	/**
-	 * For Open API
-	 * @param order
-	 * @return Order
-	 * @throws Exception
-	 */
-	@Transactional(readOnly = false)
-	@Override
-	public Order create(Order instance) throws Exception {
-		Order data = orderRepository.save(instance);
+	private void dealWithOrderItems(Order data) throws Exception {
 		// 创建或修改OrderItem
 		Long userId = data.getUserId();
 		LocalDateTime serviceBeginTime = data.getServiceBeginTime();
@@ -205,6 +195,29 @@ public class OrderServiceImpl extends BaseAbstractService implements OrderServic
 		if (!orderItems.isEmpty()) {
 			data.setOrderItems(orderItems);
 		}
+	}
+
+	/**
+	 * For Open API
+	 * @return integer
+	 * @throws Exception
+	 */
+	@Override
+	public Integer getNextOrderCode() throws Exception {
+		return orderRepository.nextSequenceValue(Constants.ORDER.CODE_SEQUENCE_NAME);
+	}
+
+	/**
+	 * For Open API
+	 * @param order
+	 * @return Order
+	 * @throws Exception
+	 */
+	@Transactional(readOnly = false)
+	@Override
+	public Order create(Order instance) throws Exception {
+		Order data = orderRepository.save(instance);
+		dealWithOrderItems(data);
 		return data;
 	}
 

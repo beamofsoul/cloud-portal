@@ -85,7 +85,7 @@ public class Order extends BaseAbstractEntity {
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@Column(columnDefinition = "datetime comment '服务开始时间'")
+	@Column(columnDefinition = "datetime comment '服务结束时间'")
 	private LocalDateTime serviceEndTime;
 	
 	@Column(columnDefinition = "int default 1 comment '订单状态 - 1:新建,2:生效,3:过期'")

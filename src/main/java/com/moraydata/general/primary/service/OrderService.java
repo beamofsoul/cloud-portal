@@ -14,7 +14,7 @@ public interface OrderService {
 	
 //	Order create(Order instance);
 	Order update(Order instance);
-	long delete(Long... instanceIds);
+	long delete(Long... instanceIds) throws Exception;
 	Order get(Long instanceId);
 	List<Order> get(Long... instanceIds);
 	Page<Order> get(Pageable pageable);
