@@ -15,6 +15,8 @@ import org.springframework.web.socket.WebSocketSession;
 
 import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.management.util.SpringUtils;
+import com.moraydata.general.primary.entity.query.QUser;
+import com.moraydata.general.primary.repository.UserRepository;
 import com.moraydata.general.primary.service.UserService;
 
 @Async
@@ -105,9 +107,10 @@ public class DefaultWebSocketHandler implements WebSocketHandler {
 					if (e.getAttributes().containsKey(Constants.WECHAT.SCAN_USERNAME_KEY) || e.getAttributes().get(Constants.WECHAT.SCAN_USERNAME_KEY) == null) {
 						Object usernameObject = e.getAttributes().get(Constants.WECHAT.SCAN_USERNAME_KEY);
 						UserService service = SpringUtils.getBean(UserService.class);
+						UserRepository repository = SpringUtils.getBean(UserRepository.class);
 						// Check whether given openId has been used
-						boolean openIdUnique = service.isOpenIdUnique(openId);
-						if (!openIdUnique) {
+						boolean exists = repository.exists(QUser.user.openId.eq(openId));
+						if (exists) {
 							// If used, warn it
 							e.sendMessage(new TextMessage(Constants.WECHAT.SCAN_BIND_WECHAT_KEY + Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR + Constants.RESPONSE_ENTITY.ERROR));
 							return;

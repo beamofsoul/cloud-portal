@@ -697,7 +697,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean isOpenIdUnique(String openId) throws Exception {
 		QUser $ = new QUser("User");
-		return userRepository.count($.openId.eq(openId)) == 0;
+		return userRepository.exists($.openId.eq(openId));
+//		return userRepository.count($.openId.eq(openId)) == 0;
 	}
 
 	/**
