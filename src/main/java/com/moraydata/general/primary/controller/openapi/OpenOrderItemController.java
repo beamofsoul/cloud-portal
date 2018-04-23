@@ -232,6 +232,32 @@ public class OpenOrderItemController {
 		}
 	}
 	
+	/**
+	 * 更新订单细则状态
+	 * @param orderItemId 订单细则编号
+	 * @param status 订单细则状态
+	 * @return boolean 是否更新成功
+	 */
+	@PutMapping("updatingStatus")
+	public ResponseEntity udpatingStatus(@RequestParam Long orderItemId, @RequestParam Integer status) {
+		Assert.notNull(orderItemId, "UPDATING_STATUS_ORDER_ID_IS_NULL");
+		Assert.notNull(status, "UPDATING_STATUS_STATUS_IS_NULL");
+		
+		try {
+			if (status == null || !Order.Status.exists(status.intValue())) {
+				return ResponseEntity.error("订单细则状态格式错误");
+			}
+			if (orderItemId == 0) {
+				return ResponseEntity.error("订单细则编号格式错误");
+			}
+			boolean data = orderItemService.updateStatus(orderItemId, Order.Status.getInstance(status));
+			return ResponseEntity.success("更新订单状态成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
 	static boolean validateSize(String string, int size) {
 		if (StringUtils.isBlank(string)) {
 			return false;

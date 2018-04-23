@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
 import com.moraydata.general.primary.entity.OrderItem;
+import com.moraydata.general.primary.entity.Order.Status;
 import com.moraydata.general.primary.entity.query.QOrderItem;
 import com.moraydata.general.primary.repository.OrderItemRepository;
 import com.moraydata.general.primary.service.OrderItemService;
@@ -49,7 +50,7 @@ public class OrderItemServiceImpl extends BaseAbstractService implements OrderIt
 
 	@Override
 	public OrderItem get(Long instanceId) {
-		return orderItemRepository.findOne(instanceId);
+		return orderItemRepository.findOneWithServiceNameById(instanceId);
 	}
 	
 
@@ -141,5 +142,18 @@ public class OrderItemServiceImpl extends BaseAbstractService implements OrderIt
 	@Override
 	public List<OrderItem> getByUserId(Long userId) throws Exception {
 		return orderItemRepository.findAllByUserId(userId);
+	}
+	
+	/**
+	 * For Open API
+	 * @param orderItemId
+	 * @param status
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Transactional(readOnly = false)
+	@Override
+	public boolean updateStatus(Long orderItemId, Status status) throws Exception {
+		return orderItemRepository.updateStatusById(status, orderItemId) > 0;
 	}
 }
