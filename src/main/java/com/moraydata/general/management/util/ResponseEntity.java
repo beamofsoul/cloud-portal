@@ -34,6 +34,15 @@ public class ResponseEntity {
 				.build();
 	}
 	
+	public static ResponseEntity error(String message, Object data) {
+		return ResponseEntity
+				.builder()
+				.code(ERROR)
+				.message(message)
+				.data(data)
+				.build();
+	}
+	
 	public static ResponseEntity success(String message, Object data) {
 		return ResponseEntity
 				.builder()

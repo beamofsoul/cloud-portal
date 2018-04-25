@@ -57,7 +57,7 @@ public final class WeChatTokenHelper {
 			put("secret", appSecret);
 		}});
 		Map<String, Object> response =  RestTemplateUtils.INSTANCE.getRestTemplate().getForObject(integratedUrl, Map.class);
-		return Token.builder().accessToken(response.get("access_token").toString()).expiresIn(Long.valueOf(response.get("expires_in").toString())).maketime(new Date().getTime()).build(); 
+		return Token.builder().accessToken(response.get(Constants.WECHAT.ACCESS_TOKEN).toString()).expiresIn(Long.valueOf(response.get(Constants.WECHAT.EXPIRES_IN).toString())).maketime(new Date().getTime()).build(); 
 	}
 	
 	@AllArgsConstructor

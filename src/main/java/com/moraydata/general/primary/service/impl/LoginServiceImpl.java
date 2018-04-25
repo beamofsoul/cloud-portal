@@ -22,7 +22,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 @Service("loginService")
-public class LoginServiceImpl extends BaseAbstractService implements LoginService {
+public class LoginServiceImpl implements LoginService {
 
 	@Autowired
 	private LoginRepository loginRepository;
