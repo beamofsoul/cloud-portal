@@ -1,3 +1,15 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Cloud Portal v0.1</title>
+	</head>
+	<body>
+		<div style="text-align: width: 50%; margin:auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);">
+			<h1>Open API of Moraydata Cloud Portal v0.1</h1>
+		</div>
+	</body>
+</html>
+<!-- 
 <!DOCTYPE html>  
 <html xmlns:th="http://www.thymeleaf.org">  
     <head>  
@@ -18,15 +30,15 @@
     </body>
     
     <script type="text/javascript">
-   	//¸Ã¶ÎJSÖ÷ÒªÓÃÓÚ¸øÌØ¶¨ÓÃ»§·¢ËÍÌØ¶¨Ä£°åÏûÏ¢
-   	// 1. »ñÈ¡ĞèÒª½ÓÊÜÏûÏ¢µÄÓÃ»§£¬²¢»ñÈ¡ÆäopenId
-   	// 2. ÅĞ¶ÏÑ¡ÓÃÄ£°åId
-   	// 3. µ÷ÓÃºóÌ¨³ÌĞò½øĞĞ·¢ËÍ£¬·µ»ØbooleanÀàĞÍ½á¹û£¬ÊÇ·ñ·¢ËÍ³É¹¦
+   	//è¯¥æ®µJSä¸»è¦ç”¨äºç»™ç‰¹å®šç”¨æˆ·å‘é€ç‰¹å®šæ¨¡æ¿æ¶ˆæ¯
+   	// 1. è·å–éœ€è¦æ¥å—æ¶ˆæ¯çš„ç”¨æˆ·ï¼Œå¹¶è·å–å…¶openId
+   	// 2. åˆ¤æ–­é€‰ç”¨æ¨¡æ¿Id
+   	// 3. è°ƒç”¨åå°ç¨‹åºè¿›è¡Œå‘é€ï¼Œè¿”å›booleanç±»å‹ç»“æœï¼Œæ˜¯å¦å‘é€æˆåŠŸ
     	var openId = "oQFmP0-K4IvdQvocmDHiJ5aPn9Uk";
    	
-		// ovJ_C1J964Y_BKS08GyMN7jXa5eI å¿
-    	// ovJ_C1LJlrm5Xl42ObHTI_u1IlLM º«
-    	// ovJ_C1NMVsJ4AjrEglyj2lDn2gh4   Íõ
+		// ovJ_C1J964Y_BKS08GyMN7jXa5eI è¹‡
+    	// ovJ_C1LJlrm5Xl42ObHTI_u1IlLM éŸ©
+    	// ovJ_C1NMVsJ4AjrEglyj2lDn2gh4   ç‹
     	
     	function sendTemplateMessage() {
 	    	$.get(hostUrl + "wechat/sendTemplateMessage?openId=" + openId, null, function(data) {
@@ -37,11 +49,11 @@
     </script>
     
     <script type="text/javascript">
-    // ¸Ã¶ÎJSÖ÷ÒªÓÃÓÚ°ïÖúÓÃ»§ÔÚÉ¨Âë³É¹¦ºó¹Ø×¢·şÎñºÅ£¬²¢ÄÜ¹»ÊµÏÖ×Ô¶¯µÇÂ¼ÍøÕ¾
- 	// 1. ÓÃ»§¼ÓÔØµÇÂ¼Ò³Ãæ£¬JS×Ô¶¯Éú³Éunicode£¬²¢ÇÒ2ÃëÖÓºó×Ô¶¯·¢ËÍ¸øwebsocket·şÎñÆ÷½«unicode´æ´¢ÔÚWebSocketSessionÖĞ
-	// 2. ÓÃ»§µã»÷Î¢ĞÅÉ¨Âë°´Å¥£¬½«unicodeÓÃ×÷sceneIdËæ»úÉú³É¶şÎ¬Âë£¬²¢ÔÚµ±Ç°Ò³Ãæ²»Ìø×ªµÄÇé¿öÏÂÏÔÊ¾¸øµ±Ç°ÓÃ»§
-	// 3. ÓÃ»§É¨Âëºó£¬Î¢ĞÅ·şÎñºÅºóÌ¨»ñÈ¡µ½unicode×÷ÎªµÄsceneId£¬Í¨Öªwebsocket·şÎñÆ÷£¬ÈÃËü¸øÓĞsessionÖĞunicodeÖµÓë´«¸øËüµÄunicodeµÄÖµÒ»ÖÂµÄsession·¢ËÍÌØ¶¨ÏûÏ¢£¬½«×Ô¶¯µÇÂ¼ÃüÁîºÍopenIdÒ»Í¬·¢ËÍ¹ıÈ¥
-	// 4. Ç°Ì¨Ò³ÃæÊÕµ½ÌØ¶¨ÏûÏ¢(×Ô¶¯µÇÂ½ÃüÁîºÍopenId)£¬×Ô¶¯°ïÖúÓÃ»§Ìø×ªµÇÂ¼
+    // è¯¥æ®µJSä¸»è¦ç”¨äºå¸®åŠ©ç”¨æˆ·åœ¨æ‰«ç æˆåŠŸåå…³æ³¨æœåŠ¡å·ï¼Œå¹¶èƒ½å¤Ÿå®ç°è‡ªåŠ¨ç™»å½•ç½‘ç«™
+ 	// 1. ç”¨æˆ·åŠ è½½ç™»å½•é¡µé¢ï¼ŒJSè‡ªåŠ¨ç”Ÿæˆunicodeï¼Œå¹¶ä¸”2ç§’é’Ÿåè‡ªåŠ¨å‘é€ç»™websocketæœåŠ¡å™¨å°†unicodeå­˜å‚¨åœ¨WebSocketSessionä¸­
+	// 2. ç”¨æˆ·ç‚¹å‡»å¾®ä¿¡æ‰«ç æŒ‰é’®ï¼Œå°†unicodeç”¨ä½œsceneIdéšæœºç”ŸæˆäºŒç»´ç ï¼Œå¹¶åœ¨å½“å‰é¡µé¢ä¸è·³è½¬çš„æƒ…å†µä¸‹æ˜¾ç¤ºç»™å½“å‰ç”¨æˆ·
+	// 3. ç”¨æˆ·æ‰«ç åï¼Œå¾®ä¿¡æœåŠ¡å·åå°è·å–åˆ°unicodeä½œä¸ºçš„sceneIdï¼Œé€šçŸ¥websocketæœåŠ¡å™¨ï¼Œè®©å®ƒç»™æœ‰sessionä¸­unicodeå€¼ä¸ä¼ ç»™å®ƒçš„unicodeçš„å€¼ä¸€è‡´çš„sessionå‘é€ç‰¹å®šæ¶ˆæ¯ï¼Œå°†è‡ªåŠ¨ç™»å½•å‘½ä»¤å’ŒopenIdä¸€åŒå‘é€è¿‡å»
+	// 4. å‰å°é¡µé¢æ”¶åˆ°ç‰¹å®šæ¶ˆæ¯(è‡ªåŠ¨ç™»é™†å‘½ä»¤å’ŒopenId)ï¼Œè‡ªåŠ¨å¸®åŠ©ç”¨æˆ·è·³è½¬ç™»å½•
     
     	var unicode;
     	var hostUrl = "http://192.168.31.137:80/";
@@ -68,48 +80,49 @@
 			if (e.data.indexOf("BIND_WECHAT####") != -1) {
 				console.log('websocket:', e.data)
 				// BIND_WECHAT####openId
-				// Ç°¶Ë»ñÈ¡µ½openId£¬½«openId¸üĞÂµ½µ±Ç°ÓÃ»§cookieÖĞ
+				// å‰ç«¯è·å–åˆ°openIdï¼Œå°†openIdæ›´æ–°åˆ°å½“å‰ç”¨æˆ·cookieä¸­
 				
 				// BIND_WECHAT####100001
-				// °ó¶¨Ê§°Ü£ºµ±Ç°openIdÒÑ¾­±»Ê¹ÓÃ¹ı£¬Ò²ÊÇ¾ÍËµÍ¬Ò»¸öÎ¢ĞÅ²»ÄÜ°ó¶¨¶à¸öÓÃ»§
+				// ç»‘å®šå¤±è´¥ï¼šå½“å‰openIdå·²ç»è¢«ä½¿ç”¨è¿‡ï¼Œä¹Ÿæ˜¯å°±è¯´åŒä¸€ä¸ªå¾®ä¿¡ä¸èƒ½ç»‘å®šå¤šä¸ªç”¨æˆ·
 			} else {
 				console.log('websocket:', e.data);
 			}
 		};
 		
-		// 1. ÓÃ»§¼ÓÔØµÇÂ¼Ò³Ãæ£¬JS×Ô¶¯Éú³Éunicode£¬²¢ÇÒ2ÃëÖÓºó×Ô¶¯·¢ËÍ¸øwebsocket·şÎñÆ÷½«unicode´æ´¢ÔÚWebSocketSessionÖĞ
+		// 1. ç”¨æˆ·åŠ è½½ç™»å½•é¡µé¢ï¼ŒJSè‡ªåŠ¨ç”Ÿæˆunicodeï¼Œå¹¶ä¸”2ç§’é’Ÿåè‡ªåŠ¨å‘é€ç»™websocketæœåŠ¡å™¨å°†unicodeå­˜å‚¨åœ¨WebSocketSessionä¸­
 		$(function() {
-// 			// ÎªÁË½«µ±Ç°session°ó¶¨µ½websocket·şÎñÆ÷ÖĞ
-// 			unicode = Math.round(Math.random() * 100000000);
-// 			setTimeout("websocket.send("+unicode+"1)", 2000); // Ïòwebsocket·şÎñÆ÷·¢ËÍmessage£¬Óëwebsocket·şÎñÆ÷´æ´¢µÄÌØ¶¨session½øĞĞ°ó¶¨
+// 			// ä¸ºäº†å°†å½“å‰sessionç»‘å®šåˆ°websocketæœåŠ¡å™¨ä¸­
+// 			unicode = Math.round(Math.random() * 10000000) + "1";
+// 			setTimeout("websocket.send("+unicode+")", 2000); // å‘websocketæœåŠ¡å™¨å‘é€messageï¼Œä¸websocketæœåŠ¡å™¨å­˜å‚¨çš„ç‰¹å®šsessionè¿›è¡Œç»‘å®š
 			
-			// ÎªÁË½«µ±Ç°session±êÊ¶ÎªÒÑµÇÂ¼µ«ÊÇÎ´°ó¶¨Î¢ĞÅµÄÓÃ»§ÔÚ¸öÈËÖĞĞÄ°ó¶¨Î¢ĞÅ
-			// ÎªÁË½«µ±Ç°session°ó¶¨µ½websocket·şÎñÆ÷ÖĞ
-			unicode = Math.round(Math.random() * 100000000) + "2";
-			setTimeout("websocket.send("+unicode+")", 2000); // Ïòwebsocket·şÎñÆ÷·¢ËÍmessage£¬Óëwebsocket·şÎñÆ÷´æ´¢µÄÌØ¶¨session½øĞĞ°ó¶¨
-			var username = "beamofsoul"; // ´Ë´¦ÎªÒÑµÇÂ¼ÓÃ»§ÓÃ»§Ãû
+			// ä¸ºäº†å°†å½“å‰sessionæ ‡è¯†ä¸ºå·²ç™»å½•ä½†æ˜¯æœªç»‘å®šå¾®ä¿¡çš„ç”¨æˆ·åœ¨ä¸ªäººä¸­å¿ƒç»‘å®šå¾®ä¿¡
+			// ä¸ºäº†å°†å½“å‰sessionç»‘å®šåˆ°websocketæœåŠ¡å™¨ä¸­
+			unicode = Math.round(Math.random() * 10000000) + "2";
+			setTimeout("websocket.send("+unicode+")", 2000); // å‘websocketæœåŠ¡å™¨å‘é€messageï¼Œä¸websocketæœåŠ¡å™¨å­˜å‚¨çš„ç‰¹å®šsessionè¿›è¡Œç»‘å®š
+			var username = "beamofsoul"; // æ­¤å¤„ä¸ºå·²ç™»å½•ç”¨æˆ·ç”¨æˆ·å
 			setTimeout("websocket.send('BIND_WECHAT####beamofsoul')", 2000);
 	    }); 
-		// 2. ÓÃ»§µã»÷Î¢ĞÅÉ¨Âë°´Å¥£¬½«unicodeÓÃ×÷sceneIdËæ»úÉú³É¶şÎ¬Âë£¬²¢ÔÚµ±Ç°Ò³Ãæ²»Ìø×ªµÄÇé¿öÏÂÏÔÊ¾¸øµ±Ç°ÓÃ»§
+		// 2. ç”¨æˆ·ç‚¹å‡»å¾®ä¿¡æ‰«ç æŒ‰é’®ï¼Œå°†unicodeç”¨ä½œsceneIdéšæœºç”ŸæˆäºŒç»´ç ï¼Œå¹¶åœ¨å½“å‰é¡µé¢ä¸è·³è½¬çš„æƒ…å†µä¸‹æ˜¾ç¤ºç»™å½“å‰ç”¨æˆ·
 		function getQRCodeUrl() {
 			$.get(hostUrl + "wechat/getQRCode?sceneId=" + unicode, null, function(url) {
 				$("#qrcode").attr("src", url);
 			});
 		}
-		// 4. Ç°Ì¨Ò³ÃæÊÕµ½ÌØ¶¨ÏûÏ¢(×Ô¶¯µÇÂ½ÃüÁîºÍopenId)£¬×Ô¶¯°ïÖúÓÃ»§Ìø×ªµÇÂ¼
+		// 4. å‰å°é¡µé¢æ”¶åˆ°ç‰¹å®šæ¶ˆæ¯(è‡ªåŠ¨ç™»é™†å‘½ä»¤å’ŒopenId)ï¼Œè‡ªåŠ¨å¸®åŠ©ç”¨æˆ·è·³è½¬ç™»å½•
 		function helpToLoginAutomatically(e) {
 			var mixedValues = e.data.split('####');
-			var openId = mixedValues[1]; // ÓÃ»§µÄopenId
-			var sceneId = 911; // µÇÂ¼ÏµÍ³Ä¬ÈÏ³¡¾°Öµ
-			// ¹Ø±Õ¶şÎ¬Âë
-			// Í¨¹ıajax·ÃÎÊºóÌ¨ÈÏÖ¤²¢µÇÂ¼
+			var openId = mixedValues[1]; // ç”¨æˆ·çš„openId
+			var sceneId = 911; // ç™»å½•ç³»ç»Ÿé»˜è®¤åœºæ™¯å€¼
+			// å…³é—­äºŒç»´ç 
+			// é€šè¿‡ajaxè®¿é—®åå°è®¤è¯å¹¶ç™»å½•
 			$.get(hostUrl + 'oauth/token?client_id=client_hm&client_secret=123456&grant_type=password&username='+openId+'&password='+sceneId, null, result => {
-				console.log(result); // ³É¹¦»ñÈ¡access_token
+				console.log(result); // æˆåŠŸè·å–access_token
 				var access_token = result.access_token;
 				$.get(hostUrl + "open/user/login?access_token="+access_token+"&username="+openId+"&password="+sceneId, null, result1 => {
-					console.log(result1); // ³É¹¦µÇÂ¼²¢»ñÈ¡µ½µÇÂ¼ÓÃ»§ĞÅÏ¢
+					console.log(result1); // æˆåŠŸç™»å½•å¹¶è·å–åˆ°ç™»å½•ç”¨æˆ·ä¿¡æ¯
 				});
 			});
 		}
 	</script>
-</html>  
+</html>
+ -->
