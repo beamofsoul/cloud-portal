@@ -39,9 +39,6 @@ import com.moraydata.general.management.wechat.SubMenuButton;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.service.UserService;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @RestController
 public class OpenWeChatController {
 	
@@ -108,7 +105,6 @@ public class OpenWeChatController {
 	
 	@GetMapping("/wechat/getQRCode")
     public String getQrcode(@RequestParam(value = "sceneId") int sceneId) throws Exception{
-		log.debug(String.format("getQrcode: %s", sceneId));
 		Token token = handler.getToken();
         String ticket = createTempTicket(token.getAccessToken(), String.valueOf(token.getExpiresIn()), sceneId);
         return ticket;
@@ -177,7 +173,6 @@ public class OpenWeChatController {
 	        if (msgType.equals("event")) {
 				if (event.equals("subscribe")) {
 					// 关注公众号
-					log.debug(String.format("callback eventKey: %s", eventKey));
 					String sceneId = eventKey.split("_")[1];
 					processScanLoginScene(sceneId, fromUserName);
 				} else if (event.equals("unsubscribe")) {
@@ -214,7 +209,6 @@ public class OpenWeChatController {
 	
 	@Transactional(readOnly = false)
 	private void processScanLoginScene(String sceneId, String fromUserName) throws Exception {
-		log.debug(String.format("processScanLoginScene: %s, %s", sceneId, fromUserName));
 		if (sceneId.endsWith(Constants.WECHAT.SCAN_LOGIN_SCENE_ID_FUNCTIONALITY_KEY)) {
 			// 通过前台页面扫码登录
 			User targetUser = getTargetUser(fromUserName);
@@ -240,7 +234,7 @@ public class OpenWeChatController {
 			// 通过前台个人中心扫码绑定微信
 			DefaultWebSocketHandler.sendMessageToBindWeChat(sceneId + Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR + fromUserName);
 		} else {
-			log.debug(String.format("未知的sceneId或者fromUserName: %s, %s", sceneId, fromUserName));
+			
 		}
 	}
 

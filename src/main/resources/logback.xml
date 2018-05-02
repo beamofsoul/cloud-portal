@@ -3,7 +3,7 @@
 <configuration>
 
 	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径-->    
-    <property name="LOG_HOME" value="/log" />    
+    <property name="LOG_HOME" value="d:/cloud_portal/log" />    
 
 	<!-- 控制台输出 -->
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
@@ -35,7 +35,7 @@
 
 		<!-- 在日志文件超过5MB时进行归档，并且归档文件后缀只要是.zip或.gz就会自动压缩日志归档 -->
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-			<fileNamePattern>${LOG_HOME}/zip/cloud_portal.%i.debug.log.zip</fileNamePattern>
+			<fileNamePattern>D:/Log/cloud_portal.%i.debug.log.zip</fileNamePattern>
 			<minIndex>1</minIndex>
 			<maxIndex>10</maxIndex>
 		</rollingPolicy>
@@ -72,7 +72,7 @@
 		
 		<!-- 在日志文件超过5MB时进行归档，并且归档文件后缀只要是.zip或.gz就会自动压缩日志归档 -->
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-			<fileNamePattern>${LOG_HOME}/zip/cloud_portal.%i.error.log.zip</fileNamePattern>
+			<fileNamePattern>D:/Log/cloud_portal.%i.error.log.zip</fileNamePattern>
 			<minIndex>1</minIndex>
 			<maxIndex>10</maxIndex>
 		</rollingPolicy>

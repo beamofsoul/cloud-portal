@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import com.moraydata.general.management.util.QuerydslUtils;
-import com.moraydata.general.primary.entity.RolePermission;
 import com.moraydata.general.primary.entity.dto.RolePermissionDTO;
 import com.moraydata.general.primary.entity.query.QRolePermission;
 import com.moraydata.general.primary.repository.RolePermissionRepositoryCustom;
@@ -16,7 +15,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 
 @NoRepositoryBean
-public class RolePermissionRepositoryImpl implements RolePermissionRepositoryCustom<RolePermission, Long> {
+public class RolePermissionRepositoryImpl<RolePermission> implements RolePermissionRepositoryCustom<RolePermission, Long> {
 	
 	@Autowired
 	private EntityManager entityManager;

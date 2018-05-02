@@ -40,8 +40,6 @@ public final class Constants {
 		public static final String EXPIRES_IN = "expires_in";
 		public static final String SERVICE_ACCESS_TOKEN = "wechat:service:" + ACCESS_TOKEN;
 		
-		public static final String ERROR_MEESSAGE_KEY = "errmsg";
-		
 		public static final String SCAN_LOGIN_SCENE_ID = "911";
 		public static final int SCAN_LOGIN_OPEN_ID_MIN_LENGTH = 20;
 		public static final String SCAN_LOGIN_WEB_SOCKET_COMMAND = "AUTOMATIC_LOGIN";

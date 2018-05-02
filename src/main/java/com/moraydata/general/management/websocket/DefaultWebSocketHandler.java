@@ -19,9 +19,6 @@ import com.moraydata.general.primary.entity.query.QUser;
 import com.moraydata.general.primary.repository.UserRepository;
 import com.moraydata.general.primary.service.UserService;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Async
 @Component
 public class DefaultWebSocketHandler implements WebSocketHandler {
@@ -49,7 +46,6 @@ public class DefaultWebSocketHandler implements WebSocketHandler {
 				if (payload.startsWith("sendAll#")) {
 					sendMessageToAll(new TextMessage(payload.split("#")[1]));
 				} else {
-					log.debug(String.format("Websocket Server has recieved a message: %s", payload));
 					// 2018-04-16 addition to support binding WeChat by scanning QR code
 					if (payload.indexOf(Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR) > -1) {
 						if (payload.indexOf(Constants.WECHAT.SCAN_BIND_WECHAT_KEY) > -1) {
@@ -80,7 +76,6 @@ public class DefaultWebSocketHandler implements WebSocketHandler {
 	}
 	
 	public static void sendMessageToAutomaticLogin(String sceneId) throws Exception {
-		log.debug("sendMessageToAutomaticLogin: %s" + sceneId);
 		// The value of input parameter "sceneId" will be formatted as [unicode/sceneId + "####" + openId].
 		String[] mixedValues = sceneId.split(Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR);
 		String unicode = mixedValues[0];
@@ -91,7 +86,6 @@ public class DefaultWebSocketHandler implements WebSocketHandler {
 			if (e.isOpen()) {
 				try {
 					// Send a text message of openId to the PC end to make sure it has able to login automatically for the user.
-					log.debug(Constants.WECHAT.SCAN_LOGIN_WEB_SOCKET_COMMAND + Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR + openId);
 					e.sendMessage(new TextMessage(Constants.WECHAT.SCAN_LOGIN_WEB_SOCKET_COMMAND + Constants.WECHAT.SCAN_LOGIN_DEFAULT_SEPARATOR + openId));
 				} catch (IOException ex) {
 					ex.printStackTrace();

@@ -17,9 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Component
 public final class WeChatTokenHelper {
 	
@@ -59,10 +57,6 @@ public final class WeChatTokenHelper {
 			put("secret", appSecret);
 		}});
 		Map<String, Object> response =  RestTemplateUtils.INSTANCE.getRestTemplate().getForObject(integratedUrl, Map.class);
-		if (response.containsKey(Constants.WECHAT.ERROR_MEESSAGE_KEY)) {
-			// 与微信通讯过程中存在异常
-			log.error("尝试向微信服务器获取access_token过程中发生异常:", JSON.toJSONString(response));
-		}
 		return Token.builder().accessToken(response.get(Constants.WECHAT.ACCESS_TOKEN).toString()).expiresIn(Long.valueOf(response.get(Constants.WECHAT.EXPIRES_IN).toString())).maketime(new Date().getTime()).build(); 
 	}
 	
