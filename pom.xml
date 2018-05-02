@@ -30,6 +30,13 @@
 	</properties>
 
 	<dependencies>
+	
+		<!-- Quartz -->
+<!-- 		<dependency> -->
+<!-- 		    <groupId>org.springframework.boot</groupId> -->
+<!-- 		    <artifactId>spring-boot-starter-quartz</artifactId> -->
+<!-- 		</dependency> -->
+	
 		<!-- WebScoket -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
