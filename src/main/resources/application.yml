@@ -11,26 +11,26 @@ spring:
     servlet:
       content-type: text/html; charset=utf-8
       
-#  quartz:
-#    job-store-type: jdbc
-#    jdbc:
-#      initialize-schema: always
-#    properties:
-#      # Configure Main Scheduler Properties
-#      org.quartz.scheduler.instanceName: cloud-portal-scheduler
-#      org.quartz.scheduler.instanceId: AUTO # 如果使用集群，instanceId必须唯一，设置成AUTO
-#      org.quartz.scheduler.skipUpdateCheck: true
-#      # Configure ThreadPool
-#      org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool
-#      org.quartz.threadPool.threadCount: 10
-#      org.quartz.threadPool.threadPriority: 5
-#      # Configure JobStore
-#      org.quartz.jobStore.misfireThreshold: 60000
-#      org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX # 存储方式为数据库
-#      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
-#      org.quartz.jobStore.useProperties: true # 使用自己的配置文件
-#      org.quartz.jobStore.tablePrefix: T_QRTZ_
-#      org.quartz.jobStore.isClustered: false # 是否使用集群
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
+    properties:
+      # Configure Main Scheduler Properties
+      org.quartz.scheduler.instanceName: cloud-portal-scheduler
+      org.quartz.scheduler.instanceId: AUTO # 如果使用集群，instanceId必须唯一，设置成AUTO
+      org.quartz.scheduler.skipUpdateCheck: true
+      # Configure ThreadPool
+      org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool
+      org.quartz.threadPool.threadCount: 10
+      org.quartz.threadPool.threadPriority: 5
+      # Configure JobStore
+      org.quartz.jobStore.misfireThreshold: 60000
+      org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX # 存储方式为数据库
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+      org.quartz.jobStore.useProperties: true # 使用自己的配置文件
+      org.quartz.jobStore.tablePrefix: T_QRTZ_
+      org.quartz.jobStore.isClustered: false # 是否使用集群
 
 swagger:
   api:
@@ -114,6 +114,9 @@ project:
         accessTokenUrl: https://api.weixin.qq.com/cgi-bin/token # 获取access_token的url
         ticketUrl: https://api.weixin.qq.com/cgi-bin/qrcode/create # 创建二维码ticket的url
         showQRCodeUrl: https://mp.weixin.qq.com/cgi-bin/showqrcode # 显示二维码的url
+        createMenuUrl: https://api.weixin.qq.com/cgi-bin/menu/create # 创建服务号菜单的url
+        connectOAuth2Menu4CodeUrl: https://open.weixin.qq.com/connect/oauth2/authorize # 创建每个菜单按钮携带重定向url并获取code所需的url
+        snsOAuth2TokenAndOpenIdUrl: https://api.weixin.qq.com/sns/oauth2/access_token # 服务号菜单跳转通过code使用OAuth2方式获取access_token和openid的url
     social: # 现在只支持微信开放平台OAuth2方式扫码登录系统
       # Make Spring Social component enabled or not
       enabled: false

@@ -36,6 +36,14 @@ public final class Constants {
 	}
 	
 	public static final class WECHAT {
+		public static final String APP_ID = "appId";
+		public static final String APP_SECRET = "secret";
+		public static final String CODE = "code";
+		public static final String GRANT_TYPE = "grant_type";
+		public static final String AUTHORIZATION_CODE = "authorization_code";
+		
+		public static final String REDIRECT_SIGN = "#wechat_redirect";
+		
 		public static final String ACCESS_TOKEN = "access_token";
 		public static final String EXPIRES_IN = "expires_in";
 		public static final String SERVICE_ACCESS_TOKEN = "wechat:service:" + ACCESS_TOKEN;
@@ -57,5 +65,14 @@ public final class Constants {
 	public static final class SENDING_MESSAGE_CODE {
 		public static final String DEFAULT_MESSAGE_CODE_FORMAT = "messageCode:%s#%s#%s"; 
 		public static final String REGISTRATION_KEY_PREFIX = "registration";
+	}
+	
+	public static final class TEMPLATE_MESSAGE {
+		public static final String FIRST = "first";
+		public static final String KEYWORD1 = "keyword1";
+		public static final String KEYWORD2 = "keyword2";
+		public static final String KEYWORD3 = "keyword3";
+		public static final String KEYWORD4 = "keyword4";
+		public static final String REMARK = "remark";
 	}
 }

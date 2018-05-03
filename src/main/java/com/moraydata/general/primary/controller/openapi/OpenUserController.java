@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.management.util.PageUtils;
@@ -542,6 +543,148 @@ public class OpenUserController {
 			}
 			boolean data = userService.updateUsername(userId, username);
 			return ResponseEntity.success("更新用户名成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 修改用户级别
+	 * @param userId 修改所用的用户编号
+	 * @param level 修改后的用户级别
+	 * @return boolean 是否修改成功
+	 */
+	@PutMapping("changingLevel")
+	public ResponseEntity changingLevel(@RequestParam Long userId, @RequestParam Integer level) {
+		Assert.notNull(userId, "CHANGING_LEVEL_USER_ID_IS_NULL");
+		Assert.notNull(level, "CHANGING_LEVEL_LEVEL_IS_NULL");
+		
+		try {
+			if (userId.longValue() == 0L) {
+				return ResponseEntity.error("用户编号有误");
+			}
+			if (!User.Level.exists(level.intValue())) {
+				return ResponseEntity.error("用户级别格式错误");
+			}
+			boolean data = userService.updateLevel(userId, User.Level.getInstance(level.intValue()));
+			return ResponseEntity.success("更新用户级别成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 修改用户是否接受通知消息状态
+	 * @param userId 修改所用的用户编号
+	 * @param notified 修改后的用户是否接受通知消息状态
+	 * @return boolean 是否修改成功
+	 */
+	@PutMapping("changingNotified")
+	public ResponseEntity changingNotified(@RequestParam Long userId, @RequestParam Boolean notified) {
+		Assert.notNull(userId, "CHANGING_NOTIFIED_USER_ID_IS_NULL");
+		Assert.notNull(notified, "CHANGING_NOTIFIED_NOTIFIED_IS_NULL");
+		
+		try {
+			if (userId.longValue() == 0L) {
+				return ResponseEntity.error("用户编号有误");
+			}
+			boolean data = userService.updateNotified(userId, notified);
+			return ResponseEntity.success("更新用户接受消息状态成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 获取全部舆情接受状态
+	 * @return String 所有舆情接受状态的Map的JSON字符串
+	 */
+	@GetMapping("sentiments")
+	public ResponseEntity sentiments() {
+		try {
+			String data = JSON.toJSONString(User.NotifiedSentiment.CODE_VALUE_MAP);
+			return ResponseEntity.success("获取全部舆情接受状态成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 修改用户对预警舆情的接受状态
+	 * @param userId 修改所用的用户编号
+	 * @param sentiment 修改后用户对预警舆情的接受状态
+	 * @return boolean 是否修改成功
+	 */
+	@PutMapping("changingNotifiedWarningPublicSentiment")
+	public ResponseEntity changingNotifiedWarningPublicSentiment(@RequestParam Long userId, @RequestParam String sentiment) {
+		Assert.notNull(userId, "CHANGING_NOTIFIED_WARNING_PUBLIC_SENTIMENT_USER_ID_IS_NULL");
+		Assert.notNull(sentiment, "CHANGING_NOTIFIED_WARNING_PUBLIC_SENTIMENT_SENTIMENT_IS_NULL");
+		
+		try {
+			if (userId.longValue() == 0L) {
+				return ResponseEntity.error("用户编号有误");
+			}
+			if (!User.NotifiedSentiment.exists(sentiment)) {
+				return ResponseEntity.error("预警舆情接受状态格式错误");
+			}
+			boolean data = userService.updateNotifiedWarningPublicSentiment(userId, User.NotifiedSentiment.getInstance(sentiment));
+			return ResponseEntity.success("预警舆情接受状态修改成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 修改用户对热点舆情的接受状态
+	 * @param userId 修改所用的用户编号
+	 * @param sentiment 修改后用户对热点舆情的接受状态
+	 * @return boolean 是否修改成功
+	 */
+	@PutMapping("changingNotifiedHotPublicSentiment")
+	public ResponseEntity changingNotifiedHotPublicSentiment(@RequestParam Long userId, @RequestParam String sentiment) {
+		Assert.notNull(userId, "CHANGING_NOTIFIED_HOT_PUBLIC_SENTIMENT_USER_ID_IS_NULL");
+		Assert.notNull(sentiment, "CHANGING_NOTIFIED_HOT_PUBLIC_SENTIMENT_SENTIMENT_IS_NULL");
+		
+		try {
+			if (userId.longValue() == 0L) {
+				return ResponseEntity.error("用户编号有误");
+			}
+			if (!User.NotifiedSentiment.exists(sentiment)) {
+				return ResponseEntity.error("热点舆情接受状态格式错误");
+			}
+			boolean data = userService.updateNotifiedHotPublicSentiment(userId, User.NotifiedSentiment.getInstance(sentiment));
+			return ResponseEntity.success("热点舆情接受状态修改成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 修改用户对负面舆情的接受状态
+	 * @param userId 修改所用的用户编号
+	 * @param sentiment 修改后用户对负面舆情的接受状态
+	 * @return boolean 是否修改成功
+	 */
+	@PutMapping("changingNotifiedNegativePublicSentiment")
+	public ResponseEntity changingNotifiedNegativePublicSentiment(@RequestParam Long userId, @RequestParam String sentiment) {
+		Assert.notNull(userId, "CHANGING_NOTIFIED_NEGATIVE_PUBLIC_SENTIMENT_USER_ID_IS_NULL");
+		Assert.notNull(sentiment, "CHANGING_NOTIFIED_NEGATIVE_PUBLIC_SENTIMENT_SENTIMENT_IS_NULL");
+		
+		try {
+			if (userId.longValue() == 0L) {
+				return ResponseEntity.error("用户编号有误");
+			}
+			if (!User.NotifiedSentiment.exists(sentiment)) {
+				return ResponseEntity.error("负面舆情接受状态格式错误");
+			}
+			boolean data = userService.updateNotifiedNegativePublicSentiment(userId, User.NotifiedSentiment.getInstance(sentiment));
+			return ResponseEntity.success("负面舆情接受状态修改成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;
