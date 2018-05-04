@@ -10,12 +10,16 @@ import com.moraydata.general.primary.entity.Service;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
+import lombok.NonNull;
+
 public interface ServiceService {
 	
 	Service create(Service instance);
 	Service update(Service instance);
 	long delete(Long... instanceIds);
 	Service get(Long instanceId);
+	boolean isUsedServices(@NonNull Long... instanceIds);
+	List<Service> getAllAvailable();
 	List<Service> get(Long... instanceIds);
 	Page<Service> get(Pageable pageable);
 	Page<Service> get(Pageable pageable, Predicate predicate);

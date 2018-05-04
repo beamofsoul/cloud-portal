@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,9 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public final class WeChatTokenHelper {
 	
+	@Getter
 	@Value("${project.base.wechat.service.appId}")
 	private String appId;
 	
+	@Getter
 	@Value("${project.base.wechat.service.appSecret}")
 	private String appSecret;
 	
@@ -61,7 +64,8 @@ public final class WeChatTokenHelper {
 		Map<String, Object> response =  RestTemplateUtils.INSTANCE.getRestTemplate().getForObject(integratedUrl, Map.class);
 		if (response.containsKey(Constants.WECHAT.ERROR_MEESSAGE_KEY)) {
 			// 与微信通讯过程中存在异常
-			log.error("尝试向微信服务器获取access_token过程中发生异常:", JSON.toJSONString(response));
+			log.error(String.format("尝试向微信服务器获取 access_token 过程中发生异常: %s", JSON.toJSONString(response)));
+			return null;
 		}
 		return Token.builder().accessToken(response.get(Constants.WECHAT.ACCESS_TOKEN).toString()).expiresIn(Long.valueOf(response.get(Constants.WECHAT.EXPIRES_IN).toString())).maketime(new Date().getTime()).build(); 
 	}

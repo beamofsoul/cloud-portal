@@ -100,6 +100,21 @@ public class User extends BaseAbstractEntity {
 	@Column(columnDefinition = "varchar(256) comment '可用服务订单细则编号'")
 	private String orderItemIds;
 	
+	@Column(columnDefinition = "tinyint default 1 comment '用户级别'")
+	private Integer level;
+	
+	@Column(columnDefinition = "bit default 1 comment '是否接受通知'")
+	private Boolean notified;
+	
+	@Column(columnDefinition = "enum('non','all','related') not null default 'non' comment '预警舆情接受状态'")
+	private String notifiedWarningPublicSentiment;
+	
+	@Column(columnDefinition = "enum('non','all','related') not null default 'non' comment '热点舆情接受状态'")
+	private String notifiedHotPublicSentiment;
+	
+	@Column(columnDefinition = "enum('non','all','related') not null default 'non' comment '负面舆情接受状态'")
+	private String notifiedNegativePublicSentiment;
+	
 	@Transient
 	private String photoString;
 	
@@ -124,7 +139,7 @@ public class User extends BaseAbstractEntity {
 	
 	@RequiredArgsConstructor(access=AccessLevel.PROTECTED)
 	public static enum Status {
-		NORMAL(1),LOCKED(0);
+		NORMAL(1), LOCKED(0);
 		@Getter private final int value;
 		private static HashMap<Integer, Status> codeValueMap = new HashMap<>(3);
 		static {
@@ -136,6 +151,60 @@ public class User extends BaseAbstractEntity {
 			return codeValueMap.get(code);
 		}
 	}
+	
+	@RequiredArgsConstructor(access=AccessLevel.PROTECTED)
+	public static enum ResourceType {
+		BUTTON("button"), MENU("menu");
+		@Getter private final String value;
+		private static HashMap<String, ResourceType> codeValueMap = new HashMap<>(3);
+		static {
+			for (ResourceType resourceType : ResourceType.values()) {
+				codeValueMap.put(resourceType.value, resourceType);
+			}
+		}
+		public static ResourceType getInstance(String code) {
+			return codeValueMap.get(code);
+		}
+		public static boolean exists(String code) {
+			return codeValueMap.containsKey(code);
+		}
+	}
+	
+	@RequiredArgsConstructor(access=AccessLevel.PROTECTED)
+	public static enum NotifiedSentiment {
+		NON("non"), ALL("all"), RELATED("related");
+		@Getter private final String value;
+		public static final HashMap<String, NotifiedSentiment> CODE_VALUE_MAP = new HashMap<>(3);
+		static {
+			for (NotifiedSentiment notifiedSentiment : NotifiedSentiment.values()) {
+				CODE_VALUE_MAP.put(notifiedSentiment.value, notifiedSentiment);
+			}
+		}
+		public static NotifiedSentiment getInstance(String code) {
+			return CODE_VALUE_MAP.get(code);
+		}
+		public static boolean exists(String code) {
+			return CODE_VALUE_MAP.containsKey(code);
+		}
+	}
+	
+	@RequiredArgsConstructor(access=AccessLevel.PROTECTED)
+	public static enum Level {
+		FIRST(1), SECOND(2), THIRD(3);
+		@Getter private final int value;
+		private static HashMap<Integer, Level> codeValueMap = new HashMap<>(3);
+		static {
+			for (Level level : Level.values()) {
+				codeValueMap.put(level.value, level);
+			}
+		}
+		public static Level getInstance(int code) {
+			return codeValueMap.get(code);
+		}
+		public static boolean exists(int code) {
+			return codeValueMap.containsKey(code);
+		}
+	}
 
 	@Override
 	public String toString() {
@@ -145,6 +214,8 @@ public class User extends BaseAbstractEntity {
 				+ countOfInvitationCodes + ", company=" + company + ", companyTitle=" + companyTitle + ", companyType="
 				+ companyType + ", companyLocation=" + companyLocation + ", companyPhone=" + companyPhone
 				+ ", companyFax=" + companyFax + ", openId=" + openId + ", description=" + description
-				+ ", photoString=" + photoString + ", status=" + status + ", roles=" + roles + "]";
+				+ ", photoString=" + photoString + ", status=" + status + ", roles=" + roles + ", level=" + level + ", notified=" + notified
+				+ ", notifiedWarningPublicSentiment=" + notifiedWarningPublicSentiment + ", notifiedHotPublicSentiment=" + notifiedHotPublicSentiment
+				+ ", notifiedNegativePublicSentiment=" + notifiedNegativePublicSentiment + "]";
 	}
 }

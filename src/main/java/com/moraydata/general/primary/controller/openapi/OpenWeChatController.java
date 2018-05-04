@@ -63,51 +63,92 @@ public class OpenWeChatController {
 	@Value("${project.base.wechat.service.showQRCodeUrl}")
 	private String showQRCodeUrl;
 	
+	@Value("${project.base.wechat.service.createMenuUrl}")
+	private String createMenuUrl;
+	
+	@Value("${project.base.wechat.service.connectOAuth2Menu4CodeUrl}")
+	private String connectOAuth2Menu4CodeUrl;
+	
+	@Value("${project.base.wechat.service.snsOAuth2TokenAndOpenIdUrl}")
+	private String snsUrl;
+	
 	/************************************************************** 发送模板消息 ****************************************************************/
 	
 	private static final String SEND_TEMPLATE_MESSAGE_PATH = "https://api.weixin.qq.com/cgi-bin/message/template/send";
 	
 	@SuppressWarnings({ "serial" })
 	@GetMapping("/wechat/sendTemplateMessage")
-	public boolean sendTemplateMessage(@RequestParam String openId) {
+	public boolean sendTemplateMessage(@RequestParam String openId) throws Exception {
 		if (StringUtils.isBlank(openId)) {
 			return false;
 		}
+//		Map<String, Object> parameters = new HashMap<String, Object>();
+//		parameters.put("touser", "oQFmP01E8wBBiJMVCh_wQbcitOz0"); // 接收者openId
+//		parameters.put("template_id", "lvUC1MN9F2JC4Ymb5HYJ-qsocKKfk5kPfCHzzqq3uAM"); // 模板Id
+//		parameters.put("url", "http://www.baidu.com");
+//		parameters.put("data", new HashMap<String, Map<String, String>>() {{
+//			put("first", new HashMap<String, String>() {{
+//				put("value", "您提交的测试任务已完成! test");
+//				put("color", "#173177");
+//			}});
+//			put("keyword1", new HashMap<String, String>() {{
+//				put("value", "2018年04月23日 11:32 test");
+//				put("color", "#173177");
+//			}});
+//			put("keyword2", new HashMap<String, String>() {{
+//				put("value", "2018年04月23日 11:32 test");
+//				put("color", "#173177");
+//			}});
+//			put("keyword3", new HashMap<String, String>() {{
+//				put("value", "测试未通过! test");
+//				put("color", "#173177");
+//			}});
+//			put("remark", new HashMap<String, String>() {{
+//				put("value", "点击查看测试结果详情 test");
+//				put("color", "#173177");
+//			}});
+//		}});
+		
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("touser", "oQFmP01E8wBBiJMVCh_wQbcitOz0"); // 接收者openId
-		parameters.put("template_id", "lvUC1MN9F2JC4Ymb5HYJ-qsocKKfk5kPfCHzzqq3uAM"); // 模板Id
+		parameters.put("template_id", "259crn-Levvu-2VDe2jff43bHncbzyQC3LWCTpZCWBw"); // 模板Id
 		parameters.put("url", "http://www.baidu.com");
 		parameters.put("data", new HashMap<String, Map<String, String>>() {{
 			put("first", new HashMap<String, String>() {{
-				put("value", "您提交的测试任务已完成! test");
+				put("value", "海鳗云平台监测到一个异常事件");
 				put("color", "#173177");
 			}});
 			put("keyword1", new HashMap<String, String>() {{
-				put("value", "2018年04月23日 11:32 test");
+				put("value", "自然灾害");
 				put("color", "#173177");
 			}});
 			put("keyword2", new HashMap<String, String>() {{
-				put("value", "2018年04月23日 11:32 test");
+				put("value", "九寨沟");
 				put("color", "#173177");
 			}});
 			put("keyword3", new HashMap<String, String>() {{
-				put("value", "测试未通过! test");
+				put("value", "2018-01-01");
+				put("color", "#173177");
+			}});
+			put("keyword4", new HashMap<String, String>() {{
+				put("value", "阿坝；九寨沟；地震；8级");
 				put("color", "#173177");
 			}});
 			put("remark", new HashMap<String, String>() {{
-				put("value", "点击查看测试结果详情 test");
+				put("value", "请及时查看处置!");
 				put("color", "#173177");
 			}});
 		}});
+		
 		JSONObject jsonResponse = RestTemplateUtils.INSTANCE.getRestTemplate().postForObject(integrateUrlWithAccessToken(SEND_TEMPLATE_MESSAGE_PATH), RestTemplateUtils.getHttpEntity(parameters), JSONObject.class);
+		log.debug(JSON.toJSONString(jsonResponse));
 		return jsonResponse.getString("errmsg").equals("ok");
 	}
-	
 	
 	/************************************************************** 关注服务号并且自动登录系统 ****************************************************************/
 	
 	@GetMapping("/wechat/getQRCode")
-    public String getQrcode(@RequestParam(value = "sceneId") int sceneId) throws Exception{
+    public String getQrcode(@RequestParam(value = "sceneId") int sceneId) {
 		log.debug(String.format("getQrcode: %s", sceneId));
 		Token token = handler.getToken();
         String ticket = createTempTicket(token.getAccessToken(), String.valueOf(token.getExpiresIn()), sceneId);
@@ -244,17 +285,7 @@ public class OpenWeChatController {
 		}
 	}
 
-	private User createTargetUser(User targetUser) {
-		return userService.create(targetUser);
-	}
-
-	private User getTargetUser(String fromUserName) throws Exception {
-		return userService.getByOpenId(fromUserName);
-	}
-	
 	/*************************************************************** 服务号菜单 ***************************************************************/
-	
-	private static final String CREATE_MENU_PATH = "https://api.weixin.qq.com/cgi-bin/menu/create";
 	
 	@GetMapping("/wechat/createMenu")
 	public ResponseEntity createMenu(@RequestParam(required = false) String jsonStringMenu) {
@@ -278,6 +309,7 @@ public class OpenWeChatController {
 **/
 		if (StringUtils.isBlank(jsonStringMenu)) {
 			String clickEvent = MenuButton.Type.CLICK.getValue();
+			String viewEvent = MenuButton.Type.VIEW.getValue();
 			Menu menu = new Menu();
 
 	        // 建3个导航菜单
@@ -286,11 +318,10 @@ public class OpenWeChatController {
 	        NavigationMenu navSecond = new NavigationMenu();
 	        navSecond.setName("个人中心");
 	        SubMenuButton navThird = new SubMenuButton();
-	        navThird.setType(MenuButton.Type.VIEW.getValue());
-//			navThird.setType(clickEvent);
+	        navThird.setType(viewEvent);
 	        navThird.setName("历史数据");
-//	        navThird.setKey("30");
-	        navThird.setUrl("http://57166643.ngrok.io/wechat/testMenuUrl?content=abc123");
+	        navThird.setUrl(integreatedMenuUrl("http://a7e5f6bf.ngrok.io/wechat/whois?action=historyData"));
+	        // http://openapi.moraydata.com/wechat/whois
 
 	        // 第一个导航菜单的子菜单
 	        SubMenuButton subMenuFirstFirst = new SubMenuButton();
@@ -338,15 +369,72 @@ public class OpenWeChatController {
 	        jsonStringMenu = JSON.toJSONString(menu);
 		}
 
-		JSONObject response = RestTemplateUtils.INSTANCE.getRestTemplate().postForObject(integrateUrlWithAccessToken(CREATE_MENU_PATH), RestTemplateUtils.getHttpEntity(jsonStringMenu), JSONObject.class);
+		JSONObject response = RestTemplateUtils.INSTANCE.getRestTemplate().postForObject(integrateUrlWithAccessToken(createMenuUrl), RestTemplateUtils.getHttpEntity(jsonStringMenu), JSONObject.class);
 		return "ok".equals(response.getString("errmsg")) ? ResponseEntity.success("重建服务号菜单成功", jsonStringMenu) : ResponseEntity.error("重建服务号菜单失败", response);
 	}
+
+	/**
+	 * 通过获取到的微信服务器code，从微信服务器获取制定的access_token和openid
+	 * @param request 请求的实例
+	 * @return JSONObject 包含用户信息、openid和access_token的JSONObject
+	 */
+	@GetMapping("/wechat/whois")
+	public ResponseEntity whois(HttpServletRequest request) {
+		String code = request.getParameter(Constants.WECHAT.CODE);
+		if (StringUtils.isBlank(code)) {
+			return ResponseEntity.error("code格式错误");
+		}
+		try {
+			log.debug("#### /wechat/whois: code: " + code);
+			String response = RestTemplateUtils.INSTANCE.getRestTemplate().getForObject(integrateUrl4TokenAndOpenId(code), String.class);
+			JSONObject parsedResponse = JSONObject.parseObject(response);
+			log.debug("#### /wechat/whois: response:" + response);
+			log.debug("#### /wechat/whois: response: access_token: " + parsedResponse.getString("access_token"));
+			log.debug("#### /wechat/whois: response: expires_in: " + parsedResponse.getInteger("expires_in"));
+			log.debug("#### /wechat/whois: response: refresh_token: " + parsedResponse.getString("refresh_token"));
+			log.debug("#### /wechat/whois: response: openid: " + parsedResponse.getString("openid"));
+			log.debug("#### /wechat/whois: response: scope: " + parsedResponse.getString("scope"));
+			User currentUser = userService.getByOpenId(parsedResponse.getString("openid"));
+			log.debug("#### /wechat/whois: currentUser: " + JSON.toJSONString(currentUser));
+			parsedResponse.put("currentUser", currentUser);
+			return ResponseEntity.success("获取当前用户信息成功", parsedResponse);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
 	
-	@GetMapping("/wechat/testMenuUrl")
-	public ResponseEntity testMenuUrl(@RequestParam String content) {
-		return ResponseEntity.success("微信服务号菜单点击跳转URL功能测试成功", content);
+	private User createTargetUser(User targetUser) {
+		return userService.create(targetUser);
 	}
 
+	private User getTargetUser(String fromUserName) throws Exception {
+		return userService.getByOpenId(fromUserName);
+	}
+
+	@SuppressWarnings("serial")
+	private String integreatedMenuUrl(String redirectUrl) {
+		String integratedUrl = HttpUrlUtils.integrate(connectOAuth2Menu4CodeUrl, new HashMap<String, Object>() {{
+			put(Constants.WECHAT.APP_ID, handler.getAppId());
+			put("redirect_uri", redirectUrl);
+			put("response_type", Constants.WECHAT.CODE);
+			put("scope", "snsapi_base");
+			put("state", 1);
+        }});
+		return integratedUrl + Constants.WECHAT.REDIRECT_SIGN;
+	}
+
+	@SuppressWarnings("serial")
+	private String integrateUrl4TokenAndOpenId(String code) {
+		String integratedUrl = HttpUrlUtils.integrate(snsUrl, new HashMap<String, Object>() {{
+			put(Constants.WECHAT.APP_ID, handler.getAppId());
+			put(Constants.WECHAT.APP_SECRET, handler.getAppSecret());
+			put(Constants.WECHAT.CODE, code);
+			put(Constants.WECHAT.GRANT_TYPE, Constants.WECHAT.AUTHORIZATION_CODE);
+		}});
+		return integratedUrl;
+	}
+	
 	private String integrateUrlWithAccessToken(final String baseUrl) {
 		return integrateUrlWithAccessToken(baseUrl, handler.getToken().getAccessToken());
 	}
