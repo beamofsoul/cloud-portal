@@ -1,20 +1,15 @@
 package com.moraydata.general.primary.entity.query;
 
-import static com.querydsl.core.types.PathMetadataFactory.forVariable;
+import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.querydsl.core.types.dsl.*;
+
+import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
 
 import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.PathMetadata;
-import com.querydsl.core.types.dsl.BooleanPath;
-import com.querydsl.core.types.dsl.DateTimePath;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.core.types.dsl.NumberPath;
-import com.querydsl.core.types.dsl.PathInits;
-import com.querydsl.core.types.dsl.SetPath;
-import com.querydsl.core.types.dsl.StringPath;
 
 
 /**
@@ -38,7 +33,7 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath companyLocation = createString("companyLocation");
 
     public final StringPath companyPhone = createString("companyPhone");
-
+    
     public final StringPath companyTitle = createString("companyTitle");
 
     public final StringPath companyType = createString("companyType");
@@ -56,21 +51,9 @@ public class QUser extends EntityPathBase<User> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final NumberPath<Integer> level = createNumber("level", Integer.class);
-
     public final StringPath nickname = createString("nickname");
-
-    public final BooleanPath notified = createBoolean("notified");
-
-    public final StringPath notifiedHotPublicSentiment = createString("notifiedHotPublicSentiment");
-
-    public final StringPath notifiedNegativePublicSentiment = createString("notifiedNegativePublicSentiment");
-
-    public final StringPath notifiedWarningPublicSentiment = createString("notifiedWarningPublicSentiment");
-
+    
     public final StringPath openId = createString("openId");
-
-    public final StringPath orderItemIds = createString("orderItemIds");
 
     public final NumberPath<Long> parentId = createNumber("parentId", Long.class);
 
@@ -81,6 +64,8 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath photo = createString("photo");
 
     public final SetPath<Role, QRole> roles = this.<Role, QRole>createSet("roles", Role.class, QRole.class, PathInits.DIRECT2);
+    
+    public final StringPath orderItemIds = createString("orderItemIds");
 
     public final NumberPath<Integer> status = createNumber("status", Integer.class);
 

@@ -49,26 +49,6 @@ public class BooleanExpressionUtils {
 	}
 	
 	/**
-	 * @Title: beforeLike  
-	 * @Description: 拼接左侧like字符串
-	 * @param property
-	 * @return String 拼接好的like字符串
-	 */
-	public static String leftLike(String property) {
-		return "%" + property;
-	}
-
-	/**
-	 * @Title: afterLike  
-	 * @Description: 拼接右侧like字符串
-	 * @param property
-	 * @return String 拼接好的like字符串
-	 */
-	public static String rightLike(String property) {
-		return property + "%";
-	}
-	
-	/**
 	 * @Title: like  
 	 * @Description: 拼接左侧或右侧like字符串 
 	 * @param property

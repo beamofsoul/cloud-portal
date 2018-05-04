@@ -65,10 +65,4 @@ public interface UserService {
 	boolean decreaseCountOfInvitationCodes(Long userId, int many) throws Exception;
 	boolean update(Long userId, String password, String phone, String description) throws Exception;
 	boolean matchRelationship(Long userId, Long... userIds) throws Exception;
-	boolean updateLevel(Long userId, User.Level level) throws Exception;
-	boolean updateNotified(Long userId, Boolean notified) throws Exception;
-	boolean updateNotifiedWarningPublicSentiment(Long userId, User.NotifiedSentiment sentiment) throws Exception;
-	boolean updateNotifiedHotPublicSentiment(Long userId, User.NotifiedSentiment sentiment) throws Exception;
-	boolean updateNotifiedNegativePublicSentiment(Long userId, User.NotifiedSentiment sentiment) throws Exception;
-	List<User> getWhoHasOpenId() throws Exception;
 }

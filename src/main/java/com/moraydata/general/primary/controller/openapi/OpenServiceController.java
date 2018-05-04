@@ -167,19 +167,4 @@ public class OpenServiceController {
 			return ResponseEntity.UNKNOWN_ERROR;
 		}
 	}
-	
-	/**
-	 * 获取所有可用服务列表 
-	 * @return List<Service> 查询到的所有可用服务信息列表
-	 */
-    @GetMapping("/available")
-	public ResponseEntity available() {
-    	try {
-			List<Service> data =  serviceService.getAllAvailable();
-			return ResponseEntity.success("获取所有可用的服务信息成功", data);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.UNKNOWN_ERROR;
-		}
-	}
 }

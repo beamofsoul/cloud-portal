@@ -19,13 +19,4 @@ public class OrderServiceTest extends TestCase {
 //	public void codeTest() {
 //		System.out.println(orderRepository.nextSequenceValue("order_code"));
 //	}
-	
-//	@Autowired
-//	private RedisTemplate<Object, Object> redisTemplate;
-//	
-//	@Test
-//	public void testest() {
-//		redisTemplate.opsForValue().get("oauth2:auth:898a8c8b-1f60-481f-9cf1-9de1f0695492");
-////		System.out.println(bytes);
-//	}
 }

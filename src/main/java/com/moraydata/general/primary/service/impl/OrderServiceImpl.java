@@ -1,9 +1,7 @@
 package com.moraydata.general.primary.service.impl;
 
 import static com.moraydata.general.management.util.BooleanExpressionUtils.addExpression;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.leftLike;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.like;
-import static com.moraydata.general.management.util.BooleanExpressionUtils.rightLike;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.toInteger;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.toLocalDateTime;
 import static com.moraydata.general.management.util.BooleanExpressionUtils.toLong;
@@ -15,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -110,10 +107,8 @@ public class OrderServiceImpl extends BaseAbstractService implements OrderServic
 		String description = conditions.getString(order.description.getMetadata().getName());
 		exp = addExpression(description, exp, order.description.like(like(description)));
 		
-		String serviceIds = conditions.getString(order.serviceIds.getMetadata().getName());
-		if (StringUtils.isNotBlank(serviceIds)) {
-			exp = addExpression(serviceIds, exp, order.serviceIds.eq(serviceIds).or(order.serviceIds.like(leftLike("," + serviceIds)).or(order.serviceIds.like(rightLike(serviceIds + ",")).or(order.serviceIds.like(like(serviceIds))))));
-		}
+		String serviceId = conditions.getString(order.serviceId.getMetadata().getName());
+		exp = addExpression(serviceId, exp, order.serviceId.eq(toLong(serviceId)));
 		
 		String user = conditions.getString(order.user.getMetadata().getName());
 		exp = addExpression(user, exp, order.user.nickname.like(like(user)));

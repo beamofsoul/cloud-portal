@@ -1,17 +1,15 @@
 package com.moraydata.general.primary.entity.query;
 
-import static com.querydsl.core.types.PathMetadataFactory.forVariable;
+import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.querydsl.core.types.dsl.*;
+
+import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
 
 import com.moraydata.general.primary.entity.Order;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.PathMetadata;
-import com.querydsl.core.types.dsl.DateTimePath;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.PathInits;
-import com.querydsl.core.types.dsl.StringPath;
 
 
 /**
@@ -49,7 +47,7 @@ public class QOrder extends EntityPathBase<Order> {
 
     public final DateTimePath<java.time.LocalDateTime> serviceEndTime = createDateTime("serviceEndTime", java.time.LocalDateTime.class);
 
-    public final StringPath serviceIds = createString("serviceIds");
+    public final NumberPath<Long> serviceId = createNumber("serviceId", Long.class);
 
     public final NumberPath<Integer> status = createNumber("status", Integer.class);
 

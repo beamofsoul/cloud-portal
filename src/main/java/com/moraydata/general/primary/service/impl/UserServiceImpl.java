@@ -37,7 +37,6 @@ import com.moraydata.general.primary.entity.InvitationCode;
 import com.moraydata.general.primary.entity.InvitationCode.Type;
 import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
-import com.moraydata.general.primary.entity.User.NotifiedSentiment;
 import com.moraydata.general.primary.entity.UserRole;
 import com.moraydata.general.primary.entity.query.QUser;
 import com.moraydata.general.primary.repository.UserRepository;
@@ -834,46 +833,5 @@ public class UserServiceImpl implements UserService {
 	public boolean matchRelationship(Long userId, Long... userIds) throws Exception {
 		QUser $ = QUser.user;
 		return userRepository.count($.id.in(userIds).and($.parentId.eq(userId))) == userIds.length; 
-	}
-
-	@Transactional(readOnly = false)
-	@Override
-	public boolean updateLevel(Long userId, User.Level level) throws Exception {
-		QUser $ = new QUser("User");
-		return userRepository.update($.level, level.getValue(), $.id.eq(userId)) > 0;
-	}
-
-	@Transactional(readOnly = false)
-	@Override
-	public boolean updateNotified(Long userId, Boolean notified) throws Exception {
-		QUser $ = new QUser("User");
-		return userRepository.update($.notified, notified, $.id.eq(userId)) > 0;
-	}
-
-	@Transactional(readOnly = false)
-	@Override
-	public boolean updateNotifiedWarningPublicSentiment(Long userId, NotifiedSentiment sentiment) throws Exception {
-		QUser $ = new QUser("User");
-		return userRepository.update($.notifiedWarningPublicSentiment, sentiment.getValue(), $.id.eq(userId)) > 0;
-	}
-
-	@Transactional(readOnly = false)
-	@Override
-	public boolean updateNotifiedHotPublicSentiment(Long userId, NotifiedSentiment sentiment) throws Exception {
-		QUser $ = new QUser("User");
-		return userRepository.update($.notifiedHotPublicSentiment, sentiment.getValue(), $.id.eq(userId)) > 0;
-	}
-
-	@Transactional(readOnly = false)
-	@Override
-	public boolean updateNotifiedNegativePublicSentiment(Long userId, NotifiedSentiment sentiment) throws Exception {
-		QUser $ = new QUser("User");
-		return userRepository.update($.notifiedNegativePublicSentiment, sentiment.getValue(), $.id.eq(userId)) > 0;
-	}
-
-	@Override
-	public List<User> getWhoHasOpenId() throws Exception {
-		QUser $ = new QUser("User");
-		return userRepository.findByPredicate($.openId.isNotNull());
 	}
 }
