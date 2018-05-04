@@ -39,6 +39,7 @@ import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.entity.User.NotifiedSentiment;
 import com.moraydata.general.primary.entity.UserRole;
+import com.moraydata.general.primary.entity.dto.UserBasicInformation;
 import com.moraydata.general.primary.entity.query.QUser;
 import com.moraydata.general.primary.repository.UserRepository;
 import com.moraydata.general.primary.service.InvitationCodeService;
@@ -89,6 +90,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User create(User instance) {
 		try {
+			instance.setCountOfInvitationCodes(0);
 			final String base64Photo = instance.getPhoto();
 			if (StringUtils.isNotBlank(base64Photo)) {
 				serializeUserPhoto(instance, base64Photo);
@@ -108,6 +110,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User create(User instance, Role role) throws Exception {
 		try {
+			instance.setCountOfInvitationCodes(0);
 			instance.setPassword(passwordEncoder.encode(instance.getPassword()));
 			User savedUser = userRepository.save(instance);
 			if (savedUser != null) {
@@ -562,7 +565,7 @@ public class UserServiceImpl implements UserService {
 	public boolean updatePhone(String key, String phone) throws Exception {
 		QUser $ = new QUser("User");
 		String[] keyParser = key.substring(key.indexOf(":") + 1).split("#");
-		return userRepository.update($.phone, phone, $.username.eq(keyParser[0]).and($.phone.eq(keyParser[1]))) > 0;
+		return userRepository.update($.phone, phone, $.username.eq(keyParser[0])) > 0;
 	}
 	
 	/**
@@ -875,5 +878,42 @@ public class UserServiceImpl implements UserService {
 	public List<User> getWhoHasOpenId() throws Exception {
 		QUser $ = new QUser("User");
 		return userRepository.findByPredicate($.openId.isNotNull());
+	}
+
+	@Override
+	public List<UserBasicInformation> getAllIdAndUsernameWhoHasOpenId() throws Exception {
+		return userRepository.findAllIdAndUsernameWhoHasOpenId();
+	}
+
+	/**
+	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有3级设置了接收推送消息的子账号
+	 * PS: 1级用户未必是主账号
+	 */
+	@Override
+	public List<UserBasicInformation> getLevel3UserBasicInformation(Long level1UserId) throws Exception {
+		// 1. 找到当前1级用户的主账号Id
+		QUser $ = new QUser("User");
+		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
+		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
+		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
+		
+		// 2. 找到主账号下所有3级子账号
+		return userRepository.findLevel3UserBasicInformation(masterUserId);
+	}
+	
+	/**
+	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有2和3级设置了接收推送消息的子账号
+	 * PS: 1级用户未必是主账号
+	 */
+	@Override
+	public List<UserBasicInformation> getLevel2Or3UserBasicInformation(Long level1UserId) throws Exception {
+		// 1. 找到当前1级用户的主账号Id
+		QUser $ = new QUser("User");
+		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
+		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
+		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
+		
+		// 2. 找到主账号下所有2和3级子账号
+		return userRepository.findLevel2Or3UserBasicInformation(masterUserId);
 	}
 }

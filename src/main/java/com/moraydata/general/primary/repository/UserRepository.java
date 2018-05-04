@@ -13,7 +13,7 @@ import com.moraydata.general.primary.entity.User;
  * @author MingshuJian
  */
 @Repository
-public interface UserRepository extends BaseMultielementRepository<User, Long> {
+public interface UserRepository extends BaseMultielementRepository<User, Long>, UserRepositoryCustom<User, Long> {
 
 	User findByUsername(String username);
 }

@@ -1,5 +1,10 @@
 package com.moraydata.general.primary.controller.openapi;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSON;
 import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.management.util.ResponseEntity;
 import com.moraydata.general.primary.entity.User;
+import com.moraydata.general.primary.entity.dto.UserBasicInformation;
 import com.moraydata.general.primary.service.RoleService;
 import com.moraydata.general.primary.service.UserService;
 
@@ -157,6 +164,29 @@ public class OpenNoAuthenticationController {
 			} else {
 				return ResponseEntity.error("验证码错误或已经过期");
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 获取加密的用户基本信息，留给内部其他模块的api调用所用
+	 * @return String Base64加密后的用户基本信息列表
+	 */
+	@SuppressWarnings("serial")
+	@GetMapping("encodedUserBasicInformation")
+	public ResponseEntity encodedUserBasicInformation() throws Exception {
+		try {
+//			List<UserBasicInformation> list = userService.getAllIdAndUsernameWhoHasOpenId();
+			List<UserBasicInformation> list = new ArrayList<UserBasicInformation>() {{
+				add(UserBasicInformation.builder().id(53L).username("oQFmP0-K4IvdQvocmDHiJ5aPn9Uk").openId("oQFmP0-K4IvdQvocmDHiJ5aPn9Uk").notifiedWarningPublicSentiment("non").notifiedHotPublicSentiment("all").notifiedNegativePublicSentiment("related").build());
+				add(UserBasicInformation.builder().id(62L).username("oQFmP01E8wBBiJMVCh_wQbcitOz0").openId("oQFmP01E8wBBiJMVCh_wQbcitOz0").notifiedWarningPublicSentiment("non").notifiedHotPublicSentiment("all").notifiedNegativePublicSentiment("related").build());
+			}};
+			
+			
+			String encodedData = Base64.getEncoder().encodeToString(JSON.toJSONString(list).getBytes(StandardCharsets.UTF_8));
+			return ResponseEntity.success("获取用户基本信息成功", encodedData);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;

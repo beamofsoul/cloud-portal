@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.moraydata.general.management.schedule.PushPublicSentimentJob;
+import com.moraydata.general.management.schedule.TemplateMessage;
+import com.moraydata.general.management.schedule.TemplateMessage.Action;
 import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.management.util.HttpUrlUtils;
 import com.moraydata.general.management.util.ResponseEntity;
@@ -37,6 +42,7 @@ import com.moraydata.general.management.wechat.MenuButton;
 import com.moraydata.general.management.wechat.NavigationMenu;
 import com.moraydata.general.management.wechat.SubMenuButton;
 import com.moraydata.general.primary.entity.User;
+import com.moraydata.general.primary.entity.dto.UserBasicInformation;
 import com.moraydata.general.primary.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +59,9 @@ public class OpenWeChatController {
 	
 	@Autowired
 	private WeChatTokenHelper handler;
+	
+	@Autowired
+	private PushPublicSentimentJob pushPublicSentimentJob;
 	
 	@Value("${project.base.social.user.defaultPassword}")
 	private String defaultPassword;
@@ -143,6 +152,61 @@ public class OpenWeChatController {
 		JSONObject jsonResponse = RestTemplateUtils.INSTANCE.getRestTemplate().postForObject(integrateUrlWithAccessToken(SEND_TEMPLATE_MESSAGE_PATH), RestTemplateUtils.getHttpEntity(parameters), JSONObject.class);
 		log.debug(JSON.toJSONString(jsonResponse));
 		return jsonResponse.getString("errmsg").equals("ok");
+	}
+	
+	@PostMapping("/wechat/sendTemplateMessage2Target")
+	public ResponseEntity sendTemplateMessage2Target(@RequestParam Long userId, @RequestParam Long templateMessageId, @RequestParam Integer action) throws Exception {
+		Assert.notNull(userId, "SEND_TEMPLATE_MESSAGE_2_TARGET_USER_ID_IS_NULL");
+		Assert.notNull(templateMessageId, "SEND_TEMPLATE_MESSAGE_2_TARGET_TEMPLATE_MESSAGE_ID_IS_NULL");
+		Assert.notNull(action, "SEND_TEMPLATE_MESSAGE_2_TARGET_ACTION_IS_NULL");
+		
+		User currentUser = userService.get(userId);
+		if (currentUser == null) {
+			return ResponseEntity.error("未能通过userId获取到任何用户信息");
+		}
+		if (!TemplateMessage.Action.exists(action)) {
+			return ResponseEntity.error("action格式错误");
+		}
+		
+		// 1. 判断当前用户的用户级别
+		if (currentUser.getLevel() == 1) {
+			// 1.1  如果是1级用户，判断当前行为
+			// 1.1.1 如果是上报功能，判断是否当前模板消息已被设置为有效
+			if (TemplateMessage.Action.getInstance(action).equals(TemplateMessage.Action.PUSH)) {
+				Integer templateMessageStatus = getTemplateMessageStatus(userId, templateMessageId);
+				if (TemplateMessage.Action.exists(templateMessageStatus)) {
+					Action currentAction = TemplateMessage.Action.getInstance(templateMessageStatus);
+					List<UserBasicInformation> sent2Users = null;
+					if (currentAction.equals(TemplateMessage.Action.VALIDATE)) {
+						// 1.1.1.1 如果已经被设置为有效，推送给3级用户，并将该消息状态标记为已上报
+						// 1.1.1.1.1 获取当前用户1级用户的3级用户
+						sent2Users = userService.getLevel3UserBasicInformation(userId);
+					} else {
+						// 1.1.1.2 如果未被设置为有效，推送给2级和3级用户，并将该消息状态标记为已上报
+						sent2Users = userService.getLevel2Or3UserBasicInformation(userId);
+					}
+					pushPublicSentimentJob.sendTemplateMessage(sent2Users, templateMessageId);
+					
+				}
+			}
+		}
+		
+		
+		
+		// 1.1.2 如果是有效功能，推送给2级用户，并将该消息状态标记为有效
+		
+		// 1.1.3 如果是无效功能，修改当前模板消息状态为无效
+		
+		// 1.2 如果是2级用户，判断当前行为
+		// 1.2.1 如果是上报功能，推送给3级用户，并将该消息状态标记为已上报
+		
+		// 1.2.2 如果是无效功能，修改当前模板消息状态为无效
+
+		return null;
+	}
+	
+	private Integer getTemplateMessageStatus(Long userId, Long templateMessageId) {
+		return null;
 	}
 	
 	/************************************************************** 关注服务号并且自动登录系统 ****************************************************************/

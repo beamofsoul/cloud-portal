@@ -221,7 +221,7 @@ public class OpenUserController {
 			if (!validated) {
 				return ResponseEntity.error("手机号码格式无效");
 			}
-			if (userService.isPhoneUnique(phone, null)) {
+			if (!userService.isPhoneUnique(phone, null)) {
 				return ResponseEntity.error("手机号码已被使用");
 			}
 			boolean matched = userService.matchPhoneCode(key, code);

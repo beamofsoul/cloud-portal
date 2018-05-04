@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.moraydata.general.primary.entity.InvitationCode;
 import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
+import com.moraydata.general.primary.entity.dto.UserBasicInformation;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
@@ -71,4 +72,7 @@ public interface UserService {
 	boolean updateNotifiedHotPublicSentiment(Long userId, User.NotifiedSentiment sentiment) throws Exception;
 	boolean updateNotifiedNegativePublicSentiment(Long userId, User.NotifiedSentiment sentiment) throws Exception;
 	List<User> getWhoHasOpenId() throws Exception;
+	List<UserBasicInformation> getAllIdAndUsernameWhoHasOpenId() throws Exception;
+	List<UserBasicInformation> getLevel3UserBasicInformation(Long level1UserId) throws Exception;
+	List<UserBasicInformation> getLevel2Or3UserBasicInformation(Long level1UserId) throws Exception;
 }

@@ -74,5 +74,7 @@ public final class Constants {
 		public static final String KEYWORD3 = "keyword3";
 		public static final String KEYWORD4 = "keyword4";
 		public static final String REMARK = "remark";
+		public static final String COLOR = "color";
+		public static final String VALUE = "value";
 	}
 }
