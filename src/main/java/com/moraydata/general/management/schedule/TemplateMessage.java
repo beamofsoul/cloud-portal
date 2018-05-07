@@ -20,6 +20,8 @@ public class TemplateMessage {
 	private static final String DEFAULT_REMARK_VALUE = "请及时查看处置!";
 	private static final String DEFAULT_COLOR_173177 = "#173177";
 	
+	private Long id;
+	
 	private String firstValue;
 	private String firstColor;
 	
@@ -39,6 +41,7 @@ public class TemplateMessage {
 	private String remarkColor;
 	
 	private String redirectUrl;
+	private Integer action;
 	
 	public TemplateMessage(String keyword1, String keyword2, String keyword3, String keyword4) {
 		this.keyword1Value = keyword1;

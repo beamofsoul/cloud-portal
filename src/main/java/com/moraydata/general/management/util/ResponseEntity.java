@@ -51,4 +51,8 @@ public class ResponseEntity {
 				.data(data)
 				.build();
 	}
+	
+	public boolean isSuccessful() {
+		return SUCCESS.equals(code);
+	}
 }

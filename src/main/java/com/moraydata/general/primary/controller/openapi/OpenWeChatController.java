@@ -81,78 +81,79 @@ public class OpenWeChatController {
 	@Value("${project.base.wechat.service.snsOAuth2TokenAndOpenIdUrl}")
 	private String snsUrl;
 	
+//	@Value("${project.base.wechat.service.sendTemplateMessageUrl}")
+//	private String sendTemplateMessageUrl;
+	
 	/************************************************************** 发送模板消息 ****************************************************************/
 	
-	private static final String SEND_TEMPLATE_MESSAGE_PATH = "https://api.weixin.qq.com/cgi-bin/message/template/send";
-	
-	@SuppressWarnings({ "serial" })
-	@GetMapping("/wechat/sendTemplateMessage")
-	public boolean sendTemplateMessage(@RequestParam String openId) throws Exception {
-		if (StringUtils.isBlank(openId)) {
-			return false;
-		}
+//	@SuppressWarnings({ "serial" })
+//	@GetMapping("/wechat/sendTemplateMessage")
+//	public boolean sendTemplateMessage(@RequestParam String openId) throws Exception {
+//		if (StringUtils.isBlank(openId)) {
+//			return false;
+//		}
+////		Map<String, Object> parameters = new HashMap<String, Object>();
+////		parameters.put("touser", "oQFmP01E8wBBiJMVCh_wQbcitOz0"); // 接收者openId
+////		parameters.put("template_id", "lvUC1MN9F2JC4Ymb5HYJ-qsocKKfk5kPfCHzzqq3uAM"); // 模板Id
+////		parameters.put("url", "http://www.baidu.com");
+////		parameters.put("data", new HashMap<String, Map<String, String>>() {{
+////			put("first", new HashMap<String, String>() {{
+////				put("value", "您提交的测试任务已完成! test");
+////				put("color", "#173177");
+////			}});
+////			put("keyword1", new HashMap<String, String>() {{
+////				put("value", "2018年04月23日 11:32 test");
+////				put("color", "#173177");
+////			}});
+////			put("keyword2", new HashMap<String, String>() {{
+////				put("value", "2018年04月23日 11:32 test");
+////				put("color", "#173177");
+////			}});
+////			put("keyword3", new HashMap<String, String>() {{
+////				put("value", "测试未通过! test");
+////				put("color", "#173177");
+////			}});
+////			put("remark", new HashMap<String, String>() {{
+////				put("value", "点击查看测试结果详情 test");
+////				put("color", "#173177");
+////			}});
+////		}});
+//		
 //		Map<String, Object> parameters = new HashMap<String, Object>();
 //		parameters.put("touser", "oQFmP01E8wBBiJMVCh_wQbcitOz0"); // 接收者openId
-//		parameters.put("template_id", "lvUC1MN9F2JC4Ymb5HYJ-qsocKKfk5kPfCHzzqq3uAM"); // 模板Id
+//		parameters.put("template_id", "259crn-Levvu-2VDe2jff43bHncbzyQC3LWCTpZCWBw"); // 模板Id
 //		parameters.put("url", "http://www.baidu.com");
 //		parameters.put("data", new HashMap<String, Map<String, String>>() {{
 //			put("first", new HashMap<String, String>() {{
-//				put("value", "您提交的测试任务已完成! test");
+//				put("value", "海鳗云平台监测到一个异常事件");
 //				put("color", "#173177");
 //			}});
 //			put("keyword1", new HashMap<String, String>() {{
-//				put("value", "2018年04月23日 11:32 test");
+//				put("value", "自然灾害");
 //				put("color", "#173177");
 //			}});
 //			put("keyword2", new HashMap<String, String>() {{
-//				put("value", "2018年04月23日 11:32 test");
+//				put("value", "九寨沟");
 //				put("color", "#173177");
 //			}});
 //			put("keyword3", new HashMap<String, String>() {{
-//				put("value", "测试未通过! test");
+//				put("value", "2018-01-01");
+//				put("color", "#173177");
+//			}});
+//			put("keyword4", new HashMap<String, String>() {{
+//				put("value", "阿坝；九寨沟；地震；8级");
 //				put("color", "#173177");
 //			}});
 //			put("remark", new HashMap<String, String>() {{
-//				put("value", "点击查看测试结果详情 test");
+//				put("value", "请及时查看处置!");
 //				put("color", "#173177");
 //			}});
 //		}});
-		
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("touser", "oQFmP01E8wBBiJMVCh_wQbcitOz0"); // 接收者openId
-		parameters.put("template_id", "259crn-Levvu-2VDe2jff43bHncbzyQC3LWCTpZCWBw"); // 模板Id
-		parameters.put("url", "http://www.baidu.com");
-		parameters.put("data", new HashMap<String, Map<String, String>>() {{
-			put("first", new HashMap<String, String>() {{
-				put("value", "海鳗云平台监测到一个异常事件");
-				put("color", "#173177");
-			}});
-			put("keyword1", new HashMap<String, String>() {{
-				put("value", "自然灾害");
-				put("color", "#173177");
-			}});
-			put("keyword2", new HashMap<String, String>() {{
-				put("value", "九寨沟");
-				put("color", "#173177");
-			}});
-			put("keyword3", new HashMap<String, String>() {{
-				put("value", "2018-01-01");
-				put("color", "#173177");
-			}});
-			put("keyword4", new HashMap<String, String>() {{
-				put("value", "阿坝；九寨沟；地震；8级");
-				put("color", "#173177");
-			}});
-			put("remark", new HashMap<String, String>() {{
-				put("value", "请及时查看处置!");
-				put("color", "#173177");
-			}});
-		}});
-		
-		JSONObject jsonResponse = RestTemplateUtils.INSTANCE.getRestTemplate().postForObject(integrateUrlWithAccessToken(SEND_TEMPLATE_MESSAGE_PATH), RestTemplateUtils.getHttpEntity(parameters), JSONObject.class);
-		log.debug(JSON.toJSONString(jsonResponse));
-		return jsonResponse.getString("errmsg").equals("ok");
-	}
+//		
+//		JSONObject jsonResponse = RestTemplateUtils.INSTANCE.getRestTemplate().postForObject(integrateUrlWithAccessToken(sendTemplateMessageUrl), RestTemplateUtils.getHttpEntity(parameters), JSONObject.class);
+//		log.debug(JSON.toJSONString(jsonResponse));
+//		return jsonResponse.getString("errmsg").equals("ok");
+//	}
 	
 	@PostMapping("/wechat/sendTemplateMessage2Target")
 	public ResponseEntity sendTemplateMessage2Target(@RequestParam Long userId, @RequestParam Long templateMessageId, @RequestParam Integer action) throws Exception {
@@ -168,45 +169,56 @@ public class OpenWeChatController {
 			return ResponseEntity.error("action格式错误");
 		}
 		
-		// 1. 判断当前用户的用户级别
-		if (currentUser.getLevel() == 1) {
-			// 1.1  如果是1级用户，判断当前行为
-			// 1.1.1 如果是上报功能，判断是否当前模板消息已被设置为有效
-			if (TemplateMessage.Action.getInstance(action).equals(TemplateMessage.Action.PUSH)) {
-				Integer templateMessageStatus = getTemplateMessageStatus(userId, templateMessageId);
-				if (TemplateMessage.Action.exists(templateMessageStatus)) {
-					Action currentAction = TemplateMessage.Action.getInstance(templateMessageStatus);
-					List<UserBasicInformation> sent2Users = null;
-					if (currentAction.equals(TemplateMessage.Action.VALIDATE)) {
-						// 1.1.1.1 如果已经被设置为有效，推送给3级用户，并将该消息状态标记为已上报
-						// 1.1.1.1.1 获取当前用户1级用户的3级用户
-						sent2Users = userService.getLevel3UserBasicInformation(userId);
-					} else {
-						// 1.1.1.2 如果未被设置为有效，推送给2级和3级用户，并将该消息状态标记为已上报
-						sent2Users = userService.getLevel2Or3UserBasicInformation(userId);
+		try {
+			// 1. 判断当前用户的用户级别
+			Integer currentUserLevel = currentUser.getLevel();
+			Action targetAction = TemplateMessage.Action.getInstance(action);
+			if (currentUserLevel.equals(User.Level.FIRST.getValue())) {
+				// 1.1  如果是1级用户，判断当前行为
+				// 1.1.1 如果是上报功能，判断是否当前模板消息已被设置为有效
+				if (targetAction.equals(TemplateMessage.Action.PUSH)) {
+					Integer templateMessageAction = pushPublicSentimentJob.getTemplateMessage(templateMessageId).getAction(); // .getTemplateMessageAction(userId, templateMessageId);
+					if (TemplateMessage.Action.exists(templateMessageAction)) {
+						Action currentAction = TemplateMessage.Action.getInstance(templateMessageAction);
+						List<UserBasicInformation> sent2Users = null;
+						if (currentAction.equals(TemplateMessage.Action.VALIDATE)) {
+							// 1.1.1.1 如果已经被设置为有效，推送给3级用户，并将该消息状态标记为已上报
+							sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.THIRD);
+						} else {
+							// 1.1.1.2 如果未被设置为有效，推送给2级和3级用户，并将该消息状态标记为已上报
+							sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.SECOND, User.Level.THIRD);
+						}
+						// 推送
+						pushPublicSentimentJob.sendTemplateMessage(sent2Users, templateMessageId);
+						// 标记
+						pushPublicSentimentJob.updateAction(templateMessageId, action);
 					}
+				} else if (targetAction.equals(TemplateMessage.Action.VALIDATE)) {
+					// 1.1.2 如果是有效功能，推送给2级用户，并将该消息状态标记为有效
+					List<UserBasicInformation> sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.SECOND);
 					pushPublicSentimentJob.sendTemplateMessage(sent2Users, templateMessageId);
-					
+					pushPublicSentimentJob.updateAction(templateMessageId, action);
+				} else if (targetAction.equals(TemplateMessage.Action.INVALIDATE)) {
+					// 1.1.3 如果是无效功能，修改当前模板消息状态为无效
+					pushPublicSentimentJob.updateAction(templateMessageId, action);
+				}
+			} else if (currentUserLevel.equals(User.Level.SECOND.getValue())) {
+				// 1.2 如果是2级用户，判断当前行为
+				if (targetAction.equals(TemplateMessage.Action.PUSH)) {
+					// 1.2.1 如果是上报功能，推送给3级用户，并将该消息状态标记为已上报
+					List<UserBasicInformation> sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.THIRD);
+					pushPublicSentimentJob.sendTemplateMessage(sent2Users, templateMessageId);
+					pushPublicSentimentJob.updateAction(templateMessageId, action);
+				} else if (targetAction.equals(TemplateMessage.Action.INVALIDATE)) {
+					// 1.2.2 如果是无效功能，修改当前模板消息状态为无效
+					pushPublicSentimentJob.updateAction(templateMessageId, action);
 				}
 			}
+			return ResponseEntity.success("发送模板消息至指定用户成功", Boolean.TRUE);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
 		}
-		
-		
-		
-		// 1.1.2 如果是有效功能，推送给2级用户，并将该消息状态标记为有效
-		
-		// 1.1.3 如果是无效功能，修改当前模板消息状态为无效
-		
-		// 1.2 如果是2级用户，判断当前行为
-		// 1.2.1 如果是上报功能，推送给3级用户，并将该消息状态标记为已上报
-		
-		// 1.2.2 如果是无效功能，修改当前模板消息状态为无效
-
-		return null;
-	}
-	
-	private Integer getTemplateMessageStatus(Long userId, Long templateMessageId) {
-		return null;
 	}
 	
 	/************************************************************** 关注服务号并且自动登录系统 ****************************************************************/

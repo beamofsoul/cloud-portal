@@ -519,15 +519,16 @@ public class OpenUserController {
 	}
 	
 	/**
-	 * 更新用户名
+	 * 更新用户名和密码
 	 * @param userId 更新的用户编号
 	 * @param username 更新后的用户名
 	 * @return boolean 是否更新成功
 	 */
-	@PutMapping("changingUsername")
-	public ResponseEntity changingUsername(@RequestParam Long userId, @RequestParam String username) {
+	@PutMapping("changingUsernameAndPassword")
+	public ResponseEntity changingUsername(@RequestParam Long userId, @RequestParam String username, @RequestParam String password) {
 		Assert.notNull(userId, "CHANGING_USERNAME_USER_ID_IS_NULL");
 		Assert.notNull(username, "CHANGING_USERNAME_USERNAME_IS_NULL");
+		Assert.notNull(password, "CHANGING_USERNAME_PASSWORD_IS_NULL");
 		
 		try {
 			if (userId.longValue() == 0L) {
@@ -535,14 +536,18 @@ public class OpenUserController {
 			}
 			boolean matched = validateUsername(username);
 			if (!matched) {
-				return ResponseEntity.error("更新用户名所用用户名格式错误");
+				return ResponseEntity.error("更新用户名密码所用用户名格式错误");
+			}
+			matched = validatePassword(password);
+			if (!matched) {
+				return ResponseEntity.error("更新用户名密码所用密码格式错误");
 			}
 			boolean isUnique = userService.isUsernameUnique(username, userId);
 			if (!isUnique) {
-				return ResponseEntity.error("更新用户名所用用户名已被使用");
+				return ResponseEntity.error("更新用户名密码所用用户名已被使用");
 			}
-			boolean data = userService.updateUsername(userId, username);
-			return ResponseEntity.success("更新用户名成功", data);
+			boolean data = userService.updateUsernameAndPassword(userId, username, password);
+			return ResponseEntity.success("更新用户名和密码成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;

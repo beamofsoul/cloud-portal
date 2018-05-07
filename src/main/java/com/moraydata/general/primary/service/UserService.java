@@ -50,7 +50,7 @@ public interface UserService {
 	User update(User instance, User originalUser) throws Exception;
 	InvitationCode getBindParentInvitationCode(String invitationCode) throws Exception;
 	long bindParentByInvitationCode(InvitationCode instance, Long currentUserId) throws Exception;
-	boolean updateUsername(Long userId, String username) throws Exception;
+	boolean updateUsernameAndPassword(Long userId, String username, String password) throws Exception;
 	boolean updateOrderItemIds(Long userId, String orderItemIds) throws Exception;
 	User getByOpenId(String openId) throws Exception;
 	boolean exists(String phone) throws Exception;
@@ -66,13 +66,20 @@ public interface UserService {
 	boolean decreaseCountOfInvitationCodes(Long userId, int many) throws Exception;
 	boolean update(Long userId, String password, String phone, String description) throws Exception;
 	boolean matchRelationship(Long userId, Long... userIds) throws Exception;
+	boolean updateLevel(String openId, User.Level level) throws Exception;
 	boolean updateLevel(Long userId, User.Level level) throws Exception;
+	boolean updateNotified(String openId, Boolean notified) throws Exception;
 	boolean updateNotified(Long userId, Boolean notified) throws Exception;
+	boolean updateNotifiedWarningPublicSentiment(String openId, User.NotifiedSentiment sentiment) throws Exception;
 	boolean updateNotifiedWarningPublicSentiment(Long userId, User.NotifiedSentiment sentiment) throws Exception;
+	boolean updateNotifiedHotPublicSentiment(String openId, User.NotifiedSentiment sentiment) throws Exception;
 	boolean updateNotifiedHotPublicSentiment(Long userId, User.NotifiedSentiment sentiment) throws Exception;
+	boolean updateNotifiedNegativePublicSentiment(String openId, User.NotifiedSentiment sentiment) throws Exception;
 	boolean updateNotifiedNegativePublicSentiment(Long userId, User.NotifiedSentiment sentiment) throws Exception;
 	List<User> getWhoHasOpenId() throws Exception;
 	List<UserBasicInformation> getAllIdAndUsernameWhoHasOpenId() throws Exception;
-	List<UserBasicInformation> getLevel3UserBasicInformation(Long level1UserId) throws Exception;
-	List<UserBasicInformation> getLevel2Or3UserBasicInformation(Long level1UserId) throws Exception;
+	List<UserBasicInformation> getLevelUserBasicInformation(Long level1UserId, User.Level... level);
+//	List<UserBasicInformation> getLevel3UserBasicInformation(Long level1UserId) throws Exception;
+//	List<UserBasicInformation> getLevel2UserBasicInformation(Long level1UserId) throws Exception;
+//	List<UserBasicInformation> getLevel2Or3UserBasicInformation(Long level1UserId) throws Exception;
 }

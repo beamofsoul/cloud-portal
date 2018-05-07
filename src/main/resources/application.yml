@@ -118,6 +118,11 @@ project:
         connectOAuth2Menu4CodeUrl: https://open.weixin.qq.com/connect/oauth2/authorize # 创建每个菜单按钮携带重定向url并获取code所需的url
         snsOAuth2TokenAndOpenIdUrl: https://api.weixin.qq.com/sns/oauth2/access_token # 服务号菜单跳转通过code使用OAuth2方式获取access_token和openid的url
         sendTemplateMessageUrl: https://api.weixin.qq.com/cgi-bin/message/template/send # 发送模板消息所用的url
+        templateMessage:
+          publicSentiment: 259crn-Levvu-2VDe2jff43bHncbzyQC3LWCTpZCWBw # 推送舆情异常消息的模板Id
+    business:
+      publicSentiment:
+        interfaceUrl: http://192.168.31.26/wxNotice/
     social: # 现在只支持微信开放平台OAuth2方式扫码登录系统
       # Make Spring Social component enabled or not
       enabled: false

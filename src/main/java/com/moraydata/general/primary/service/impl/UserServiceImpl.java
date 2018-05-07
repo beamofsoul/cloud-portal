@@ -14,6 +14,7 @@ import static com.moraydata.general.management.util.ImageUtils.makePathEndWithDo
 import static com.moraydata.general.management.util.ImageUtils.serializeImageFromBase64;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -617,14 +618,15 @@ public class UserServiceImpl implements UserService {
 	 * For Open API
 	 * @param userId
 	 * @param username
+	 * @param password
 	 * @return boolean
 	 * @throws Exception
 	 */
 	@Transactional
 	@Override
-	public boolean updateUsername(Long userId, String username) throws Exception {
+	public boolean updateUsernameAndPassword(Long userId, String username, String password) throws Exception {
 		QUser $ = new QUser("User");
-		return userRepository.update($.username, username, $.id.eq(userId)) > 0;
+		return userRepository.update(Arrays.asList($.username, $.password) , Arrays.asList(username, passwordEncoder.encode(password)), $.id.eq(userId)) > 0;
 	}
 	
 	/**
@@ -647,10 +649,14 @@ public class UserServiceImpl implements UserService {
 	 * @return User
 	 * @throws Exception
 	 */
+	@Transactional
 	@Override
 	public User getByOpenId(String openId) throws Exception {
-		QUser $ = new QUser("User");
-		return userRepository.findOneByPredicate($.openId.eq(openId));
+		User user = userRepository.findByOpenId(openId);
+		if (user != null) {
+			Hibernate.initialize(user.getRoles());
+		}
+		return user;
 	}
 	
 	/**
@@ -838,12 +844,26 @@ public class UserServiceImpl implements UserService {
 		QUser $ = QUser.user;
 		return userRepository.count($.id.in(userIds).and($.parentId.eq(userId))) == userIds.length; 
 	}
+	
+	@Transactional(readOnly = false)
+	@Override
+	public boolean updateLevel(String openId, User.Level level) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.update($.level, level.getValue(), $.openId.eq(openId)) > 0;
+	}
 
 	@Transactional(readOnly = false)
 	@Override
 	public boolean updateLevel(Long userId, User.Level level) throws Exception {
 		QUser $ = new QUser("User");
 		return userRepository.update($.level, level.getValue(), $.id.eq(userId)) > 0;
+	}
+	
+	@Transactional(readOnly = false)
+	@Override
+	public boolean updateNotified(String openId, Boolean notified) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.update($.notified, notified, $.openId.eq(openId)) > 0;
 	}
 
 	@Transactional(readOnly = false)
@@ -852,6 +872,13 @@ public class UserServiceImpl implements UserService {
 		QUser $ = new QUser("User");
 		return userRepository.update($.notified, notified, $.id.eq(userId)) > 0;
 	}
+	
+	@Transactional(readOnly = false)
+	@Override
+	public boolean updateNotifiedWarningPublicSentiment(String openId, NotifiedSentiment sentiment) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.update($.notifiedWarningPublicSentiment, sentiment.getValue(), $.openId.eq(openId)) > 0;
+	}
 
 	@Transactional(readOnly = false)
 	@Override
@@ -859,12 +886,26 @@ public class UserServiceImpl implements UserService {
 		QUser $ = new QUser("User");
 		return userRepository.update($.notifiedWarningPublicSentiment, sentiment.getValue(), $.id.eq(userId)) > 0;
 	}
+	
+	@Transactional(readOnly = false)
+	@Override
+	public boolean updateNotifiedHotPublicSentiment(String openId, NotifiedSentiment sentiment) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.update($.notifiedHotPublicSentiment, sentiment.getValue(), $.openId.eq(openId)) > 0;
+	}
 
 	@Transactional(readOnly = false)
 	@Override
 	public boolean updateNotifiedHotPublicSentiment(Long userId, NotifiedSentiment sentiment) throws Exception {
 		QUser $ = new QUser("User");
 		return userRepository.update($.notifiedHotPublicSentiment, sentiment.getValue(), $.id.eq(userId)) > 0;
+	}
+	
+	@Transactional(readOnly = false)
+	@Override
+	public boolean updateNotifiedNegativePublicSentiment(String openId, NotifiedSentiment sentiment) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.update($.notifiedNegativePublicSentiment, sentiment.getValue(), $.openId.eq(openId)) > 0;
 	}
 
 	@Transactional(readOnly = false)
@@ -884,36 +925,78 @@ public class UserServiceImpl implements UserService {
 	public List<UserBasicInformation> getAllIdAndUsernameWhoHasOpenId() throws Exception {
 		return userRepository.findAllIdAndUsernameWhoHasOpenId();
 	}
-
-	/**
-	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有3级设置了接收推送消息的子账号
-	 * PS: 1级用户未必是主账号
-	 */
-	@Override
-	public List<UserBasicInformation> getLevel3UserBasicInformation(Long level1UserId) throws Exception {
-		// 1. 找到当前1级用户的主账号Id
-		QUser $ = new QUser("User");
-		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
-		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
-		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
-		
-		// 2. 找到主账号下所有3级子账号
-		return userRepository.findLevel3UserBasicInformation(masterUserId);
-	}
 	
 	/**
-	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有2和3级设置了接收推送消息的子账号
+	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有2或3级设置了接收推送消息的子账号
 	 * PS: 1级用户未必是主账号
 	 */
 	@Override
-	public List<UserBasicInformation> getLevel2Or3UserBasicInformation(Long level1UserId) throws Exception {
-		// 1. 找到当前1级用户的主账号Id
+	public List<UserBasicInformation> getLevelUserBasicInformation(Long level1UserId, User.Level... level) {
 		QUser $ = new QUser("User");
 		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
 		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
 		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
 		
-		// 2. 找到主账号下所有2和3级子账号
-		return userRepository.findLevel2Or3UserBasicInformation(masterUserId);
+		int[] levels = null;
+		if (level != null && level.length > 0) {
+			levels = new int[level.length];
+			for (int i = 0; i < level.length; i++) {
+				levels[i] = level[i].getValue();
+			}
+		} else {
+			return null;
+		}
+		
+		return userRepository.findLevelUserBasicInformation(masterUserId, levels);
 	}
+
+//	/**
+//	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有3级设置了接收推送消息的子账号
+//	 * PS: 1级用户未必是主账号
+//	 */
+//	@Override
+//	public List<UserBasicInformation> getLevel3UserBasicInformation(Long level1UserId) throws Exception {
+//		// 1. 找到当前1级用户的主账号Id
+//		QUser $ = new QUser("User");
+//		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
+//		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
+//		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
+//		
+//		// 2. 找到主账号下所有3级子账号
+//		return userRepository.findLevelUserBasicInformation(masterUserId, User.Level.THIRD.getValue());
+////		return userRepository.findLevel3UserBasicInformation(masterUserId);
+//	}
+//	
+//	/**
+//	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有2级设置了接收推送消息的子账号
+//	 * PS: 1级用户未必是主账号
+//	 */
+//	@Override
+//	public List<UserBasicInformation> getLevel2UserBasicInformation(Long level1UserId) throws Exception {
+//		// 1. 找到当前1级用户的主账号Id
+//		QUser $ = new QUser("User");
+//		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
+//		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
+//		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
+//		
+//		// 2. 找到主账号下所有3级子账号
+//		return userRepository.findLevelUserBasicInformation(masterUserId, User.Level.SECOND.getValue());
+////		return userRepository.findLevel2UserBasicInformation(masterUserId);
+//	}
+//	
+//	/**
+//	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有2和3级设置了接收推送消息的子账号
+//	 * PS: 1级用户未必是主账号
+//	 */
+//	@Override
+//	public List<UserBasicInformation> getLevel2Or3UserBasicInformation(Long level1UserId) throws Exception {
+//		// 1. 找到当前1级用户的主账号Id
+//		QUser $ = new QUser("User");
+//		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
+//		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
+//		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
+//		
+//		// 2. 找到主账号下所有2和3级子账号
+//		return userRepository.findLevel2Or3UserBasicInformation(masterUserId);
+//	}
 }

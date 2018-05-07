@@ -76,6 +76,7 @@ public class AuthenticationUserDetailsService implements UserDetailsService {
 				// Ensured that current user is using open id as its' user-name
 				User targetUser = userService.getByOpenId(username);
 				targetUser.setSceneId(Constants.WECHAT.SCAN_LOGIN_SCENE_ID);
+				return targetUser;
 			} catch (Exception e) {
 				throw new UsernameNotFoundException(e.getMessage());
 			}

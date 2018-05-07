@@ -16,4 +16,5 @@ import com.moraydata.general.primary.entity.User;
 public interface UserRepository extends BaseMultielementRepository<User, Long>, UserRepositoryCustom<User, Long> {
 
 	User findByUsername(String username);
+	User findByOpenId(String openId);
 }

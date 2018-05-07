@@ -1,7 +1,6 @@
 package com.moraydata.general.primary.controller.openapi;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -174,19 +173,145 @@ public class OpenNoAuthenticationController {
 	 * 获取加密的用户基本信息，留给内部其他模块的api调用所用
 	 * @return String Base64加密后的用户基本信息列表
 	 */
-	@SuppressWarnings("serial")
 	@GetMapping("encodedUserBasicInformation")
 	public ResponseEntity encodedUserBasicInformation() throws Exception {
 		try {
-//			List<UserBasicInformation> list = userService.getAllIdAndUsernameWhoHasOpenId();
-			List<UserBasicInformation> list = new ArrayList<UserBasicInformation>() {{
-				add(UserBasicInformation.builder().id(53L).username("oQFmP0-K4IvdQvocmDHiJ5aPn9Uk").openId("oQFmP0-K4IvdQvocmDHiJ5aPn9Uk").notifiedWarningPublicSentiment("non").notifiedHotPublicSentiment("all").notifiedNegativePublicSentiment("related").build());
-				add(UserBasicInformation.builder().id(62L).username("oQFmP01E8wBBiJMVCh_wQbcitOz0").openId("oQFmP01E8wBBiJMVCh_wQbcitOz0").notifiedWarningPublicSentiment("non").notifiedHotPublicSentiment("all").notifiedNegativePublicSentiment("related").build());
-			}};
-			
-			
+			List<UserBasicInformation> list = userService.getAllIdAndUsernameWhoHasOpenId();
 			String encodedData = Base64.getEncoder().encodeToString(JSON.toJSONString(list).getBytes(StandardCharsets.UTF_8));
 			return ResponseEntity.success("获取用户基本信息成功", encodedData);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 只通过openId在未授权的情况下获取对应用户的个人信息
+	 * @param openId 目标用户的openId
+	 * @return User 获取到的用户信息
+	 */
+	@GetMapping("insecureUserInformation")
+	public ResponseEntity insecureUserInformation(@RequestParam String openId) throws Exception {
+		Assert.notNull(openId, "INSECURE_USER_INFORMATION_OPEN_ID_IS_NULL");
+		
+		try {
+			User data = userService.getByOpenId(openId);
+			return ResponseEntity.success("用户信息获取成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 修改用户级别
+	 * @param openId 目标用户的openId
+	 * @param level 修改后的用户级别
+	 * @return boolean 是否修改成功
+	 */
+	@PutMapping("insecureChangingLevel")
+	public ResponseEntity insecureChangingLevel(@RequestParam String openId, @RequestParam Integer level) {
+		Assert.notNull(openId, "CHANGING_LEVEL_OPEN_ID_IS_NULL");
+		Assert.notNull(level, "CHANGING_LEVEL_LEVEL_IS_NULL");
+		
+		try {
+			boolean data = userService.updateLevel(openId, User.Level.getInstance(level.intValue()));
+			return ResponseEntity.success("更新用户级别成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 修改用户是否接受通知消息状态
+	 * @param userId 修改所用的用户编号
+	 * @param notified 修改后的用户是否接受通知消息状态
+	 * @return boolean 是否修改成功
+	 */
+	@PutMapping("insecureChangingNotified")
+	public ResponseEntity insecureChangingNotified(@RequestParam String openId, @RequestParam Boolean notified) {
+		Assert.notNull(openId, "INSECURE_CHANGING_NOTIFIED_USER_ID_IS_NULL");
+		Assert.notNull(notified, "INSECURE_CHANGING_NOTIFIED_NOTIFIED_IS_NULL");
+		
+		try {
+			boolean data = userService.updateNotified(openId, notified);
+			return ResponseEntity.success("更新用户接受消息状态成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 获取全部舆情接受状态
+	 * @return String 所有舆情接受状态的Map的JSON字符串
+	 */
+	@GetMapping("insecureSentiments")
+	public ResponseEntity insecureSentiments() {
+		try {
+			String data = JSON.toJSONString(User.NotifiedSentiment.CODE_VALUE_MAP);
+			return ResponseEntity.success("获取全部舆情接受状态成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 修改用户对预警舆情的接受状态
+	 * @param userId 修改所用的用户编号
+	 * @param sentiment 修改后用户对预警舆情的接受状态
+	 * @return boolean 是否修改成功
+	 */
+	@PutMapping("insecureChangingNotifiedWarningPublicSentiment")
+	public ResponseEntity insecureChangingNotifiedWarningPublicSentiment(@RequestParam String openId, @RequestParam String sentiment) {
+		Assert.notNull(openId, "INSECURE_CHANGING_NOTIFIED_WARNING_PUBLIC_SENTIMENT_USER_ID_IS_NULL");
+		Assert.notNull(sentiment, "INSECURE_CHANGING_NOTIFIED_WARNING_PUBLIC_SENTIMENT_SENTIMENT_IS_NULL");
+		
+		try {
+			boolean data = userService.updateNotifiedWarningPublicSentiment(openId, User.NotifiedSentiment.getInstance(sentiment));
+			return ResponseEntity.success("预警舆情接受状态修改成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 修改用户对热点舆情的接受状态
+	 * @param userId 修改所用的用户编号
+	 * @param sentiment 修改后用户对热点舆情的接受状态
+	 * @return boolean 是否修改成功
+	 */
+	@PutMapping("insecureChangingNotifiedHotPublicSentiment")
+	public ResponseEntity changingNotifiedHotPublicSentiment(@RequestParam String openId, @RequestParam String sentiment) {
+		Assert.notNull(openId, "INSECURE_NOTIFIED_HOT_PUBLIC_SENTIMENT_USER_ID_IS_NULL");
+		Assert.notNull(sentiment, "INSECURE_CHANGING_NOTIFIED_HOT_PUBLIC_SENTIMENT_SENTIMENT_IS_NULL");
+		
+		try {
+			boolean data = userService.updateNotifiedHotPublicSentiment(openId, User.NotifiedSentiment.getInstance(sentiment));
+			return ResponseEntity.success("热点舆情接受状态修改成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 修改用户对负面舆情的接受状态
+	 * @param userId 修改所用的用户编号
+	 * @param sentiment 修改后用户对负面舆情的接受状态
+	 * @return boolean 是否修改成功
+	 */
+	@PutMapping("insecureChangingNotifiedNegativePublicSentiment")
+	public ResponseEntity changingNotifiedNegativePublicSentiment(@RequestParam String openId, @RequestParam String sentiment) {
+		Assert.notNull(openId, "INSECURE_CHANGING_NOTIFIED_NEGATIVE_PUBLIC_SENTIMENT_USER_ID_IS_NULL");
+		Assert.notNull(sentiment, "INSECURE_CHANGING_NOTIFIED_NEGATIVE_PUBLIC_SENTIMENT_SENTIMENT_IS_NULL");
+		
+		try {
+			boolean data = userService.updateNotifiedNegativePublicSentiment(openId, User.NotifiedSentiment.getInstance(sentiment));
+			return ResponseEntity.success("负面舆情接受状态修改成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;
