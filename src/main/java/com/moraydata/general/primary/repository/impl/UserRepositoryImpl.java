@@ -10,6 +10,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import com.moraydata.general.management.util.QuerydslUtils;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.entity.dto.UserBasicInformation;
+import com.moraydata.general.primary.entity.dto.UserMiniInformation;
 import com.moraydata.general.primary.entity.query.QUser;
 import com.moraydata.general.primary.repository.UserRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -21,6 +22,21 @@ public class UserRepositoryImpl implements UserRepositoryCustom<User, Long> {
 	
 	@Autowired
 	private EntityManager entityManager;
+	
+	/**
+	 * 获取所有用户的Id和username
+	 */
+	@Override
+	public List<UserMiniInformation> findAllIdAndUsername() {
+		JPAQuery<User> query = QuerydslUtils.newQuery(entityManager);
+		QUser $ = new QUser("user");
+		return query.select(Projections.constructor(UserMiniInformation.class, 
+					$.id,
+					$.username))
+				.from($)
+				.orderBy($.id.asc())
+				.fetch();
+	}
 
 	/**
 	 * 获取有openId的1级用户的用户Id、username和openId

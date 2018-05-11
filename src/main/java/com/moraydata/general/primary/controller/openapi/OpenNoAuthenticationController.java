@@ -22,6 +22,7 @@ import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.management.util.ResponseEntity;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.entity.dto.UserBasicInformation;
+import com.moraydata.general.primary.entity.dto.UserMiniInformation;
 import com.moraydata.general.primary.service.RoleService;
 import com.moraydata.general.primary.service.UserService;
 
@@ -34,6 +35,23 @@ public class OpenNoAuthenticationController {
 	
 	@Autowired
 	private RoleService roleService;
+	
+	/**
+	 * 验证密码是否正确，用户登录时区分密码错误，还是token过期 
+	 */
+	@GetMapping("checkingPassword")
+	public ResponseEntity checkingPassword(@RequestParam String username, @RequestParam String password) {
+		Assert.notNull(username, "CHECKING_PASSWORD_USERNAME_IS_NULL");
+		Assert.notNull(password, "CHECKING_PASSWORD_PASSWORD_IS_NULL");
+		
+		try {
+			boolean correct = userService.existsByUsernameAndPassword(username, password);
+			return ResponseEntity.success("验证密码是否正确成功", correct);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
 	
 	/**
 	 * 用户注册 - 步骤1：用户注册时填写手机号码后，点击获取验证码，用户手机收到验证码，该接口返回用户注册验证码redis中对应的key
@@ -142,15 +160,19 @@ public class OpenNoAuthenticationController {
 	 * @return boolean 密码是否修改成功
 	 */
 	@PutMapping("retakingPassword")
-	public ResponseEntity retakingPassword(@RequestParam String key, @RequestParam String code, @RequestParam String newPassword) {
-		Assert.notNull(key, "RETAKING_PASSWORD_KEY_IS_NULL");
-		Assert.notNull(code, "RETAKING_PASSWORD_CODE_IS_NULL");
+	public ResponseEntity retakingPassword(@RequestParam String newPassword, HttpServletRequest request) {
 		Assert.notNull(newPassword, "RETAKING_PASSWORD_NEW_PASSWORD_IS_NULL");
 		
 		try {
 			boolean validated = OpenUserController.validatePassword(newPassword);
 			if (!validated) {
 				return ResponseEntity.error("密码格式有误");
+			}
+			
+			String key = request.getHeader("MESSAGE_KEY");
+			String code = request.getHeader("MESSAGE_CODE");
+			if (StringUtils.isBlank(key) || StringUtils.isBlank(code)) {
+				return ResponseEntity.error("手机验证码或对应的键格式错误");
 			}
 			boolean matched = userService.matchPasswordCode(key, code);
 			if (matched) {
@@ -170,15 +192,31 @@ public class OpenNoAuthenticationController {
 	}
 	
 	/**
-	 * 获取加密的用户基本信息，留给内部其他模块的api调用所用
+	 * 获取加密的用户级别为1的用户基本信息，留给内部其他模块的api调用所用
 	 * @return String Base64加密后的用户基本信息列表
 	 */
-	@GetMapping("encodedUserBasicInformation")
-	public ResponseEntity encodedUserBasicInformation() throws Exception {
+	@GetMapping("encodedLevel1UserBasicInformation")
+	public ResponseEntity encodedLevel1UserBasicInformation() throws Exception {
 		try {
 			List<UserBasicInformation> list = userService.getAllIdAndUsernameWhoHasOpenId();
 			String encodedData = Base64.getEncoder().encodeToString(JSON.toJSONString(list).getBytes(StandardCharsets.UTF_8));
 			return ResponseEntity.success("获取用户基本信息成功", encodedData);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 获取加密的所有用户基本信息，留给内部其他模块的api调用所用
+	 * @return String Base64加密后的用户迷你信息列表
+	 */
+	@GetMapping("encodedUserMiniInformation")
+	public ResponseEntity encodedUserBasicInformation() throws Exception {
+		try {
+			List<UserMiniInformation> list = userService.getAllIdAndUsername();
+			String encodedData = Base64.getEncoder().encodeToString(JSON.toJSONString(list).getBytes(StandardCharsets.UTF_8));
+			return ResponseEntity.success("获取用户迷你信息成功", encodedData);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;
@@ -285,7 +323,7 @@ public class OpenNoAuthenticationController {
 	 * @return boolean 是否修改成功
 	 */
 	@PutMapping("insecureChangingNotifiedHotPublicSentiment")
-	public ResponseEntity changingNotifiedHotPublicSentiment(@RequestParam String openId, @RequestParam String sentiment) {
+	public ResponseEntity insecureChangingNotifiedHotPublicSentiment(@RequestParam String openId, @RequestParam String sentiment) {
 		Assert.notNull(openId, "INSECURE_NOTIFIED_HOT_PUBLIC_SENTIMENT_USER_ID_IS_NULL");
 		Assert.notNull(sentiment, "INSECURE_CHANGING_NOTIFIED_HOT_PUBLIC_SENTIMENT_SENTIMENT_IS_NULL");
 		
@@ -305,13 +343,31 @@ public class OpenNoAuthenticationController {
 	 * @return boolean 是否修改成功
 	 */
 	@PutMapping("insecureChangingNotifiedNegativePublicSentiment")
-	public ResponseEntity changingNotifiedNegativePublicSentiment(@RequestParam String openId, @RequestParam String sentiment) {
+	public ResponseEntity insecureChangingNotifiedNegativePublicSentiment(@RequestParam String openId, @RequestParam String sentiment) {
 		Assert.notNull(openId, "INSECURE_CHANGING_NOTIFIED_NEGATIVE_PUBLIC_SENTIMENT_USER_ID_IS_NULL");
 		Assert.notNull(sentiment, "INSECURE_CHANGING_NOTIFIED_NEGATIVE_PUBLIC_SENTIMENT_SENTIMENT_IS_NULL");
 		
 		try {
 			boolean data = userService.updateNotifiedNegativePublicSentiment(openId, User.NotifiedSentiment.getInstance(sentiment));
 			return ResponseEntity.success("负面舆情接受状态修改成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	/**
+	 * 为cloudUserId加密，返回后用于传递给客户端页面进行跨服务跳转
+	 * @param cloudUserId 云用户的userId
+	 * @return String 加密后的cloudUserId
+	 */
+	@GetMapping("encodedCloudUserId4Login")
+	public ResponseEntity encodedCloudUserId(@RequestParam Long cloudUserId) {
+		Assert.notNull(cloudUserId, "ENCODED_CLOUD_USER_ID_IS_NULL");
+		
+		try {
+			String data = userService.encodeUserIdWithAES(cloudUserId);
+			return ResponseEntity.success("加密云用户编号成功", data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;

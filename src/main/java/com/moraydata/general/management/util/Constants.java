@@ -22,7 +22,7 @@ public final class Constants {
 		public static final String ERROR = "100001";
 		public static final String SUCCESS = "100000";
 		
-		public static final String OPERATION_FAILURE_CAUSED_BY_UNKNOWN_ERROR = "未知错误引起操作失败";
+		public static final String OPERATION_FAILURE_CAUSED_BY_UNKNOWN_ERROR = "未知错误引起操作失败,请联系客服";
 		public static final String OPERATION_SUCCESS = "操作成功";
 	}
 	
@@ -76,5 +76,9 @@ public final class Constants {
 		public static final String REMARK = "remark";
 		public static final String COLOR = "color";
 		public static final String VALUE = "value";
+	}
+	
+	public static final class SERVICE_CONNECTION {
+		public static final String AES_SEED_SKIP_LOGIN = "skipLogin";
 	}
 }

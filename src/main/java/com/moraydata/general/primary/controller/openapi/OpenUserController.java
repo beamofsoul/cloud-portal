@@ -190,12 +190,20 @@ public class OpenUserController {
 			if (!validated) {
 				return ResponseEntity.error("手机号码格式无效");
 			}
-			boolean exists = userService.existsByUsername(username);
-			if (!exists) {
+			User currentUser = userService.get(username);
+			if (currentUser == null) {
 				return ResponseEntity.error("未能通过用户名和手机找到任何用户信息");
 			} else {
-				String data = userService.sendMessageCode4ChangingPhone(username, phone, currentClientMilliseconds);
-				return ResponseEntity.success("更换手机验证码已经发送至用户手机", data);
+				if (currentUser.getPhone() != null && currentUser.getPhone().equals(phone)) {
+					return ResponseEntity.error("修改后的手机号码与当前 手机号码一致");
+				}
+				boolean phoneUnique = userService.isPhoneUnique(phone, currentUser.getId());
+				if (phoneUnique) {
+					String data = userService.sendMessageCode4ChangingPhone(username, phone, currentClientMilliseconds);
+					return ResponseEntity.success("更换手机验证码已经发送至用户手机", data);
+				} else {
+					return ResponseEntity.error("手机号码已经被使用");
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

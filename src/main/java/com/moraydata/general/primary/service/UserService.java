@@ -10,6 +10,7 @@ import com.moraydata.general.primary.entity.InvitationCode;
 import com.moraydata.general.primary.entity.Role;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.entity.dto.UserBasicInformation;
+import com.moraydata.general.primary.entity.dto.UserMiniInformation;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
@@ -55,6 +56,7 @@ public interface UserService {
 	User getByOpenId(String openId) throws Exception;
 	boolean exists(String phone) throws Exception;
 	boolean existsByUsername(String username) throws Exception;
+	boolean existsByUsernameAndPassword(String username, String password) throws Exception;
 	User create(User instance, Role role) throws Exception;
 	boolean isPhoneUnique(String phone, Long userId) throws Exception;
 	boolean bindWeChat(String username, String openId) throws Exception;
@@ -79,7 +81,6 @@ public interface UserService {
 	List<User> getWhoHasOpenId() throws Exception;
 	List<UserBasicInformation> getAllIdAndUsernameWhoHasOpenId() throws Exception;
 	List<UserBasicInformation> getLevelUserBasicInformation(Long level1UserId, User.Level... level);
-//	List<UserBasicInformation> getLevel3UserBasicInformation(Long level1UserId) throws Exception;
-//	List<UserBasicInformation> getLevel2UserBasicInformation(Long level1UserId) throws Exception;
-//	List<UserBasicInformation> getLevel2Or3UserBasicInformation(Long level1UserId) throws Exception;
+	List<UserMiniInformation> getAllIdAndUsername() throws Exception;
+	String encodeUserIdWithAES(Long cloudUserId) throws Exception;
 }

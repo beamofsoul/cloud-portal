@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSONObject;
 import com.moraydata.general.management.annotation.Property;
 import com.moraydata.general.management.message.MessageCodeManager;
+import com.moraydata.general.management.util.AESUtils;
 import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.primary.entity.InvitationCode;
 import com.moraydata.general.primary.entity.InvitationCode.Type;
@@ -41,6 +42,7 @@ import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.entity.User.NotifiedSentiment;
 import com.moraydata.general.primary.entity.UserRole;
 import com.moraydata.general.primary.entity.dto.UserBasicInformation;
+import com.moraydata.general.primary.entity.dto.UserMiniInformation;
 import com.moraydata.general.primary.entity.query.QUser;
 import com.moraydata.general.primary.repository.UserRepository;
 import com.moraydata.general.primary.service.InvitationCodeService;
@@ -92,6 +94,12 @@ public class UserServiceImpl implements UserService {
 	public User create(User instance) {
 		try {
 			instance.setCountOfInvitationCodes(0);
+			instance.setLevel(User.Level.FIRST.getValue());
+			instance.setNotified(Boolean.TRUE);
+			String defaultPublicSentimentValue = User.NotifiedSentiment.NON.getValue();
+			instance.setNotifiedHotPublicSentiment(defaultPublicSentimentValue);
+			instance.setNotifiedNegativePublicSentiment(defaultPublicSentimentValue);
+			instance.setNotifiedWarningPublicSentiment(defaultPublicSentimentValue);
 			final String base64Photo = instance.getPhoto();
 			if (StringUtils.isNotBlank(base64Photo)) {
 				serializeUserPhoto(instance, base64Photo);
@@ -112,6 +120,12 @@ public class UserServiceImpl implements UserService {
 	public User create(User instance, Role role) throws Exception {
 		try {
 			instance.setCountOfInvitationCodes(0);
+			instance.setLevel(User.Level.FIRST.getValue());
+			instance.setNotified(Boolean.TRUE);
+			String defaultPublicSentimentValue = User.NotifiedSentiment.NON.getValue();
+			instance.setNotifiedHotPublicSentiment(defaultPublicSentimentValue);
+			instance.setNotifiedNegativePublicSentiment(defaultPublicSentimentValue);
+			instance.setNotifiedWarningPublicSentiment(defaultPublicSentimentValue);
 			instance.setPassword(passwordEncoder.encode(instance.getPassword()));
 			User savedUser = userRepository.save(instance);
 			if (savedUser != null) {
@@ -920,6 +934,11 @@ public class UserServiceImpl implements UserService {
 		QUser $ = new QUser("User");
 		return userRepository.findByPredicate($.openId.isNotNull());
 	}
+	
+	@Override
+	public List<UserMiniInformation> getAllIdAndUsername() throws Exception {
+		return userRepository.findAllIdAndUsername();
+	}
 
 	@Override
 	public List<UserBasicInformation> getAllIdAndUsernameWhoHasOpenId() throws Exception {
@@ -949,54 +968,15 @@ public class UserServiceImpl implements UserService {
 		
 		return userRepository.findLevelUserBasicInformation(masterUserId, levels);
 	}
+	
+	@Override
+	public boolean existsByUsernameAndPassword(String username, String password) throws Exception {
+		User currentUser = this.get(username);
+		return this.matchPassword(password, currentUser.getPassword());
+	}
 
-//	/**
-//	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有3级设置了接收推送消息的子账号
-//	 * PS: 1级用户未必是主账号
-//	 */
-//	@Override
-//	public List<UserBasicInformation> getLevel3UserBasicInformation(Long level1UserId) throws Exception {
-//		// 1. 找到当前1级用户的主账号Id
-//		QUser $ = new QUser("User");
-//		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
-//		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
-//		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
-//		
-//		// 2. 找到主账号下所有3级子账号
-//		return userRepository.findLevelUserBasicInformation(masterUserId, User.Level.THIRD.getValue());
-////		return userRepository.findLevel3UserBasicInformation(masterUserId);
-//	}
-//	
-//	/**
-//	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有2级设置了接收推送消息的子账号
-//	 * PS: 1级用户未必是主账号
-//	 */
-//	@Override
-//	public List<UserBasicInformation> getLevel2UserBasicInformation(Long level1UserId) throws Exception {
-//		// 1. 找到当前1级用户的主账号Id
-//		QUser $ = new QUser("User");
-//		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
-//		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
-//		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
-//		
-//		// 2. 找到主账号下所有3级子账号
-//		return userRepository.findLevelUserBasicInformation(masterUserId, User.Level.SECOND.getValue());
-////		return userRepository.findLevel2UserBasicInformation(masterUserId);
-//	}
-//	
-//	/**
-//	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有2和3级设置了接收推送消息的子账号
-//	 * PS: 1级用户未必是主账号
-//	 */
-//	@Override
-//	public List<UserBasicInformation> getLevel2Or3UserBasicInformation(Long level1UserId) throws Exception {
-//		// 1. 找到当前1级用户的主账号Id
-//		QUser $ = new QUser("User");
-//		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
-//		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
-//		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
-//		
-//		// 2. 找到主账号下所有2和3级子账号
-//		return userRepository.findLevel2Or3UserBasicInformation(masterUserId);
-//	}
+	@Override
+	public String encodeUserIdWithAES(Long cloudUserId) throws Exception {
+		return AESUtils.encrypt(String.valueOf(cloudUserId), Constants.SERVICE_CONNECTION.AES_SEED_SKIP_LOGIN);
+	}
 }

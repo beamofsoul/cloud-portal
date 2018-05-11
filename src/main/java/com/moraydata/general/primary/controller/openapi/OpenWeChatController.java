@@ -24,12 +24,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.moraydata.general.management.schedule.PushPublicSentimentJob;
-import com.moraydata.general.management.schedule.TemplateMessage;
-import com.moraydata.general.management.schedule.TemplateMessage.Action;
+//import com.moraydata.general.management.schedule.PushPublicSentimentJob;
+//import com.moraydata.general.management.schedule.TemplateMessage;
+//import com.moraydata.general.management.schedule.TemplateMessage.Action;
 import com.moraydata.general.management.util.Constants;
 import com.moraydata.general.management.util.HttpUrlUtils;
 import com.moraydata.general.management.util.ResponseEntity;
@@ -44,6 +46,7 @@ import com.moraydata.general.management.wechat.SubMenuButton;
 import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.entity.dto.UserBasicInformation;
 import com.moraydata.general.primary.service.UserService;
+import com.mysema.commons.lang.URLEncoder;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,8 +63,8 @@ public class OpenWeChatController {
 	@Autowired
 	private WeChatTokenHelper handler;
 	
-	@Autowired
-	private PushPublicSentimentJob pushPublicSentimentJob;
+//	@Autowired
+//	private PushPublicSentimentJob pushPublicSentimentJob;
 	
 	@Value("${project.base.social.user.defaultPassword}")
 	private String defaultPassword;
@@ -155,71 +158,71 @@ public class OpenWeChatController {
 //		return jsonResponse.getString("errmsg").equals("ok");
 //	}
 	
-	@PostMapping("/wechat/sendTemplateMessage2Target")
-	public ResponseEntity sendTemplateMessage2Target(@RequestParam Long userId, @RequestParam Long templateMessageId, @RequestParam Integer action) throws Exception {
-		Assert.notNull(userId, "SEND_TEMPLATE_MESSAGE_2_TARGET_USER_ID_IS_NULL");
-		Assert.notNull(templateMessageId, "SEND_TEMPLATE_MESSAGE_2_TARGET_TEMPLATE_MESSAGE_ID_IS_NULL");
-		Assert.notNull(action, "SEND_TEMPLATE_MESSAGE_2_TARGET_ACTION_IS_NULL");
-		
-		User currentUser = userService.get(userId);
-		if (currentUser == null) {
-			return ResponseEntity.error("未能通过userId获取到任何用户信息");
-		}
-		if (!TemplateMessage.Action.exists(action)) {
-			return ResponseEntity.error("action格式错误");
-		}
-		
-		try {
-			// 1. 判断当前用户的用户级别
-			Integer currentUserLevel = currentUser.getLevel();
-			Action targetAction = TemplateMessage.Action.getInstance(action);
-			if (currentUserLevel.equals(User.Level.FIRST.getValue())) {
-				// 1.1  如果是1级用户，判断当前行为
-				// 1.1.1 如果是上报功能，判断是否当前模板消息已被设置为有效
-				if (targetAction.equals(TemplateMessage.Action.PUSH)) {
-					Integer templateMessageAction = pushPublicSentimentJob.getTemplateMessage(templateMessageId).getAction(); // .getTemplateMessageAction(userId, templateMessageId);
-					if (TemplateMessage.Action.exists(templateMessageAction)) {
-						Action currentAction = TemplateMessage.Action.getInstance(templateMessageAction);
-						List<UserBasicInformation> sent2Users = null;
-						if (currentAction.equals(TemplateMessage.Action.VALIDATE)) {
-							// 1.1.1.1 如果已经被设置为有效，推送给3级用户，并将该消息状态标记为已上报
-							sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.THIRD);
-						} else {
-							// 1.1.1.2 如果未被设置为有效，推送给2级和3级用户，并将该消息状态标记为已上报
-							sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.SECOND, User.Level.THIRD);
-						}
-						// 推送
-						pushPublicSentimentJob.sendTemplateMessage(sent2Users, templateMessageId);
-						// 标记
-						pushPublicSentimentJob.updateAction(templateMessageId, action);
-					}
-				} else if (targetAction.equals(TemplateMessage.Action.VALIDATE)) {
-					// 1.1.2 如果是有效功能，推送给2级用户，并将该消息状态标记为有效
-					List<UserBasicInformation> sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.SECOND);
-					pushPublicSentimentJob.sendTemplateMessage(sent2Users, templateMessageId);
-					pushPublicSentimentJob.updateAction(templateMessageId, action);
-				} else if (targetAction.equals(TemplateMessage.Action.INVALIDATE)) {
-					// 1.1.3 如果是无效功能，修改当前模板消息状态为无效
-					pushPublicSentimentJob.updateAction(templateMessageId, action);
-				}
-			} else if (currentUserLevel.equals(User.Level.SECOND.getValue())) {
-				// 1.2 如果是2级用户，判断当前行为
-				if (targetAction.equals(TemplateMessage.Action.PUSH)) {
-					// 1.2.1 如果是上报功能，推送给3级用户，并将该消息状态标记为已上报
-					List<UserBasicInformation> sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.THIRD);
-					pushPublicSentimentJob.sendTemplateMessage(sent2Users, templateMessageId);
-					pushPublicSentimentJob.updateAction(templateMessageId, action);
-				} else if (targetAction.equals(TemplateMessage.Action.INVALIDATE)) {
-					// 1.2.2 如果是无效功能，修改当前模板消息状态为无效
-					pushPublicSentimentJob.updateAction(templateMessageId, action);
-				}
-			}
-			return ResponseEntity.success("发送模板消息至指定用户成功", Boolean.TRUE);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.UNKNOWN_ERROR;
-		}
-	}
+//	@PostMapping("/wechat/sendTemplateMessage2Target")
+//	public ResponseEntity sendTemplateMessage2Target(@RequestParam Long userId, @RequestParam Long templateMessageId, @RequestParam Integer action) throws Exception {
+//		Assert.notNull(userId, "SEND_TEMPLATE_MESSAGE_2_TARGET_USER_ID_IS_NULL");
+//		Assert.notNull(templateMessageId, "SEND_TEMPLATE_MESSAGE_2_TARGET_TEMPLATE_MESSAGE_ID_IS_NULL");
+//		Assert.notNull(action, "SEND_TEMPLATE_MESSAGE_2_TARGET_ACTION_IS_NULL");
+//		
+//		User currentUser = userService.get(userId);
+//		if (currentUser == null) {
+//			return ResponseEntity.error("未能通过userId获取到任何用户信息");
+//		}
+//		if (!TemplateMessage.Action.exists(action)) {
+//			return ResponseEntity.error("action格式错误");
+//		}
+//		
+//		try {
+//			// 1. 判断当前用户的用户级别
+//			Integer currentUserLevel = currentUser.getLevel();
+//			Action targetAction = TemplateMessage.Action.getInstance(action);
+//			if (currentUserLevel.equals(User.Level.FIRST.getValue())) {
+//				// 1.1  如果是1级用户，判断当前行为
+//				// 1.1.1 如果是上报功能，判断是否当前模板消息已被设置为有效
+//				if (targetAction.equals(TemplateMessage.Action.PUSH)) {
+//					Integer templateMessageAction = pushPublicSentimentJob.getTemplateMessage(templateMessageId).getAction(); // .getTemplateMessageAction(userId, templateMessageId);
+//					if (TemplateMessage.Action.exists(templateMessageAction)) {
+//						Action currentAction = TemplateMessage.Action.getInstance(templateMessageAction);
+//						List<UserBasicInformation> sent2Users = null;
+//						if (currentAction.equals(TemplateMessage.Action.VALIDATE)) {
+//							// 1.1.1.1 如果已经被设置为有效，推送给3级用户，并将该消息状态标记为已上报
+//							sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.THIRD);
+//						} else {
+//							// 1.1.1.2 如果未被设置为有效，推送给2级和3级用户，并将该消息状态标记为已上报
+//							sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.SECOND, User.Level.THIRD);
+//						}
+//						// 推送
+//						pushPublicSentimentJob.sendTemplateMessage(sent2Users, templateMessageId);
+//						// 标记
+//						pushPublicSentimentJob.updateAction(templateMessageId, action);
+//					}
+//				} else if (targetAction.equals(TemplateMessage.Action.VALIDATE)) {
+//					// 1.1.2 如果是有效功能，推送给2级用户，并将该消息状态标记为有效
+//					List<UserBasicInformation> sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.SECOND);
+//					pushPublicSentimentJob.sendTemplateMessage(sent2Users, templateMessageId);
+//					pushPublicSentimentJob.updateAction(templateMessageId, action);
+//				} else if (targetAction.equals(TemplateMessage.Action.INVALIDATE)) {
+//					// 1.1.3 如果是无效功能，修改当前模板消息状态为无效
+//					pushPublicSentimentJob.updateAction(templateMessageId, action);
+//				}
+//			} else if (currentUserLevel.equals(User.Level.SECOND.getValue())) {
+//				// 1.2 如果是2级用户，判断当前行为
+//				if (targetAction.equals(TemplateMessage.Action.PUSH)) {
+//					// 1.2.1 如果是上报功能，推送给3级用户，并将该消息状态标记为已上报
+//					List<UserBasicInformation> sent2Users = userService.getLevelUserBasicInformation(userId, User.Level.THIRD);
+//					pushPublicSentimentJob.sendTemplateMessage(sent2Users, templateMessageId);
+//					pushPublicSentimentJob.updateAction(templateMessageId, action);
+//				} else if (targetAction.equals(TemplateMessage.Action.INVALIDATE)) {
+//					// 1.2.2 如果是无效功能，修改当前模板消息状态为无效
+//					pushPublicSentimentJob.updateAction(templateMessageId, action);
+//				}
+//			}
+//			return ResponseEntity.success("发送模板消息至指定用户成功", Boolean.TRUE);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return ResponseEntity.UNKNOWN_ERROR;
+//		}
+//	}
 	
 	/************************************************************** 关注服务号并且自动登录系统 ****************************************************************/
 	
@@ -430,14 +433,16 @@ public class OpenWeChatController {
 	        subMenuSecondFirst.setKey("21");
 
 	        SubMenuButton subMenuSecondSecond = new SubMenuButton();
-	        subMenuSecondSecond.setType(clickEvent);
+	        subMenuSecondSecond.setType(viewEvent);
 	        subMenuSecondSecond.setName("用户权限");
-	        subMenuSecondSecond.setKey("22");
+	        subMenuSecondSecond.setUrl(integreatedMenuUrl(URLEncoder.encodeURL("http://openapi.moraydata.com/wechat/whois?action=publicSentiments_opinion")));
+//	        publicSentiments/opinion.html
 
 	        SubMenuButton subMenuSecondThird = new SubMenuButton();
-	        subMenuSecondThird.setType(clickEvent);
+	        subMenuSecondThird.setType(viewEvent);
 	        subMenuSecondThird.setName("通知管理");
-	        subMenuSecondThird.setKey("23");
+	        subMenuSecondThird.setUrl(integreatedMenuUrl(URLEncoder.encodeURL("http://openapi.moraydata.com/wechat/whois?action=publicSentiments_inform")));
+//	        publicSentiments/inform.html
 
 	        // 加入导航菜单
 	        navSecond.setSub_button(new SubMenuButton[] {subMenuSecondFirst, subMenuSecondSecond, subMenuSecondThird});
@@ -449,35 +454,55 @@ public class OpenWeChatController {
 		return "ok".equals(response.getString("errmsg")) ? ResponseEntity.success("重建服务号菜单成功", jsonStringMenu) : ResponseEntity.error("重建服务号菜单失败", response);
 	}
 
+//	/**
+//	 * 通过获取到的微信服务器code，从微信服务器获取制定的access_token和openid
+//	 * @param request 请求的实例
+//	 * @return JSONObject 包含用户信息、openid和access_token的JSONObject
+//	 */
+//	@GetMapping("/wechat/whois")
+//	public ResponseEntity whois(HttpServletRequest request) {
+//		String code = request.getParameter(Constants.WECHAT.CODE);
+//		if (StringUtils.isBlank(code)) {
+//			return ResponseEntity.error("code格式错误");
+//		}
+//		try {
+//			log.debug("#### /wechat/whois: code: " + code);
+//			String response = RestTemplateUtils.INSTANCE.getRestTemplate().getForObject(integrateUrl4TokenAndOpenId(code), String.class);
+//			JSONObject parsedResponse = JSONObject.parseObject(response);
+//			log.debug("#### /wechat/whois: response:" + response);
+//			log.debug("#### /wechat/whois: response: access_token: " + parsedResponse.getString("access_token"));
+//			log.debug("#### /wechat/whois: response: expires_in: " + parsedResponse.getInteger("expires_in"));
+//			log.debug("#### /wechat/whois: response: refresh_token: " + parsedResponse.getString("refresh_token"));
+//			log.debug("#### /wechat/whois: response: openid: " + parsedResponse.getString("openid"));
+//			log.debug("#### /wechat/whois: response: scope: " + parsedResponse.getString("scope"));
+//			User currentUser = userService.getByOpenId(parsedResponse.getString("openid"));
+//			log.debug("#### /wechat/whois: currentUser: " + JSON.toJSONString(currentUser));
+//			parsedResponse.put("currentUser", currentUser);
+//			return ResponseEntity.success("获取当前用户信息成功", parsedResponse);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return ResponseEntity.UNKNOWN_ERROR;
+//		}
+//	}
+	
 	/**
 	 * 通过获取到的微信服务器code，从微信服务器获取制定的access_token和openid
 	 * @param request 请求的实例
 	 * @return JSONObject 包含用户信息、openid和access_token的JSONObject
 	 */
 	@GetMapping("/wechat/whois")
-	public ResponseEntity whois(HttpServletRequest request) {
+	public ModelAndView whois(HttpServletRequest request) {
 		String code = request.getParameter(Constants.WECHAT.CODE);
-		if (StringUtils.isBlank(code)) {
-			return ResponseEntity.error("code格式错误");
-		}
+		String action = request.getParameter("action");
 		try {
-			log.debug("#### /wechat/whois: code: " + code);
 			String response = RestTemplateUtils.INSTANCE.getRestTemplate().getForObject(integrateUrl4TokenAndOpenId(code), String.class);
 			JSONObject parsedResponse = JSONObject.parseObject(response);
-			log.debug("#### /wechat/whois: response:" + response);
-			log.debug("#### /wechat/whois: response: access_token: " + parsedResponse.getString("access_token"));
-			log.debug("#### /wechat/whois: response: expires_in: " + parsedResponse.getInteger("expires_in"));
-			log.debug("#### /wechat/whois: response: refresh_token: " + parsedResponse.getString("refresh_token"));
-			log.debug("#### /wechat/whois: response: openid: " + parsedResponse.getString("openid"));
-			log.debug("#### /wechat/whois: response: scope: " + parsedResponse.getString("scope"));
-			User currentUser = userService.getByOpenId(parsedResponse.getString("openid"));
-			log.debug("#### /wechat/whois: currentUser: " + JSON.toJSONString(currentUser));
-			parsedResponse.put("currentUser", currentUser);
-			return ResponseEntity.success("获取当前用户信息成功", parsedResponse);
+			String openId = parsedResponse.getString("openid");
+			return new ModelAndView(new RedirectView("http://cloud.moraydata.com/" + action.replace("_", "/") + ".html?openId=" + openId));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.UNKNOWN_ERROR;
+			return null;
 		}
+//		return new ModelAndView(new RedirectView("http://www.baidu.com"));
 	}
 	
 	private User createTargetUser(User targetUser) {

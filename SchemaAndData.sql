@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
-Source Server Version : 50720
-Source Host           : localhost:3306
-Source Database       : rabbit
+Source Server         : 海鳗v1.4(外网) FASTER
+Source Server Version : 50634
+Source Host           : 47.93.109.133:3306
+Source Database       : moraydata_cloud_primary_01
 
 Target Server Type    : MYSQL
-Target Server Version : 50720
+Target Server Version : 50634
 File Encoding         : 65001
 
-Date: 2018-04-11 16:46:45
+Date: 2018-05-11 15:42:55
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -40,6 +40,243 @@ CREATE TABLE `oauth_client_details` (
 INSERT INTO `oauth_client_details` VALUES ('client_hm', 'open_api', '$2a$10$Qok3Z3Kg8YgxHtjXWHEVreIteUgm9HJ8kqmc3Mgrh1edLQ/njhL5m', 'select', 'password,refresh_token', null, null, null, null, null, null);
 
 -- ----------------------------
+-- Table structure for `qrtz_blob_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_blob_triggers`;
+CREATE TABLE `qrtz_blob_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(190) COLLATE utf8_bin NOT NULL,
+  `BLOB_DATA` blob,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  KEY `SCHED_NAME` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  CONSTRAINT `qrtz_blob_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_blob_triggers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `qrtz_calendars`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_calendars`;
+CREATE TABLE `qrtz_calendars` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `CALENDAR_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `CALENDAR` blob NOT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`CALENDAR_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_calendars
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `qrtz_cron_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_cron_triggers`;
+CREATE TABLE `qrtz_cron_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(190) COLLATE utf8_bin NOT NULL,
+  `CRON_EXPRESSION` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TIME_ZONE_ID` varchar(80) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  CONSTRAINT `qrtz_cron_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_cron_triggers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `qrtz_fired_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_fired_triggers`;
+CREATE TABLE `qrtz_fired_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `ENTRY_ID` varchar(95) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(190) COLLATE utf8_bin NOT NULL,
+  `INSTANCE_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `FIRED_TIME` bigint(13) NOT NULL,
+  `SCHED_TIME` bigint(13) NOT NULL,
+  `PRIORITY` int(11) NOT NULL,
+  `STATE` varchar(16) COLLATE utf8_bin NOT NULL,
+  `JOB_NAME` varchar(190) COLLATE utf8_bin DEFAULT NULL,
+  `JOB_GROUP` varchar(190) COLLATE utf8_bin DEFAULT NULL,
+  `IS_NONCONCURRENT` varchar(1) COLLATE utf8_bin DEFAULT NULL,
+  `REQUESTS_RECOVERY` varchar(1) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`ENTRY_ID`),
+  KEY `IDX_QRTZ_FT_TRIG_INST_NAME` (`SCHED_NAME`,`INSTANCE_NAME`),
+  KEY `IDX_QRTZ_FT_INST_JOB_REQ_RCVRY` (`SCHED_NAME`,`INSTANCE_NAME`,`REQUESTS_RECOVERY`),
+  KEY `IDX_QRTZ_FT_J_G` (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
+  KEY `IDX_QRTZ_FT_JG` (`SCHED_NAME`,`JOB_GROUP`),
+  KEY `IDX_QRTZ_FT_T_G` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  KEY `IDX_QRTZ_FT_TG` (`SCHED_NAME`,`TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_fired_triggers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `qrtz_job_details`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_job_details`;
+CREATE TABLE `qrtz_job_details` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `JOB_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `JOB_GROUP` varchar(190) COLLATE utf8_bin NOT NULL,
+  `DESCRIPTION` varchar(250) COLLATE utf8_bin DEFAULT NULL,
+  `JOB_CLASS_NAME` varchar(250) COLLATE utf8_bin NOT NULL,
+  `IS_DURABLE` varchar(1) COLLATE utf8_bin NOT NULL,
+  `IS_NONCONCURRENT` varchar(1) COLLATE utf8_bin NOT NULL,
+  `IS_UPDATE_DATA` varchar(1) COLLATE utf8_bin NOT NULL,
+  `REQUESTS_RECOVERY` varchar(1) COLLATE utf8_bin NOT NULL,
+  `JOB_DATA` blob,
+  PRIMARY KEY (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
+  KEY `IDX_QRTZ_J_REQ_RECOVERY` (`SCHED_NAME`,`REQUESTS_RECOVERY`),
+  KEY `IDX_QRTZ_J_GRP` (`SCHED_NAME`,`JOB_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_job_details
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `qrtz_locks`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_locks`;
+CREATE TABLE `qrtz_locks` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `LOCK_NAME` varchar(40) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`LOCK_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_locks
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `qrtz_paused_trigger_grps`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_paused_trigger_grps`;
+CREATE TABLE `qrtz_paused_trigger_grps` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(190) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_paused_trigger_grps
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `qrtz_scheduler_state`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_scheduler_state`;
+CREATE TABLE `qrtz_scheduler_state` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `INSTANCE_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `LAST_CHECKIN_TIME` bigint(13) NOT NULL,
+  `CHECKIN_INTERVAL` bigint(13) NOT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`INSTANCE_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_scheduler_state
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `qrtz_simple_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_simple_triggers`;
+CREATE TABLE `qrtz_simple_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(190) COLLATE utf8_bin NOT NULL,
+  `REPEAT_COUNT` bigint(7) NOT NULL,
+  `REPEAT_INTERVAL` bigint(12) NOT NULL,
+  `TIMES_TRIGGERED` bigint(10) NOT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  CONSTRAINT `qrtz_simple_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_simple_triggers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `qrtz_simprop_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_simprop_triggers`;
+CREATE TABLE `qrtz_simprop_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(190) COLLATE utf8_bin NOT NULL,
+  `STR_PROP_1` varchar(512) COLLATE utf8_bin DEFAULT NULL,
+  `STR_PROP_2` varchar(512) COLLATE utf8_bin DEFAULT NULL,
+  `STR_PROP_3` varchar(512) COLLATE utf8_bin DEFAULT NULL,
+  `INT_PROP_1` int(11) DEFAULT NULL,
+  `INT_PROP_2` int(11) DEFAULT NULL,
+  `LONG_PROP_1` bigint(20) DEFAULT NULL,
+  `LONG_PROP_2` bigint(20) DEFAULT NULL,
+  `DEC_PROP_1` decimal(13,4) DEFAULT NULL,
+  `DEC_PROP_2` decimal(13,4) DEFAULT NULL,
+  `BOOL_PROP_1` varchar(1) COLLATE utf8_bin DEFAULT NULL,
+  `BOOL_PROP_2` varchar(1) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  CONSTRAINT `qrtz_simprop_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_simprop_triggers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `qrtz_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `qrtz_triggers`;
+CREATE TABLE `qrtz_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(190) COLLATE utf8_bin NOT NULL,
+  `JOB_NAME` varchar(190) COLLATE utf8_bin NOT NULL,
+  `JOB_GROUP` varchar(190) COLLATE utf8_bin NOT NULL,
+  `DESCRIPTION` varchar(250) COLLATE utf8_bin DEFAULT NULL,
+  `NEXT_FIRE_TIME` bigint(13) DEFAULT NULL,
+  `PREV_FIRE_TIME` bigint(13) DEFAULT NULL,
+  `PRIORITY` int(11) DEFAULT NULL,
+  `TRIGGER_STATE` varchar(16) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_TYPE` varchar(8) COLLATE utf8_bin NOT NULL,
+  `START_TIME` bigint(13) NOT NULL,
+  `END_TIME` bigint(13) DEFAULT NULL,
+  `CALENDAR_NAME` varchar(190) COLLATE utf8_bin DEFAULT NULL,
+  `MISFIRE_INSTR` smallint(2) DEFAULT NULL,
+  `JOB_DATA` blob,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  KEY `IDX_QRTZ_T_J` (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
+  KEY `IDX_QRTZ_T_JG` (`SCHED_NAME`,`JOB_GROUP`),
+  KEY `IDX_QRTZ_T_C` (`SCHED_NAME`,`CALENDAR_NAME`),
+  KEY `IDX_QRTZ_T_G` (`SCHED_NAME`,`TRIGGER_GROUP`),
+  KEY `IDX_QRTZ_T_STATE` (`SCHED_NAME`,`TRIGGER_STATE`),
+  KEY `IDX_QRTZ_T_N_STATE` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
+  KEY `IDX_QRTZ_T_N_G_STATE` (`SCHED_NAME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
+  KEY `IDX_QRTZ_T_NEXT_FIRE_TIME` (`SCHED_NAME`,`NEXT_FIRE_TIME`),
+  KEY `IDX_QRTZ_T_NFT_ST` (`SCHED_NAME`,`TRIGGER_STATE`,`NEXT_FIRE_TIME`),
+  KEY `IDX_QRTZ_T_NFT_MISFIRE` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`),
+  KEY `IDX_QRTZ_T_NFT_ST_MISFIRE` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_STATE`),
+  KEY `IDX_QRTZ_T_NFT_ST_MISFIRE_GRP` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
+  CONSTRAINT `qrtz_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`) REFERENCES `qrtz_job_details` (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of qrtz_triggers
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for `t_invitation_code`
 -- ----------------------------
 DROP TABLE IF EXISTS `t_invitation_code`;
@@ -53,21 +290,21 @@ CREATE TABLE `t_invitation_code` (
   `type` tinyint(4) DEFAULT '1' COMMENT '邀请码类型 - 1:绑定父账户邀请码',
   `user_id` bigint(20) NOT NULL COMMENT '持有用户',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_invitation_code
 -- ----------------------------
-INSERT INTO `t_invitation_code` VALUES ('1', '2018-04-04 22:11:12', '2018-04-04 22:11:12', '', 'D7E87D056B714F20A33F93F44BF31BC6', null, '1', '1');
-INSERT INTO `t_invitation_code` VALUES ('2', '2018-04-04 22:11:12', '2018-04-04 22:11:12', '', '08E71C050D704AFB939B6A1A50F5FFE3', null, '1', '1');
-INSERT INTO `t_invitation_code` VALUES ('3', '2018-04-04 22:11:12', '2018-04-04 22:11:12', '', 'D26966C96C3E496590B076CE740F9DA3', null, '1', '1');
-INSERT INTO `t_invitation_code` VALUES ('4', '2018-04-04 22:11:12', '2018-04-04 22:11:12', '', '48FAE1EB531046E3BEC9635D77AEC299', null, '1', '1');
-INSERT INTO `t_invitation_code` VALUES ('5', '2018-04-04 22:11:12', '2018-04-04 22:11:12', '', '115A0DE1C5414AC6AC6BFB7EB74CA5F3', null, '1', '1');
-INSERT INTO `t_invitation_code` VALUES ('6', '2018-04-09 09:39:56', '2018-04-09 09:39:56', '', 'CD5D755C97D04A4C91C03C0C0D20E47F', null, '1', '1');
-INSERT INTO `t_invitation_code` VALUES ('7', '2018-04-09 09:39:56', '2018-04-09 09:39:56', '', '6B75D78A551445ACA8F34C347C4D521B', null, '1', '1');
-INSERT INTO `t_invitation_code` VALUES ('8', '2018-04-09 09:39:56', '2018-04-09 09:39:56', '', '4385B5CC176F4607861E4FD5C960F593', null, '1', '1');
-INSERT INTO `t_invitation_code` VALUES ('9', '2018-04-09 09:39:56', '2018-04-09 09:39:56', '', '49128CD3DD274CB18A7313FFC5502605', null, '1', '1');
-INSERT INTO `t_invitation_code` VALUES ('10', '2018-04-09 09:39:56', '2018-04-09 09:39:56', '', '9D9CDCD10FE64DBD94DEFE8ABFC7D7B0', null, '1', '1');
+INSERT INTO `t_invitation_code` VALUES ('11', '2018-04-16 18:02:36', '2018-04-16 18:02:36', '', '987A8A219680419EA40FDF882D1ECEC7', null, '1', '1');
+INSERT INTO `t_invitation_code` VALUES ('12', '2018-04-18 16:40:43', '2018-04-18 16:40:43', '', '96BB360418414F599391A5C93F3C9553', null, '1', '22');
+INSERT INTO `t_invitation_code` VALUES ('13', '2018-04-18 16:41:03', '2018-04-18 16:41:03', '', 'FA6225321E5B47C6BE3764A1E864D2CD', null, '1', '22');
+INSERT INTO `t_invitation_code` VALUES ('14', '2018-04-18 16:46:22', '2018-04-18 16:46:22', '', 'D89229E225D7453DA6A6B8BA2FC163E8', null, '1', '22');
+INSERT INTO `t_invitation_code` VALUES ('15', '2018-04-18 16:48:35', '2018-04-18 16:48:35', '', '867814EE6BA34F898BC4C80B5892BF6C', null, '1', '22');
+INSERT INTO `t_invitation_code` VALUES ('16', '2018-04-18 16:50:01', '2018-04-18 16:50:01', '', '408362A3F0ED46D2B6CD631E15778222', null, '1', '22');
+INSERT INTO `t_invitation_code` VALUES ('17', '2018-04-18 16:50:52', '2018-04-18 16:50:52', '', '8E011E78903941E7AFBBAF735291D25E', null, '1', '22');
+INSERT INTO `t_invitation_code` VALUES ('19', '2018-04-18 19:10:59', '2018-04-18 19:10:59', '', 'F1EBCA4BEEE34F35A8FB0CC3E203F7F7', null, '1', '22');
+INSERT INTO `t_invitation_code` VALUES ('20', '2018-04-18 19:11:24', '2018-04-18 19:11:24', '', 'C95B6F3541FF4739B69045CCD4532AA9', null, '1', '22');
+INSERT INTO `t_invitation_code` VALUES ('21', '2018-04-18 19:11:59', '2018-04-18 19:11:59', '', '54988E50D882459D8BAE2DE1FDAC5EE6', null, '1', '22');
 
 -- ----------------------------
 -- Table structure for `t_login`
@@ -87,7 +324,7 @@ CREATE TABLE `t_login` (
   PRIMARY KEY (`id`),
   KEY `FKqbwhd8ffw00hdkekquhhm7g7c` (`user_id`),
   CONSTRAINT `FKqbwhd8ffw00hdkekquhhm7g7c` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_login
@@ -162,6 +399,13 @@ INSERT INTO `t_login` VALUES ('69', '2018-04-06 01:24:28', '2018-04-06 01:24:28'
 INSERT INTO `t_login` VALUES ('70', '2018-04-09 09:43:06', '2018-04-09 09:43:06', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
 INSERT INTO `t_login` VALUES ('71', '2018-04-10 11:41:02', '2018-04-10 11:41:02', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
 INSERT INTO `t_login` VALUES ('72', '2018-04-10 17:24:10', '2018-04-10 17:24:10', null, 'Chrome-65.0.3325.181', '192.168.31.98', null, 'Mac', null, '1');
+INSERT INTO `t_login` VALUES ('73', '2018-04-13 16:49:16', '2018-04-13 16:49:16', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
+INSERT INTO `t_login` VALUES ('74', '2018-04-19 13:31:29', '2018-04-19 13:31:29', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
+INSERT INTO `t_login` VALUES ('75', '2018-04-19 14:06:04', '2018-04-19 14:06:04', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
+INSERT INTO `t_login` VALUES ('76', '2018-04-19 14:40:09', '2018-04-19 14:40:09', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
+INSERT INTO `t_login` VALUES ('77', '2018-04-19 15:40:43', '2018-04-19 15:40:43', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
+INSERT INTO `t_login` VALUES ('78', '2018-04-19 16:26:44', '2018-04-19 16:26:44', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
+INSERT INTO `t_login` VALUES ('79', '2018-04-19 17:15:36', '2018-04-19 17:15:36', null, 'Firefox-59.0', '192.168.31.137', null, 'Windows', null, '1');
 
 -- ----------------------------
 -- Table structure for `t_order`
@@ -178,18 +422,19 @@ CREATE TABLE `t_order` (
   `description` varchar(100) COLLATE utf8_bin DEFAULT NULL COMMENT '备注',
   `operator` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '运维人员',
   `service_begin_time` datetime DEFAULT NULL COMMENT '服务开始时间',
-  `service_end_time` datetime DEFAULT NULL COMMENT '服务开始时间',
+  `service_end_time` datetime DEFAULT NULL COMMENT '服务结束时间',
   `service_ids` varchar(256) COLLATE utf8_bin NOT NULL COMMENT '具体服务',
   `status` int(11) DEFAULT '1' COMMENT '订单状态 - 1:新建,2:生效,3:过期',
   `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   PRIMARY KEY (`id`),
   KEY `FKho2r4qgj3txpy8964fnla95ub` (`user_id`),
   CONSTRAINT `FKho2r4qgj3txpy8964fnla95ub` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_order
 -- ----------------------------
+INSERT INTO `t_order` VALUES ('3', '2018-04-16 05:58:47', '2018-04-18 18:19:25', null, '592547.23', '0.00', '100004', '没什么可描述的', '张三123', '2018-04-16 05:58:47', '2018-04-16 05:58:47', '1,2,3,4', '2', '22');
 
 -- ----------------------------
 -- Table structure for `t_order_item`
@@ -206,11 +451,15 @@ CREATE TABLE `t_order_item` (
   `status` int(11) DEFAULT '1' COMMENT '订单状态 - 1:新建,2:生效,3:过期',
   `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_order_item
 -- ----------------------------
+INSERT INTO `t_order_item` VALUES ('1', '2018-04-16 15:33:34', '2018-04-16 15:33:34', '没什么可描述的', '2018-04-16 05:58:47', '2018-04-16 05:58:47', '1', '1', '22');
+INSERT INTO `t_order_item` VALUES ('2', '2018-04-16 15:33:34', '2018-04-16 15:33:34', '没什么可描述的', '2018-04-16 05:58:47', '2018-04-16 05:58:47', '2', '1', '22');
+INSERT INTO `t_order_item` VALUES ('3', '2018-04-16 15:33:34', '2018-04-16 15:33:34', '没什么可描述的', '2018-04-16 05:58:47', '2018-04-16 05:58:47', '3', '2', '22');
+INSERT INTO `t_order_item` VALUES ('4', '2018-04-16 15:33:34', '2018-04-16 15:33:34', '没什么可描述的', '2018-04-16 05:58:47', '2018-04-16 05:58:47', '4', '1', '22');
 
 -- ----------------------------
 -- Table structure for `t_permission`
@@ -253,6 +502,250 @@ INSERT INTO `t_permission` VALUES ('15', '登录列表', 'login:list', '登录�
 INSERT INTO `t_permission` VALUES ('16', '登录增加', 'login:add', '登录管理', '15', 'button', '3', '', '2018-02-28 20:29:12', '2018-02-28 20:29:44');
 INSERT INTO `t_permission` VALUES ('17', '登录修改', 'login:update', '登录管理', '15', 'button', '3', '', '2018-02-28 20:29:38', '2018-02-28 20:29:38');
 INSERT INTO `t_permission` VALUES ('18', '登录删除', 'login:delete', '登录管理', '15', 'button', '3', '', '2018-02-28 20:29:58', '2018-02-28 20:29:58');
+
+-- ----------------------------
+-- Table structure for `t_qrtz_blob_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_blob_triggers`;
+CREATE TABLE `t_qrtz_blob_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(200) COLLATE utf8_bin NOT NULL,
+  `BLOB_DATA` blob,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  KEY `SCHED_NAME` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  CONSTRAINT `t_qrtz_blob_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `t_qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_blob_triggers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `t_qrtz_calendars`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_calendars`;
+CREATE TABLE `t_qrtz_calendars` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `CALENDAR_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `CALENDAR` blob NOT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`CALENDAR_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_calendars
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `t_qrtz_cron_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_cron_triggers`;
+CREATE TABLE `t_qrtz_cron_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(200) COLLATE utf8_bin NOT NULL,
+  `CRON_EXPRESSION` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TIME_ZONE_ID` varchar(80) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  CONSTRAINT `t_qrtz_cron_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `t_qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_cron_triggers
+-- ----------------------------
+INSERT INTO `t_qrtz_cron_triggers` VALUES ('quartzScheduler', 'com.moraydata.general.management.schedule.PushPublicSentimentJob', 'test', '0 0/1 * * * ?', 'Asia/Shanghai');
+INSERT INTO `t_qrtz_cron_triggers` VALUES ('quartzScheduler', 'com.moraydata.general.management.schedule.TestQuartz', 'test', '0/5 * * * * ?', 'Asia/Shanghai');
+
+-- ----------------------------
+-- Table structure for `t_qrtz_fired_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_fired_triggers`;
+CREATE TABLE `t_qrtz_fired_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `ENTRY_ID` varchar(95) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(200) COLLATE utf8_bin NOT NULL,
+  `INSTANCE_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `FIRED_TIME` bigint(13) NOT NULL,
+  `SCHED_TIME` bigint(13) NOT NULL,
+  `PRIORITY` int(11) NOT NULL,
+  `STATE` varchar(16) COLLATE utf8_bin NOT NULL,
+  `JOB_NAME` varchar(200) COLLATE utf8_bin DEFAULT NULL,
+  `JOB_GROUP` varchar(200) COLLATE utf8_bin DEFAULT NULL,
+  `IS_NONCONCURRENT` varchar(1) COLLATE utf8_bin DEFAULT NULL,
+  `REQUESTS_RECOVERY` varchar(1) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`ENTRY_ID`),
+  KEY `IDX_T_QRTZ_FT_TRIG_INST_NAME` (`SCHED_NAME`,`INSTANCE_NAME`),
+  KEY `IDX_T_QRTZ_FT_INST_JOB_REQ_RCVRY` (`SCHED_NAME`,`INSTANCE_NAME`,`REQUESTS_RECOVERY`),
+  KEY `IDX_T_QRTZ_FT_J_G` (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
+  KEY `IDX_T_QRTZ_FT_JG` (`SCHED_NAME`,`JOB_GROUP`),
+  KEY `IDX_T_QRTZ_FT_T_G` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  KEY `IDX_T_QRTZ_FT_TG` (`SCHED_NAME`,`TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_fired_triggers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `t_qrtz_job_details`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_job_details`;
+CREATE TABLE `t_qrtz_job_details` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `JOB_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `JOB_GROUP` varchar(200) COLLATE utf8_bin NOT NULL,
+  `DESCRIPTION` varchar(250) COLLATE utf8_bin DEFAULT NULL,
+  `JOB_CLASS_NAME` varchar(250) COLLATE utf8_bin NOT NULL,
+  `IS_DURABLE` varchar(1) COLLATE utf8_bin NOT NULL,
+  `IS_NONCONCURRENT` varchar(1) COLLATE utf8_bin NOT NULL,
+  `IS_UPDATE_DATA` varchar(1) COLLATE utf8_bin NOT NULL,
+  `REQUESTS_RECOVERY` varchar(1) COLLATE utf8_bin NOT NULL,
+  `JOB_DATA` blob,
+  PRIMARY KEY (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
+  KEY `IDX_T_QRTZ_J_REQ_RECOVERY` (`SCHED_NAME`,`REQUESTS_RECOVERY`),
+  KEY `IDX_T_QRTZ_J_GRP` (`SCHED_NAME`,`JOB_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_job_details
+-- ----------------------------
+INSERT INTO `t_qrtz_job_details` VALUES ('quartzScheduler', 'com.moraydata.general.management.schedule.PushPublicSentimentJob', 'test', null, 'com.moraydata.general.management.schedule.PushPublicSentimentJob', '0', '0', '0', '0', 0x230D0A23546875204D61792030332031383A32363A30332043535420323031380D0A);
+INSERT INTO `t_qrtz_job_details` VALUES ('quartzScheduler', 'com.moraydata.general.management.schedule.TestQuartz', 'test', null, 'com.moraydata.general.management.schedule.TestQuartz', '0', '0', '0', '0', 0x230D0A23547565204170722032342031313A34343A33362043535420323031380D0A);
+
+-- ----------------------------
+-- Table structure for `t_qrtz_locks`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_locks`;
+CREATE TABLE `t_qrtz_locks` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `LOCK_NAME` varchar(40) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`LOCK_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_locks
+-- ----------------------------
+INSERT INTO `t_qrtz_locks` VALUES ('quartzScheduler', 'TRIGGER_ACCESS');
+
+-- ----------------------------
+-- Table structure for `t_qrtz_paused_trigger_grps`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_paused_trigger_grps`;
+CREATE TABLE `t_qrtz_paused_trigger_grps` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(200) COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_paused_trigger_grps
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `t_qrtz_scheduler_state`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_scheduler_state`;
+CREATE TABLE `t_qrtz_scheduler_state` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `INSTANCE_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `LAST_CHECKIN_TIME` bigint(13) NOT NULL,
+  `CHECKIN_INTERVAL` bigint(13) NOT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`INSTANCE_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_scheduler_state
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `t_qrtz_simple_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_simple_triggers`;
+CREATE TABLE `t_qrtz_simple_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(200) COLLATE utf8_bin NOT NULL,
+  `REPEAT_COUNT` bigint(7) NOT NULL,
+  `REPEAT_INTERVAL` bigint(12) NOT NULL,
+  `TIMES_TRIGGERED` bigint(10) NOT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  CONSTRAINT `t_qrtz_simple_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `t_qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_simple_triggers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `t_qrtz_simprop_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_simprop_triggers`;
+CREATE TABLE `t_qrtz_simprop_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(200) COLLATE utf8_bin NOT NULL,
+  `STR_PROP_1` varchar(512) COLLATE utf8_bin DEFAULT NULL,
+  `STR_PROP_2` varchar(512) COLLATE utf8_bin DEFAULT NULL,
+  `STR_PROP_3` varchar(512) COLLATE utf8_bin DEFAULT NULL,
+  `INT_PROP_1` int(11) DEFAULT NULL,
+  `INT_PROP_2` int(11) DEFAULT NULL,
+  `LONG_PROP_1` bigint(20) DEFAULT NULL,
+  `LONG_PROP_2` bigint(20) DEFAULT NULL,
+  `DEC_PROP_1` decimal(13,4) DEFAULT NULL,
+  `DEC_PROP_2` decimal(13,4) DEFAULT NULL,
+  `BOOL_PROP_1` varchar(1) COLLATE utf8_bin DEFAULT NULL,
+  `BOOL_PROP_2` varchar(1) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  CONSTRAINT `t_qrtz_simprop_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `t_qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_simprop_triggers
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for `t_qrtz_triggers`
+-- ----------------------------
+DROP TABLE IF EXISTS `t_qrtz_triggers`;
+CREATE TABLE `t_qrtz_triggers` (
+  `SCHED_NAME` varchar(120) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_GROUP` varchar(200) COLLATE utf8_bin NOT NULL,
+  `JOB_NAME` varchar(200) COLLATE utf8_bin NOT NULL,
+  `JOB_GROUP` varchar(200) COLLATE utf8_bin NOT NULL,
+  `DESCRIPTION` varchar(250) COLLATE utf8_bin DEFAULT NULL,
+  `NEXT_FIRE_TIME` bigint(13) DEFAULT NULL,
+  `PREV_FIRE_TIME` bigint(13) DEFAULT NULL,
+  `PRIORITY` int(11) DEFAULT NULL,
+  `TRIGGER_STATE` varchar(16) COLLATE utf8_bin NOT NULL,
+  `TRIGGER_TYPE` varchar(8) COLLATE utf8_bin NOT NULL,
+  `START_TIME` bigint(13) NOT NULL,
+  `END_TIME` bigint(13) DEFAULT NULL,
+  `CALENDAR_NAME` varchar(200) COLLATE utf8_bin DEFAULT NULL,
+  `MISFIRE_INSTR` smallint(2) DEFAULT NULL,
+  `JOB_DATA` blob,
+  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+  KEY `IDX_T_QRTZ_T_J` (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
+  KEY `IDX_T_QRTZ_T_JG` (`SCHED_NAME`,`JOB_GROUP`),
+  KEY `IDX_T_QRTZ_T_C` (`SCHED_NAME`,`CALENDAR_NAME`),
+  KEY `IDX_T_QRTZ_T_G` (`SCHED_NAME`,`TRIGGER_GROUP`),
+  KEY `IDX_T_QRTZ_T_STATE` (`SCHED_NAME`,`TRIGGER_STATE`),
+  KEY `IDX_T_QRTZ_T_N_STATE` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
+  KEY `IDX_T_QRTZ_T_N_G_STATE` (`SCHED_NAME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
+  KEY `IDX_T_QRTZ_T_NEXT_FIRE_TIME` (`SCHED_NAME`,`NEXT_FIRE_TIME`),
+  KEY `IDX_T_QRTZ_T_NFT_ST` (`SCHED_NAME`,`TRIGGER_STATE`,`NEXT_FIRE_TIME`),
+  KEY `IDX_T_QRTZ_T_NFT_MISFIRE` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`),
+  KEY `IDX_T_QRTZ_T_NFT_ST_MISFIRE` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_STATE`),
+  KEY `IDX_T_QRTZ_T_NFT_ST_MISFIRE_GRP` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
+  CONSTRAINT `t_qrtz_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`) REFERENCES `t_qrtz_job_details` (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ----------------------------
+-- Records of t_qrtz_triggers
+-- ----------------------------
+INSERT INTO `t_qrtz_triggers` VALUES ('quartzScheduler', 'com.moraydata.general.management.schedule.PushPublicSentimentJob', 'test', 'com.moraydata.general.management.schedule.PushPublicSentimentJob', 'test', null, '1525441800000', '1525441779927', '5', 'PAUSED', 'CRON', '1525343163000', '0', null, '0', '');
+INSERT INTO `t_qrtz_triggers` VALUES ('quartzScheduler', 'com.moraydata.general.management.schedule.TestQuartz', 'test', 'com.moraydata.general.management.schedule.TestQuartz', 'test', null, '1524564575000', '1524564570000', '5', 'PAUSED', 'CRON', '1524541476000', '0', null, '0', '');
 
 -- ----------------------------
 -- Table structure for `t_role`
@@ -330,7 +823,7 @@ CREATE TABLE `t_sequence` (
 -- ----------------------------
 -- Records of t_sequence
 -- ----------------------------
-INSERT INTO `t_sequence` VALUES ('order_code', '100001', '199999', '100002', '1');
+INSERT INTO `t_sequence` VALUES ('order_code', '100001', '199999', '100005', '1');
 
 -- ----------------------------
 -- Table structure for `t_service`
@@ -343,11 +836,18 @@ CREATE TABLE `t_service` (
   `available` bit(1) DEFAULT b'1' COMMENT '是否可用',
   `name` varchar(50) COLLATE utf8_bin NOT NULL COMMENT '服务名称',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_service
 -- ----------------------------
+INSERT INTO `t_service` VALUES ('1', '2018-04-16 15:20:25', '2018-04-16 15:20:29', '', '旅游舆情');
+INSERT INTO `t_service` VALUES ('2', '2018-04-16 15:20:39', '2018-04-16 15:20:42', '', '满意度洞察');
+INSERT INTO `t_service` VALUES ('3', '2018-04-16 15:20:51', '2018-04-16 15:20:53', '', '影响力评价');
+INSERT INTO `t_service` VALUES ('4', '2018-04-16 15:21:02', '2018-04-16 15:21:04', '', '传播分析');
+INSERT INTO `t_service` VALUES ('5', '2018-04-16 15:21:12', '2018-04-16 15:21:15', '', '可视化大屏');
+INSERT INTO `t_service` VALUES ('6', '2018-04-16 15:21:23', '2018-04-16 15:21:26', '', '报告中心');
+INSERT INTO `t_service` VALUES ('7', '2018-04-16 15:21:35', '2018-04-16 15:21:37', '', '数据中心');
 
 -- ----------------------------
 -- Table structure for `t_user`
@@ -377,21 +877,40 @@ CREATE TABLE `t_user` (
   `open_id` varchar(64) COLLATE utf8_bin DEFAULT NULL COMMENT '微信openId',
   `description` varchar(20) COLLATE utf8_bin DEFAULT NULL COMMENT '描述',
   `order_item_ids` varchar(256) COLLATE utf8_bin DEFAULT NULL COMMENT '可用服务订单细则编号',
+  `level` tinyint(4) NOT NULL DEFAULT '1' COMMENT '用户级别',
+  `notified` bit(1) NOT NULL DEFAULT b'1' COMMENT '是否接受通知',
+  `notified_hot_public_sentiment` enum('non','all','related') COLLATE utf8_bin NOT NULL DEFAULT 'non' COMMENT '热点舆情接受状态',
+  `notified_negative_public_sentiment` enum('non','all','related') COLLATE utf8_bin NOT NULL DEFAULT 'non' COMMENT '负面舆情接受状态',
+  `notified_warning_public_sentiment` enum('non','all','related') COLLATE utf8_bin NOT NULL DEFAULT 'non' COMMENT '预警舆情接受状态',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES ('1', '2018-01-25 21:23:49', '2018-02-28 15:14:18', 'beamofsoul@sina.com', 'Justin', '$2a$10$ooB04XZxrLnGMroyXC0Qrua3Gvp4ZMOPwb6cH1gY.UQpEalE1HCAa', '1', 'beamofsoul', '18600574873', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null);
-INSERT INTO `t_user` VALUES ('12', '2018-02-01 20:14:33', '2018-03-01 23:32:28', 'tutou1@gmail.com', 'tutou1', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'testuser1', '13200000000', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null);
-INSERT INTO `t_user` VALUES ('21', '2018-03-25 18:24:03', '2018-03-25 18:24:03', null, 'Justin', '$2a$10$K1839SWbAxuscaBKcGu7uubJmD1tmDNK1PlWediqzG.tE8W1D0J3W', '1', 'od4PTw_ORXTmY8EESquabIhBIya4', null, null, 'http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLsib5qXNA3ADCQADapGuQsl4HUoELnp3uOfMxxaFsMnt6PeanVTmianFjiciaaicdeGZ9fQQMvZwKl5eQ/132', '0', '0', '0', null, null, null, null, null, null, null, null, null);
-INSERT INTO `t_user` VALUES ('22', '2018-04-09 15:03:10', '2018-04-09 15:03:13', null, 'zhangsan', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'zhangsan', '13200000000', null, null, '0', '0', '0', null, null, null, null, null, null, null, 'zhangsan', null);
-INSERT INTO `t_user` VALUES ('28', '2018-04-11 10:47:01', '2018-04-11 10:47:01', null, null, '$2a$10$YYGcVxOysRkP4c7Ox3mOVu/PS1Z/bacsNCUM.1F1psu/AqDbvmkXO', '1', 'ovJ_C1J964Y_BKS08GyMN7jXa5eI', null, null, null, null, null, null, null, null, null, null, null, null, 'ovJ_C1J964Y_BKS08GyMN7jXa5eI', null, null);
-INSERT INTO `t_user` VALUES ('29', '2018-04-11 11:15:36', '2018-04-11 11:15:36', null, null, '$2a$10$W7ghh8rQ0eGpdyF5NatST.QAL4e9/0MDt0ia/iylK8m0NH39530Zi', '1', 'ovJ_C1PSS5OHMtnZ08jT8Ko8nYl4', null, null, null, null, null, null, null, null, null, null, null, null, 'ovJ_C1PSS5OHMtnZ08jT8Ko8nYl4', null, null);
-INSERT INTO `t_user` VALUES ('30', '2018-04-11 11:43:34', '2018-04-11 11:43:34', null, null, '$2a$10$Y9G27aka.ytfFVyViCMYLu8ge7.aDvBDNSIi9PnJN2eBhBvVk.a1a', '1', 'ovJ_C1LJlrm5Xl42ObHTI_u1IlLM', null, null, null, null, null, null, null, null, null, null, null, null, 'ovJ_C1LJlrm5Xl42ObHTI_u1IlLM', null, null);
-INSERT INTO `t_user` VALUES ('31', '2018-04-11 15:48:34', '2018-04-11 15:48:34', null, null, '$2a$10$FpjfAnsa2e6FKneiX6roROWLwxR3GnihrvO0MxHrJrFox5/ckvbzW', '1', 'ovJ_C1NMVsJ4AjrEglyj2lDn2gh4', null, null, null, null, null, null, null, null, null, null, null, null, 'ovJ_C1NMVsJ4AjrEglyj2lDn2gh4', null, null);
+INSERT INTO `t_user` VALUES ('1', '2018-01-25 21:23:49', '2018-02-28 15:14:18', 'beamofsoul@sina.com', '张三', '$2a$10$ooB04XZxrLnGMroyXC0Qrua3Gvp4ZMOPwb6cH1gY.UQpEalE1HCAa', '1', 'beamofsoul', '', '', null, '0', '0', '0', '什么什么有限责任公司', 'aaaaaaaaaaaaaaaaaaa', '上海浦东新区纳贤路701号百度上研大厦', '0000000000110', '总经理助理', '其他类型', '', '这里是描述信息这里是描述信息', null, '3', '', 'related', 'non', 'all');
+INSERT INTO `t_user` VALUES ('12', '2018-02-01 20:14:33', '2018-03-01 23:32:28', 'tutou1@gmail.com', 'tutou1', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'testuser1', '13200000000', '', null, '0', '0', '0', null, null, null, null, null, null, null, null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('21', '2018-03-25 18:24:03', '2018-03-25 18:24:03', null, 'Justin', '$2a$10$K1839SWbAxuscaBKcGu7uubJmD1tmDNK1PlWediqzG.tE8W1D0J3W', '1', 'od4PTw_ORXTmY8EESquabIhBIya4', null, null, '', '0', '0', '0', null, null, null, null, null, null, null, null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('22', '2018-04-09 15:03:10', '2018-04-09 15:03:13', null, '张三', '$2a$10$4ea07GgQgJKGr7I4o7rk5.IyxOpSZAObiXWMlqz8vXiiR4ILea2FW', '1', 'zhangsan', '13200000000', null, null, '0', '0', '0', '啊啊啊', '', '请选择省份请选择城市请选择区县', '1231233333', '哦哦哦', '景区', '', 'zhangsan', null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('38', '2018-04-12 11:57:43', '2018-04-12 11:57:43', null, null, '$2a$10$D2BOEG8/2d4fkulpUb6iPe.8n/QiaZOHQnAs.C1iYEM1dmmTC7Q.G', '1', 'dapengdapeng', null, null, null, null, null, '0', null, null, null, null, null, null, '', null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('43', '2018-04-12 17:39:27', '2018-04-12 17:39:27', null, null, '$2a$10$NTEmU3KkOOP1VNIKkgD1OOhOfB5KN5D52tj8gqBQdlqmdrmb1HNsy', '1', 'zhanglaosan', '15806660675', null, null, null, null, '0', null, null, null, null, null, null, null, '有可能是大鹏的', null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('44', '2018-04-16 08:09:42', '2018-04-16 08:09:42', null, null, '$2a$10$VSkxUrYJVFfd1QshH2uuzuNz/2yvb3ejNJra4tg0qW84DjQfXKInu', '1', 'bilibili', '13200000001', null, null, null, '1', '0', null, null, null, null, null, null, '', '没什么可描述的', null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('45', '2018-04-17 06:19:13', '2018-04-17 06:19:13', null, '张三三', '$2a$10$sefonXuXrv3fqpUvA3o9netbdxOuxDuWm8HmOx/Ru9tki3zj4q9Dm', '1', 'alibaba', '13200000002', null, null, null, '22', '0', '', '', '请选择省份请选择城市请选择区县', '', '', '', 'oQFmP07bX--NREsmAuT3054uU9WQ', 'string', '1', '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('53', '2018-04-28 13:57:27', '2018-04-28 13:57:27', null, null, '$2a$10$JeQOJgok20nSQLdZRiXwz.S/isPJlNcrd/TEHphdPB3rewh6f.5aO', '1', 'oQFmP0-K4IvdQvocmDHiJ5aPn9Uk', null, null, null, null, null, '0', null, null, null, null, null, null, 'oQFmP0-K4IvdQvocmDHiJ5aPn9Uk', null, null, '1', '', 'all', 'all', 'related');
+INSERT INTO `t_user` VALUES ('55', '2018-04-28 14:06:45', '2018-04-28 14:06:45', null, null, '$2a$10$aINMrfKgf7JQh.Y2Vrmffuor45J/U0ANYqOiQYoVg0j4y5ISIOZGm', '1', 'oQFmP0_YO_oDRGDY5U9cJGOTzFn0', null, null, null, null, null, '0', null, null, null, null, null, null, 'oQFmP0_YO_oDRGDY5U9cJGOTzFn0', null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('56', '2018-04-28 16:03:25', '2018-04-28 16:03:25', null, null, '$2a$10$hVbnUK6nSWJuSYQgRusrGemZoAYlkBzHIG1ZZ0k27TYDlu.81s3xG', '1', 'jstone', '18611133559', null, null, null, null, '0', null, null, null, null, null, null, 'oQFmP06LOs9VKTzQgV635Y5aYXi8', '张总', null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('60', '2018-05-03 13:22:00', '2018-05-03 13:22:00', null, null, '$2a$10$q1NhJ3zs9UFhPUPx8bE9H.i.ez/0bLHtGW7Qy2Watcd3hI5PXD8R6', '1', 'asdasd', '', null, null, null, null, '0', null, null, null, null, null, null, null, null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('62', '2018-05-03 18:49:59', '2018-05-03 18:49:59', null, null, '$2a$10$GsKXzk5XEcRZyx3VebXhzupWDbKrks.zri927yOvj9EdFIZHEACIC', '1', 'oQFmP01E8wBBiJMVCh_wQbcitOz0', '17611575662', null, null, null, null, '0', null, null, null, null, null, null, 'oQFmP01E8wBBiJMVCh_wQbcitOz0', '一定是闻潮', null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('86', '2018-05-08 14:12:03', '2018-05-08 14:12:03', null, null, '$2a$10$HAneAdU2RcXIKGJkhfq4Q.ew7vDFsNuWT3RORgg4oVOPKZJxlm8qW', '1', 'oQFmP06XJkdxm2-HUl41Q6na91Tk', null, null, null, null, null, '0', null, null, null, null, null, null, 'oQFmP06XJkdxm2-HUl41Q6na91Tk', null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('87', '2018-05-08 14:43:09', '2018-05-08 14:43:09', null, null, '$2a$10$4zTSlMKX.Jq0C1CVgGGo5OU4UbPjXIrQdV0PcM.JGk1LP5a4ehoHe', '1', 'zhanglaojiu', '', null, null, null, null, '0', null, null, null, null, null, null, null, null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('89', '2018-05-08 18:47:03', '2018-05-08 18:47:03', null, null, '$2a$10$2RWDCEJ7MFTyoCuRn8OaX.aBWGnoWZ//ziq6wxSp9tDXT4C24C/CC', '1', 'wanglaoliu', '', null, null, null, null, '0', null, null, null, null, null, null, null, null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('90', '2018-05-09 17:17:03', '2018-05-09 17:17:03', null, null, '$2a$10$D1CA/Okc2s8OQ3G1mK9IE.7P2ukB67qY0UX6LSkK1dK2pMni.TIFG', '1', 'zhanglaoshi', '', null, null, null, null, '0', null, null, null, null, null, null, null, null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('91', '2018-05-09 17:20:35', '2018-05-09 17:20:35', null, null, '$2a$10$MKnidXfJEBm8hCffMIJ7S.8SCV1IK19bxBWNxu8GLblVUqa7uFj6u', '1', 'lilaoshi', '', null, null, null, null, '0', null, null, null, null, null, null, null, null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('92', '2018-05-09 17:22:37', '2018-05-09 17:22:37', null, null, '$2a$10$zQZHz1xaJMWDQtPv2BDGKeirrUARFnV.w9myCfu/vn4mqmZ.fJ2ii', '1', 'wanglaoqi', '', null, null, null, null, '0', null, null, null, null, null, null, null, null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('110', '2018-05-10 14:59:35', '2018-05-10 14:59:35', null, null, '$2a$10$T.a3JF0ZV1L5RajbKiFogurwbIKi0Wri4C9cbMjhp7Y0ivFoMcwvW', '1', 'hx837866040', '17611575662', null, null, null, null, '0', null, null, null, null, null, null, 'oQFmP09rAj4o3lPUblbgZMfp0T24', null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('111', '2018-05-10 15:37:48', '2018-05-10 15:37:48', null, null, '$2a$10$t51tbiwrSka5/CEfvPKZWeufp2EItpZIU9pJNrGuzdoFfe4uL6CP2', '1', 'test111', '15581642441', null, null, null, null, '0', null, null, null, null, null, null, null, null, null, '1', '', 'non', 'non', 'non');
+INSERT INTO `t_user` VALUES ('112', '2018-05-11 11:30:42', '2018-05-11 11:30:42', null, null, '$2a$10$pGPviwSCaZxwAOIfAQjpyuvPXMDbkKYYwCoLAtvjfW6NNj0HhG7sG', '1', 'test222', '15117963717', null, null, null, null, '0', null, null, null, null, null, null, null, null, null, '1', '', 'non', 'non', 'non');
 
 -- ----------------------------
 -- Table structure for `t_userconnection`
@@ -433,33 +952,51 @@ CREATE TABLE `t_user_role` (
   KEY `FKq5un6x7ecoef5w1n39cop66kl` (`user_id`),
   CONSTRAINT `FKa9c8iiy6ut0gnx491fqx4pxam` FOREIGN KEY (`role_id`) REFERENCES `t_role` (`id`),
   CONSTRAINT `FKq5un6x7ecoef5w1n39cop66kl` FOREIGN KEY (`user_id`) REFERENCES `t_user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=91 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- ----------------------------
 -- Records of t_user_role
 -- ----------------------------
 INSERT INTO `t_user_role` VALUES ('1', '2018-02-01 16:39:25', '2018-02-01 16:39:27', '1', '1');
-INSERT INTO `t_user_role` VALUES ('2', '2018-04-09 15:03:54', '2018-04-09 15:03:57', '1', '22');
-INSERT INTO `t_user_role` VALUES ('3', '2018-04-11 10:47:01', '2018-04-11 10:47:01', '4', '28');
-INSERT INTO `t_user_role` VALUES ('4', '2018-04-11 11:15:36', '2018-04-11 11:15:36', '4', '29');
-INSERT INTO `t_user_role` VALUES ('5', '2018-04-11 11:15:37', '2018-04-11 11:15:37', '4', '29');
-INSERT INTO `t_user_role` VALUES ('6', '2018-04-11 11:43:34', '2018-04-11 11:43:34', '4', '30');
-INSERT INTO `t_user_role` VALUES ('7', '2018-04-11 11:43:34', '2018-04-11 11:43:34', '4', '30');
-INSERT INTO `t_user_role` VALUES ('8', '2018-04-11 15:48:34', '2018-04-11 15:48:34', '4', '31');
-INSERT INTO `t_user_role` VALUES ('9', '2018-04-11 15:48:34', '2018-04-11 15:48:34', '4', '31');
+INSERT INTO `t_user_role` VALUES ('21', '2018-04-12 11:57:43', '2018-04-12 11:57:43', '4', '38');
+INSERT INTO `t_user_role` VALUES ('26', '2018-04-12 17:39:27', '2018-04-12 17:39:27', '4', '43');
+INSERT INTO `t_user_role` VALUES ('27', '2018-04-16 17:16:18', '2018-04-16 17:16:18', '6', '44');
+INSERT INTO `t_user_role` VALUES ('28', '2018-04-17 14:31:44', '2018-04-17 14:31:44', '4', '45');
+INSERT INTO `t_user_role` VALUES ('29', '2018-04-18 17:27:30', '2018-04-18 17:27:33', '5', '22');
+INSERT INTO `t_user_role` VALUES ('30', '2018-04-18 17:28:03', '2018-04-18 17:28:06', '4', '22');
+INSERT INTO `t_user_role` VALUES ('38', '2018-04-28 13:57:27', '2018-04-28 13:57:27', '4', '53');
+INSERT INTO `t_user_role` VALUES ('40', '2018-04-28 14:06:45', '2018-04-28 14:06:45', '4', '55');
+INSERT INTO `t_user_role` VALUES ('41', '2018-04-28 16:03:25', '2018-04-28 16:03:25', '4', '56');
+INSERT INTO `t_user_role` VALUES ('45', '2018-05-03 13:22:00', '2018-05-03 13:22:00', '4', '60');
+INSERT INTO `t_user_role` VALUES ('47', '2018-05-03 18:49:59', '2018-05-03 18:49:59', '4', '62');
+INSERT INTO `t_user_role` VALUES ('71', '2018-05-08 14:12:03', '2018-05-08 14:12:03', '4', '86');
+INSERT INTO `t_user_role` VALUES ('72', '2018-05-08 14:43:09', '2018-05-08 14:43:09', '4', '87');
+INSERT INTO `t_user_role` VALUES ('74', '2018-05-08 18:47:03', '2018-05-08 18:47:03', '4', '89');
+INSERT INTO `t_user_role` VALUES ('75', '2018-05-09 17:17:03', '2018-05-09 17:17:03', '4', '90');
+INSERT INTO `t_user_role` VALUES ('76', '2018-05-09 17:20:35', '2018-05-09 17:20:35', '4', '91');
+INSERT INTO `t_user_role` VALUES ('77', '2018-05-09 17:22:37', '2018-05-09 17:22:37', '4', '92');
+INSERT INTO `t_user_role` VALUES ('88', '2018-05-10 14:59:35', '2018-05-10 14:59:35', '4', '110');
+INSERT INTO `t_user_role` VALUES ('89', '2018-05-10 15:37:48', '2018-05-10 15:37:48', '4', '111');
+INSERT INTO `t_user_role` VALUES ('90', '2018-05-11 11:30:42', '2018-05-11 11:30:42', '4', '112');
+
+-- ----------------------------
+-- View structure for `v_job_combine_trigger`
+-- ----------------------------
+DROP VIEW IF EXISTS `v_job_combine_trigger`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root_eel`@`%` SQL SECURITY DEFINER VIEW `v_job_combine_trigger` AS select count(0) AS `id`,`tqjd`.`JOB_NAME` AS `job_name`,`tqjd`.`JOB_GROUP` AS `job_group`,`tqjd`.`JOB_CLASS_NAME` AS `job_class_name`,`tqt`.`TRIGGER_NAME` AS `trigger_name`,`tqt`.`TRIGGER_GROUP` AS `trigger_group`,`tqct`.`CRON_EXPRESSION` AS `cron_expression`,`tqct`.`TIME_ZONE_ID` AS `time_zone_id` from ((`t_qrtz_job_details` `tqjd` join `t_qrtz_triggers` `tqt`) join `t_qrtz_cron_triggers` `tqct` on(((`tqjd`.`JOB_NAME` = `tqt`.`JOB_NAME`) and (`tqt`.`TRIGGER_NAME` = `tqct`.`TRIGGER_NAME`) and (`tqt`.`TRIGGER_GROUP` = `tqct`.`TRIGGER_GROUP`)))) ;
 
 -- ----------------------------
 -- View structure for `v_user_role_combine_role`
 -- ----------------------------
 DROP VIEW IF EXISTS `v_user_role_combine_role`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_user_role_combine_role` AS select `tu`.`id` AS `id`,`tu`.`id` AS `user_id`,`tu`.`username` AS `username`,`tu`.`nickname` AS `nickname`,ifnull(group_concat(`tur`.`role_id` order by `tur`.`role_id` ASC separator ','),0) AS `role_id`,ifnull(group_concat(`tr`.`name` order by `tr`.`name` ASC separator ','),'') AS `role_name` from ((`t_user` `tu` left join `t_user_role` `tur` on((`tur`.`user_id` = `tu`.`id`))) left join `t_role` `tr` on((`tr`.`id` = `tur`.`role_id`))) group by `tu`.`id` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root_eel`@`%` SQL SECURITY DEFINER VIEW `v_user_role_combine_role` AS select `tu`.`id` AS `id`,`tu`.`id` AS `user_id`,`tu`.`username` AS `username`,`tu`.`nickname` AS `nickname`,ifnull(group_concat(`tur`.`role_id` order by `tur`.`role_id` ASC separator ','),0) AS `role_id`,ifnull(group_concat(`tr`.`name` order by `tr`.`id` ASC separator ','),'') AS `role_name` from ((`t_user` `tu` left join `t_user_role` `tur` on((`tur`.`user_id` = `tu`.`id`))) left join `t_role` `tr` on((`tr`.`id` = `tur`.`role_id`))) group by `tu`.`id` ;
 
 -- ----------------------------
 -- Procedure structure for `getNextSequenceValue`
 -- ----------------------------
 DROP PROCEDURE IF EXISTS `getNextSequenceValue`;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getNextSequenceValue`(IN name varchar(50), OUT code int)
+CREATE DEFINER=`root_eel`@`%` PROCEDURE `getNextSequenceValue`(IN name varchar(50), OUT code int)
 BEGIN
 	declare _cur int;  
 	declare _maxvalue int;  -- 接收最大值  

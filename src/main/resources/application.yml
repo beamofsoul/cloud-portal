@@ -109,8 +109,8 @@ project:
         - /**/favicon.ico
     wechat:
       service: # 支持微信服务号
-        appId: 
-        appSecret: 
+        appId: wx7a2ffdf99b8bd18c # wx7a2ffdf99b8bd18c 公司账号 wx1fb4cf9f5f3385e7 测试账号
+        appSecret: 7332143e8d281cc7588e510ae615cea5 #  7332143e8d281cc7588e510ae615cea5 公司密码 3889e726e00f19662e8b7e9cde4b5599 测试账号
         accessTokenUrl: https://api.weixin.qq.com/cgi-bin/token # 获取access_token的url
         ticketUrl: https://api.weixin.qq.com/cgi-bin/qrcode/create # 创建二维码ticket的url
         showQRCodeUrl: https://mp.weixin.qq.com/cgi-bin/showqrcode # 显示二维码的url
@@ -138,9 +138,9 @@ project:
       provider: weixin
       client:
         # Third party application id registered by authorization service provider 微信开放平台appId
-        appId: 
+        appId: wxd99431bbff8305a0
         # Third party application secret registered by authorization service provider 微信开放平台appSecret
-        appSecret: 
+        appSecret: 60f78681d063590a469f1b297feff3c4
       user:
         # Default password of new user which logged in by scanning qrcode
         defaultPassword: 123456
@@ -148,11 +148,11 @@ project:
       enabled: true
       product: Dysmsapi # 产品名称:云通信短信API产品,开发者无需替换
       domain: dysmsapi.aliyuncs.com # 产品域名,开发者无需替换
-      accessKeyId: 
-      accessKeySecret: 
+      accessKeyId: LTAImyRL3hwgWVqo
+      accessKeySecret: oeXnKT9SZZu4lx4bOTg0F1dVnwCHJT
       sendTimeout: 10000
       signName: 海鳗数据 # 签名
-      verificationCodeTemplateCode: 
+      verificationCodeTemplateCode: SMS_129763401 # 短信模板编码
     oauth2:
       enabled: true
       resourceIds: open_api # 内容无所谓，但是数据库表oauth_client_details每条记录的resource_ids属性值必须与其一致，否则无法识别用户想要访问的资源
