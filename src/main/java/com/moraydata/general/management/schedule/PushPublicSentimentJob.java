@@ -179,7 +179,7 @@ public class PushPublicSentimentJob extends QuartzJobBean {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("touser", openId); // 接收者openId
 		parameters.put("template_id", templateId); // 模板Id
-		parameters.put("url", targetUrl + "?openId=" + openId);
+		parameters.put("url", targetUrl);
 		parameters.put("data", data);
 		
 		JSONObject jsonResponse = RestTemplateUtils.INSTANCE.getRestTemplate().postForObject(integrateUrlWithAccessToken(sendTemplateMessageUrl), RestTemplateUtils.getHttpEntity(parameters), JSONObject.class);
