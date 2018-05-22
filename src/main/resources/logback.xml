@@ -3,7 +3,7 @@
 <configuration>
 
 	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径-->    
-    <property name="LOG_HOME" value="/log" />    
+    <property name="LOG_HOME" value="/log/cloud-portal-template-message" />    
 
 	<!-- 控制台输出 -->
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
@@ -15,7 +15,7 @@
 
 	<!-- 时间滚动输出 level为 DEBUG 日志 -->
 	<appender name="file-debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_HOME}/cloud_portal.debug.log</file>
+		<file>${LOG_HOME}/cloud_portal-template-message.debug.log</file>
 		
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>DEBUG</level>
@@ -28,14 +28,14 @@
 			<!-- 指定日志保存的文件名和路径，不写会根据fileNamePattern动态变化 -->
 			<!-- <file>logs/app.log</file> -->
 			<!--日志文件输出的文件名-->
-			<fileNamePattern>${LOG_HOME}/cloud_portal-%d{yyyy-MM-dd}.debug.log</fileNamePattern>
+			<fileNamePattern>${LOG_HOME}/cloud_portal-template-message-%d{yyyy-MM-dd}.debug.log</fileNamePattern>
 			<!-- 控制保留的归档文件的最大数量，超出数量就删除旧文件 -->
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
 
 		<!-- 在日志文件超过5MB时进行归档，并且归档文件后缀只要是.zip或.gz就会自动压缩日志归档 -->
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-			<fileNamePattern>${LOG_HOME}/zip/cloud_portal.%i.debug.log.zip</fileNamePattern>
+			<fileNamePattern>${LOG_HOME}/zip/cloud_portal-template-message.%i.debug.log.zip</fileNamePattern>
 			<minIndex>1</minIndex>
 			<maxIndex>10</maxIndex>
 		</rollingPolicy>
@@ -52,7 +52,7 @@
 
 	<!-- 时间滚动输出 level为 ERROR 日志 -->
 	<appender name="file—error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOG_HOME}/cloud_portal.error.log</file>
+		<file>${LOG_HOME}/cloud_portal-template-message.error.log</file>
 	
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>ERROR</level>
@@ -65,14 +65,14 @@
 			<!-- 指定日志保存的文件名和路径，不写会根据fileNamePattern动态变化 -->
 			<!-- <file>logs/app.log</file> -->
 			<!--日志文件输出的文件名-->
-			<fileNamePattern>${LOG_HOME}/cloud_portal-%d{yyyy-MM-dd}.error.log</fileNamePattern>
+			<fileNamePattern>${LOG_HOME}/cloud_portal-template-message-%d{yyyy-MM-dd}.error.log</fileNamePattern>
 			<!-- 控制保留的归档文件的最大数量，超出数量就删除旧文件 -->
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
 		
 		<!-- 在日志文件超过5MB时进行归档，并且归档文件后缀只要是.zip或.gz就会自动压缩日志归档 -->
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-			<fileNamePattern>${LOG_HOME}/zip/cloud_portal.%i.error.log.zip</fileNamePattern>
+			<fileNamePattern>${LOG_HOME}/zip/cloud_portal-template-message.%i.error.log.zip</fileNamePattern>
 			<minIndex>1</minIndex>
 			<maxIndex>10</maxIndex>
 		</rollingPolicy>

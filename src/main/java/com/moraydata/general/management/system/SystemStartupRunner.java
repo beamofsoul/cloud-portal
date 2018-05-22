@@ -1,13 +1,11 @@
 package com.moraydata.general.management.system;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.moraydata.general.management.repository.BaseJpaRepositoryConfiguration;
-import com.moraydata.general.primary.service.RolePermissionService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,9 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class SystemStartupRunner implements CommandLineRunner {
 	
-	@Autowired
-	private RolePermissionService rolePermissionService;
-	
 	@Override
 	public void run(String... args) throws Exception {
 		log.info("服务启动开始,执行加载数据等操作...");
@@ -34,8 +29,6 @@ public class SystemStartupRunner implements CommandLineRunner {
 		DatabaseTableEntityMapping.initTableEntityMap();
 		AnnotationServiceNameMapping.loadServiceMap();
 		AnnotationRepositoryNameMapping.loadRepositoryMap();
-		
-		RolePermissionsMapping.fill(rolePermissionService.findAllRolePermissionMapping());
 		log.info("服务启动完毕...");
 	}
 }
