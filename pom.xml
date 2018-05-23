@@ -4,7 +4,7 @@
 
 	<groupId>com.moraydata.general</groupId>
 	<artifactId>cloud-portal-autotask</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<name>cloud-portal-autotask</name>
 	<url>http://maven.apache.org</url>

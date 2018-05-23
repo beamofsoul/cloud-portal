@@ -1,6 +1,7 @@
 package com.moraydata.general.management.schedule;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +9,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,7 @@ import com.moraydata.general.management.util.ObjectMapperUtils;
 import com.moraydata.general.management.util.ResponseEntity;
 import com.moraydata.general.management.util.RestTemplateUtils;
 import com.moraydata.general.management.util.WeChatTokenHelper;
+import com.moraydata.general.primary.entity.dto.UserBasicInformation;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,7 +114,7 @@ public class PushPublicSentimentJob extends QuartzJobBean {
 		try {
 			response = RestTemplateUtils.INSTANCE.getRestTemplate().getForObject(targetUrl, Map.class);
 		} catch (Exception e) {
-			log.error("获取模板消息记录连接或读取资源时超时, 目标URL => " + targetUrl, e.getCause().getMessage());
+			log.error("获取模板消息记录连接或读取资源时超时, 目标URL => " + targetUrl, e);
 		}
 		if (response != null) {
 			try {
@@ -122,7 +125,7 @@ public class PushPublicSentimentJob extends QuartzJobBean {
 					log.error(responseEntity.getMessage());
 				}
 			} catch (Exception e) {
-				log.error("因意外原因引起的获取模板消息失败", e.getCause());
+				log.error("因意外原因引起的获取模板消息失败", e);
 			}
 		}
 		return null;
@@ -185,6 +188,40 @@ public class PushPublicSentimentJob extends QuartzJobBean {
 		JSONObject jsonResponse = RestTemplateUtils.INSTANCE.getRestTemplate().postForObject(integrateUrlWithAccessToken(sendTemplateMessageUrl), RestTemplateUtils.getHttpEntity(parameters), JSONObject.class);
 		log.debug(JSON.toJSONString(jsonResponse));
 		return jsonResponse.getString("errmsg").equals("ok");
+	}
+	
+	/**
+	 * 通过模板消息记录Id和目标行为状态，修改对应的模板消息的状态值，如从未处理改为已上报
+	 * @param templateMessageId 模板消息Id
+	 * @param action 修改后的模板消息的状态
+	 */
+	@SuppressWarnings("serial")
+	public void updateAction(Long templateMessageId, Integer action) throws Exception {
+		String url = HttpUrlUtils.integrate(publicSentimentInterfaceUrl + "modifyStatus", new HashMap<String, Object>() {{
+			put("templateMessageId", templateMessageId);
+			put("action", action);
+		}});
+		RestTemplateUtils.INSTANCE.getRestTemplate().exchange(url, HttpMethod.PUT, RestTemplateUtils.getHttpEntity(), JSONObject.class);
+	}
+	
+	/**
+	 * 通过输入的用户基本信息对象集合和(舆情异常提醒)模板消息Id，向特定用户发送改模板消息Id所对应的模板消息
+	 * @param users 用户基本信息对象集合，模板消息发送的目标用户集合
+	 * @param templateMessageId 要发送的模板消息对应的Id
+	 */
+	public void sendTemplateMessage(List<UserBasicInformation> users, Long templateMessageId) throws Exception {
+		if (users == null || users.isEmpty()) return; // 如果不能获得发送到哪些用户，则谈不上发送模板消息的问题，发送自动失败
+		TemplateMessage tm = getTemplateMessage(templateMessageId);
+		
+		for (UserBasicInformation ubi : users) {
+			/**
+			 * 修复bug - 1级用户推送消息至2、3级用户时，数据库中模板消息记录携带的openId默认是1级用户的
+			 * 当2、3级别用户打开该消息时无法获取到自己的openId，造成了无法识别当前用户级别的问题
+			 * 2018-05-23
+			 */
+			tm.setRedirectUrl(tm.getRedirectUrl().substring(0, tm.getRedirectUrl().lastIndexOf("&")) + "&openId=" + ubi.getOpenId());
+			doSend(ubi.getOpenId(), tm);
+		}
 	}
 	
 	/**
