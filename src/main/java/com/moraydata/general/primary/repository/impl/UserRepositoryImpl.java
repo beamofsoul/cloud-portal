@@ -54,4 +54,31 @@ public class UserRepositoryImpl implements UserRepositoryCustom<User, Long> {
 		}
 		return null;
 	}
+	
+	/**
+	 * 根据主账号Id(parentId)获取其下(如果主账号自己符合条件也会被包括在内)所有用户级别为1/2/3的子账号Id
+	 */
+	@Override
+	public List<Long> findLevelUserIds(Long parentId, int... levels) {
+		JPAQuery<User> query = QuerydslUtils.newQuery(entityManager);
+		QUser $ = new QUser("user");
+		BooleanExpression levelExpression = null;
+		
+		if (levels != null && levels.length > 0) {
+			levelExpression = $.level.eq(levels[0]);
+			for (int i = 1; i < levels.length; i++) {
+				levelExpression = levelExpression.or($.level.eq(levels[i]));
+			}
+		}
+		
+		BooleanExpression whereExpression = ($.parentId.eq(parentId).or($.id.eq(parentId))).and(levelExpression);
+		if (whereExpression != null) {
+			return query.select($.id)
+						.from($)
+						.where(whereExpression)
+						.orderBy($.id.asc())
+						.fetch();
+		}
+		return null;
+	}
 }

@@ -9,4 +9,5 @@ public interface UserService {
 	
 	User get(Long instanceId);
 	List<UserBasicInformation> getLevelUserBasicInformation(Long level1UserId, User.Level... level);
+	List<Long> getLevelUserIds(Long level1UserId, User.Level... level);
 }

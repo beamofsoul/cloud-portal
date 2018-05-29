@@ -30,6 +30,29 @@ public class UserServiceImpl implements UserService {
 		}
 		return one;
 	}
+	
+	/**
+	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有1或2或3级别子账号Id
+	 * PS: 1级用户未必是主账号
+	 */
+	@Override
+	public List<Long> getLevelUserIds(Long level1UserId, User.Level... level) {
+		QUser $ = new QUser("User");
+		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
+		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
+		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
+		
+		int[] levels = null;
+		if (level != null && level.length > 0) {
+			levels = new int[level.length];
+			for (int i = 0; i < level.length; i++) {
+				levels[i] = level[i].getValue();
+			}
+		} else {
+			return null;
+		}
+		return userRepository.findLevelUserIds(masterUserId, levels);
+	}
 
 	/**
 	 * 通过输入的1级用户的userId，找到其主账号(包括主账号)所辖所有2或3级设置了接收推送消息的子账号
