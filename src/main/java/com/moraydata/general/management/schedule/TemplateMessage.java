@@ -42,6 +42,8 @@ public class TemplateMessage {
 	
 	private String redirectUrl;
 	private Integer action;
+	private Integer type;
+	private Boolean isHighlyRelevant;
 	
 	public TemplateMessage(String keyword1, String keyword2, String keyword3, String keyword4) {
 		this.keyword1Value = keyword1;

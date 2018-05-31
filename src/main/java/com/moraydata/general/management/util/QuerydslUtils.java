@@ -56,6 +56,14 @@ public class QuerydslUtils {
 		return query;
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <S> JPAQuery<S> newQuery(@NonNull EntityManager entityManager, @NonNull EntityPathBase<?> entityPath, Predicate predicate, Expression<S> select) {
+		JPAQuery<S> query = (JPAQuery<S>) new JPAQuery(entityManager).from(entityPath);
+		if (select != null) query.select(select); 
+		if (predicate != null) query.where(predicate);
+		return query;
+	}
+	
 	public static JPADeleteClause newDelete(@NonNull EntityManager entityManager, @NonNull EntityPathBase<?> entityPath) {
 		return new JPADeleteClause(entityManager, entityPath);
 	}
@@ -92,13 +100,6 @@ public class QuerydslUtils {
 	
 	public static <S> JPAUpdateClause newUpdate(@NonNull EntityManager entityManager, @NonNull EntityPathBase<?> entityPath, @NonNull List<? extends Path<?>> paths,@NonNull List<?> values, Predicate predicate) {
 		JPAUpdateClause update = newUpdate(entityManager, entityPath, paths, values);
-		if (predicate != null) update.where(predicate);
-		return update;
-	}
-	
-	public static <S> JPAUpdateClause newUpdate(@NonNull EntityManager entityManager, @NonNull EntityPathBase<?> entityPath, @NonNull Path<S> path, Expression<S> exp, Predicate predicate) {
-		JPAUpdateClause update = newUpdate(entityManager, entityPath);
-		update.set(path, exp);
 		if (predicate != null) update.where(predicate);
 		return update;
 	}
@@ -168,10 +169,6 @@ public class QuerydslUtils {
 	
 	public static <S> long doUpdate(@NonNull EntityManager entityManager, @NonNull EntityPathBase<?> entityPath, @NonNull List<? extends Path<?>> paths,@NonNull List<?> values, Predicate predicate) {
 		return newUpdate(entityManager, entityPath, paths, values, predicate).execute();
-	}
-	
-	public static <S> long doUpdate(@NonNull EntityManager entityManager, @NonNull EntityPathBase<?> entityPath, @NonNull Path<S> path, Expression<S> exp, Predicate predicate) {
-		return newUpdate(entityManager, entityPath, path, exp, predicate).execute();
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

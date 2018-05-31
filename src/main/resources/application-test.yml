@@ -1,13 +1,13 @@
 debug: false
 
 server:
-  port: 12306
+  port: 12308
 
 spring:
   datasource:
     primary:
       type: com.zaxxer.hikari.HikariDataSource
-      jdbcUrl: jdbc:mysql://39.107.200.38:3306/moraydata_cloud_primary_01?characterEncoding=utf-8&useSSL=true&generateSimpleParameterMetadata=true
+      jdbcUrl: jdbc:mysql://10.0.54.93:3306/moraydata_cloud_primary_01?characterEncoding=utf-8&useSSL=true&generateSimpleParameterMetadata=true
       username: java.cloud
       password: Moray12345
       driver-class-name: com.mysql.jdbc.Driver

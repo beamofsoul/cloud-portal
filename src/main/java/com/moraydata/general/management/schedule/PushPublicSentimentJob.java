@@ -23,6 +23,7 @@ import com.moraydata.general.management.util.ObjectMapperUtils;
 import com.moraydata.general.management.util.ResponseEntity;
 import com.moraydata.general.management.util.RestTemplateUtils;
 import com.moraydata.general.management.util.WeChatTokenHelper;
+import com.moraydata.general.primary.entity.User;
 import com.moraydata.general.primary.entity.dto.UserBasicInformation;
 
 import lombok.extern.slf4j.Slf4j;
@@ -212,8 +213,25 @@ public class PushPublicSentimentJob extends QuartzJobBean {
 	public void sendTemplateMessage(List<UserBasicInformation> users, Long templateMessageId) throws Exception {
 		if (users == null || users.isEmpty()) return; // 如果不能获得发送到哪些用户，则谈不上发送模板消息的问题，发送自动失败
 		TemplateMessage tm = getTemplateMessage(templateMessageId);
-		
+		/**
+		 * 修复bug - 判断当前用户是否接收当前消息类型的消息推送，判断其是否只接收高相关的消息
+		 * 2018-05-23
+		 */
+		String publicSentiment = null;
 		for (UserBasicInformation ubi : users) {
+			if (tm.getType() == 1) { // 预警
+				publicSentiment = ubi.getNotifiedWarningPublicSentiment();
+			} else if (tm.getType() == 2) { // 热点
+				publicSentiment = ubi.getNotifiedHotPublicSentiment();
+			} else if (tm.getType() == 3) { // 负面
+				publicSentiment = ubi.getNotifiedNegativePublicSentiment();
+			}
+			// 当前用户不接受当前消息类型的消息推送
+			if (publicSentiment.equals(User.NotifiedSentiment.NON.getValue()))
+				continue;
+			// 当前用户不接收当前消息类型的非高相关的数据
+			if (publicSentiment.equals(User.NotifiedSentiment.RELATED.getValue()) && (!tm.getIsHighlyRelevant()))
+				continue;
 			/**
 			 * 修复bug - 1级用户推送消息至2、3级用户时，数据库中模板消息记录携带的openId默认是1级用户的
 			 * 当2、3级别用户打开该消息时无法获取到自己的openId，造成了无法识别当前用户级别的问题

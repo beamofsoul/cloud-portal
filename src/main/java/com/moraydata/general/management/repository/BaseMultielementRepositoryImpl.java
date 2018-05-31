@@ -179,7 +179,7 @@ public class BaseMultielementRepositoryImpl<T,ID extends Serializable> extends Q
 	}
 
    /**
-	 * @Title: findSpecificDataByPredicate
+	 * @Title: findSpecificData
 	 * @Description: 根据查询需要的字段查询当前泛型业务实体类的特定结果集
 	 * @param predicate 断言对象，保存了查询的条件
      * @param selects 查询需要的字段
@@ -189,6 +189,45 @@ public class BaseMultielementRepositoryImpl<T,ID extends Serializable> extends Q
 	public QueryResults<?> findSpecificData(Predicate predicate, Expression<?>... selects) {
 		JPAQuery<T> query = newQuery(entityManager, entityPath, predicate, null, selects);
 		return query.fetchResults();
+	}
+	
+	/**
+	 * @Title: findMultipleEntitySpecificData
+	 * @Description: 根据查询需要的字段查询当前泛型业务实体类的特定结果集
+	 * @param predicate 断言对象，保存了查询的条件
+	 * @param selects 查询需要的字段
+	 * @return QueryResults<?> 查询到的业务实体类的特定结果集
+	 */
+	@Override
+	public List<T> findMultipleEntitySpecificData(Predicate predicate, Expression<?>... selects) {
+		JPAQuery<T> query = newQuery(entityManager, entityPath, predicate, null, selects);
+		return query.fetch();
+	}
+	
+   /**
+	 * @Title: findOneEntitySpecificData
+	 * @Description: 根据查询需要的字段查询当前泛型业务实体类
+	 * @param predicate 断言对象，保存了查询的条件
+     * @param selects 查询需要的字段
+	 * @return T 查询到的业务实体类
+	 */
+	@Override
+	public T findOneEntitySpecificData(Predicate predicate, Expression<?>... selects) {
+		JPAQuery<T> query = newQuery(entityManager, entityPath, predicate, null, selects);
+		return query.fetchOne();
+	}
+	
+   /**
+	 * @Title: findOneSpecificData
+	 * @Description: 根据查询需要的字段查询当前泛型业务实体类的一个特定数据
+	 * @param predicate 断言对象，保存了查询的条件
+     * @param select 查询需要的字段
+	 * @return S 查询到的业务实体类的一个特定数据
+	 */
+	@Override
+	public <S> S findOneSpecificData(Predicate predicate, Expression<S> select) {
+		JPAQuery<S> query = newQuery(entityManager, entityPath, predicate, select);
+		return query.fetchOne();
 	}
 	
    /**
@@ -264,20 +303,7 @@ public class BaseMultielementRepositoryImpl<T,ID extends Serializable> extends Q
 	@Override
 	public long update(List<? extends Path<?>> paths, List<?> values, Predicate predicate) {
 		return doUpdate(entityManager, entityPath, paths, values, predicate);
-	}
-	
-	/**
-	 * @Title: update
-	 * @Description: 根据path与expression值批量修改数据库表中的记录
-	 * @param path 需要修改的字段
-	 * @param exp 修改后的表达式
-	 * @param predicate 修改的条件
-	 * @return long 修改了多少条记录
-	 */
-	@Override
-	public <S> long update(Path<S> path, Expression<S> exp, Predicate predicate) {
-		return doUpdate(entityManager, entityPath, path, exp, predicate);
-	}
+	} 
 	
 	/**
 	 * @Title: deleteByPredicate  

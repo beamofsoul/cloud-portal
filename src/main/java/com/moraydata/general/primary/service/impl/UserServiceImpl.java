@@ -12,8 +12,6 @@ import com.moraydata.general.primary.entity.dto.UserBasicInformation;
 import com.moraydata.general.primary.entity.query.QUser;
 import com.moraydata.general.primary.repository.UserRepository;
 import com.moraydata.general.primary.service.UserService;
-import com.querydsl.core.QueryResults;
-import com.querydsl.core.Tuple;
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
@@ -38,10 +36,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<Long> getLevelUserIds(Long level1UserId, User.Level... level) {
 		QUser $ = new QUser("User");
-		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
-		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
-		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
-		
+		Long parentId = userRepository.findOneSpecificData($.id.eq(level1UserId), $.parentId);
+		Long masterUserId = (parentId == null || parentId == 0) ? level1UserId : parentId;
 		int[] levels = null;
 		if (level != null && level.length > 0) {
 			levels = new int[level.length];
@@ -61,9 +57,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<UserBasicInformation> getLevelUserBasicInformation(Long level1UserId, User.Level... level) {
 		QUser $ = new QUser("User");
-		QueryResults<?> queryResult = userRepository.findSpecificData($.id.eq(level1UserId), $.parentId);
-		Long level1UserParentId = ((Tuple) queryResult.getResults().get(0)).get($.parentId);
-		Long masterUserId = (level1UserParentId == null || level1UserParentId == 0) ? level1UserId : level1UserParentId;
+		Long parentId = userRepository.findOneSpecificData($.id.eq(level1UserId), $.parentId);
+		Long masterUserId = (parentId == null || parentId == 0) ? level1UserId : parentId;
 		
 		int[] levels = null;
 		if (level != null && level.length > 0) {
