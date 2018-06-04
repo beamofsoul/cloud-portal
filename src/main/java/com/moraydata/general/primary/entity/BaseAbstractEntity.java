@@ -26,13 +26,13 @@ public abstract class BaseAbstractEntity implements Serializable {
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@Column(updatable = false, columnDefinition = "datetime comment '最后修改时间'")
+	@Column(updatable = false, columnDefinition = "datetime comment '创建时间'")
 	protected LocalDateTime createdDate;
 
 	@JsonSerialize(using = LocalDateTimeSerializer.class)
 	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@Column(columnDefinition = "datetime comment '创建时间'")
+	@Column(columnDefinition = "datetime comment '最后修改时间'")
 	protected LocalDateTime updatedDate;
 
 	public BaseAbstractEntity() {

@@ -1,5 +1,6 @@
 package com.moraydata.general.primary.entity;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +16,13 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.std.DateDeserializers.DateDeserializer;
+import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -114,6 +122,12 @@ public class User extends BaseAbstractEntity {
 	
 	@Column(columnDefinition = "enum('non','all','related') not null default 'non' comment '负面舆情接受状态'")
 	private String notifiedNegativePublicSentiment;
+	
+	@JsonSerialize(using = DateSerializer.class)
+	@JsonDeserialize(using = DateDeserializer.class)
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@Column(columnDefinition = "date default null comment '试用开始日期'")
+	private Date trialStartDate;
 	
 	@Transient
 	private String photoString;
@@ -216,6 +230,6 @@ public class User extends BaseAbstractEntity {
 				+ ", companyFax=" + companyFax + ", openId=" + openId + ", description=" + description
 				+ ", photoString=" + photoString + ", status=" + status + ", roles=" + roles + ", level=" + level + ", notified=" + notified
 				+ ", notifiedWarningPublicSentiment=" + notifiedWarningPublicSentiment + ", notifiedHotPublicSentiment=" + notifiedHotPublicSentiment
-				+ ", notifiedNegativePublicSentiment=" + notifiedNegativePublicSentiment + "]";
+				+ ", notifiedNegativePublicSentiment=" + notifiedNegativePublicSentiment + ", trialStartDate=]" + trialStartDate;
 	}
 }

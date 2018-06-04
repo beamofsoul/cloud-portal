@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,7 +42,6 @@ import com.moraydata.general.management.wechat.MenuButton;
 import com.moraydata.general.management.wechat.NavigationMenu;
 import com.moraydata.general.management.wechat.SubMenuButton;
 import com.moraydata.general.primary.entity.User;
-import com.moraydata.general.primary.entity.dto.UserBasicInformation;
 import com.moraydata.general.primary.service.UserService;
 import com.mysema.commons.lang.URLEncoder;
 
@@ -428,9 +425,9 @@ public class OpenWeChatController {
 
 	        // 第二 个导航菜单的子菜单
 	        SubMenuButton subMenuSecondFirst = new SubMenuButton();
-	        subMenuSecondFirst.setType(clickEvent);
+	        subMenuSecondFirst.setType(viewEvent);
 	        subMenuSecondFirst.setName("账号信息");
-	        subMenuSecondFirst.setKey("21");
+	        subMenuSecondFirst.setUrl(integreatedMenuUrl(URLEncoder.encodeURL("http://openapi.moraydata.com/wechat/whois?action=publicSentiments_message")));
 
 	        SubMenuButton subMenuSecondSecond = new SubMenuButton();
 	        subMenuSecondSecond.setType(viewEvent);

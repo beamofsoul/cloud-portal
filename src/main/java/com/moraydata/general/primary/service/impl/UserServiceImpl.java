@@ -969,6 +969,30 @@ public class UserServiceImpl implements UserService {
 		return userRepository.findLevelUserBasicInformation(masterUserId, levels);
 	}
 	
+	/**
+	 * 通过输入的parentId，找到其主账号(包括主账号)所辖所有1、2或3级的子账号基本信息
+	 */
+	@Override
+	public List<UserBasicInformation> getLevelUserBasicInformationByParentId(Long parentId, User.Level... level) {
+		boolean includedParentSelf = false;
+		User parentUser = this.get(parentId);
+		if (parentUser != null && parentUser.getLevel().equals(User.Level.FIRST.getValue())) {
+			includedParentSelf = true;
+		}
+		
+		int[] levels = null;
+		if (level != null && level.length > 0) {
+			levels = new int[level.length];
+			for (int i = 0; i < level.length; i++) {
+				levels[i] = level[i].getValue();
+			}
+		} else {
+			return null;
+		}
+		
+		return userRepository.findLevelUserBasicInformation(parentId, includedParentSelf, levels);
+	}
+	
 	@Override
 	public boolean existsByUsernameAndPassword(String username, String password) throws Exception {
 		User currentUser = this.get(username);
@@ -978,5 +1002,12 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String encodeUserIdWithAES(Long cloudUserId) throws Exception {
 		return AESUtils.encrypt(String.valueOf(cloudUserId), Constants.SERVICE_CONNECTION.AES_SEED_SKIP_LOGIN);
+	}
+
+	@Transactional(readOnly = false)
+	@Override
+	public boolean startTrial(Long userId) throws Exception {
+		QUser $ = new QUser("User");
+		return userRepository.update($.trialStartDate, new Date(), $.id.eq(userId)) > 0;
 	}
 }

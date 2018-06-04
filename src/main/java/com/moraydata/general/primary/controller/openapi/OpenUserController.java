@@ -24,6 +24,7 @@ import com.moraydata.general.management.util.PageUtils;
 import com.moraydata.general.management.util.ResponseEntity;
 import com.moraydata.general.primary.entity.InvitationCode;
 import com.moraydata.general.primary.entity.User;
+import com.moraydata.general.primary.entity.dto.UserBasicInformation;
 import com.moraydata.general.primary.service.RoleService;
 import com.moraydata.general.primary.service.UserService;
 
@@ -760,6 +761,31 @@ public class OpenUserController {
 		try {
 			Page<User> data =  userService.get(PageUtils.parsePageable(pageable), userService.search(conditions));
 			return ResponseEntity.success("获取分页用户信息成功", data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	@GetMapping("/level1BasicInformation")
+	public ResponseEntity level1Ids(@RequestParam Long parentId) {
+		Assert.notNull(parentId, "LEVEL_1_IDS_PARENT_IDS_IS_NULL");
+		
+		try {
+			List<UserBasicInformation> data = userService.getLevelUserBasicInformationByParentId(parentId, User.Level.FIRST);
+			return ResponseEntity.of(data == null ? "未能够根据输入的parentId获取到任何相关的1级子用户" : "获取当前父用户下所有1级子用户基本信息成功" , data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.UNKNOWN_ERROR;
+		}
+	}
+	
+	@PutMapping("/startTrial")
+	public ResponseEntity startTrial(@RequestParam Long userId) {
+		Assert.notNull(userId, "START_TRIAL_USER_ID_IS_NULL");
+		try {
+			boolean data = userService.startTrial(userId);
+			return ResponseEntity.of(data ? "当前用户开始试用成功" : "未能够根据输入的userId获取到任何相关用户记录" , data);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.UNKNOWN_ERROR;

@@ -81,6 +81,8 @@ public interface UserService {
 	List<User> getWhoHasOpenId() throws Exception;
 	List<UserBasicInformation> getAllIdAndUsernameWhoHasOpenId() throws Exception;
 	List<UserBasicInformation> getLevelUserBasicInformation(Long level1UserId, User.Level... level);
+	List<UserBasicInformation> getLevelUserBasicInformationByParentId(Long parentId, User.Level... level);
 	List<UserMiniInformation> getAllIdAndUsername() throws Exception;
 	String encodeUserIdWithAES(Long cloudUserId) throws Exception;
+	boolean startTrial(Long userId) throws Exception;
 }

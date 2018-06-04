@@ -52,7 +52,7 @@ public class ResponseEntity {
 				.build();
 	}
 	
-	public boolean isSuccessful() {
-		return SUCCESS.equals(code);
+	public static ResponseEntity of(String message, Object data) {
+		return data == null ? error(message) : success(message, data);
 	}
 }

@@ -83,6 +83,8 @@ public class QUser extends EntityPathBase<User> {
     public final SetPath<Role, QRole> roles = this.<Role, QRole>createSet("roles", Role.class, QRole.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> status = createNumber("status", Integer.class);
+    
+    public final DateTimePath<java.util.Date> trialStartDate = createDateTime("trialStartDate", java.util.Date.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedDate = _super.updatedDate;

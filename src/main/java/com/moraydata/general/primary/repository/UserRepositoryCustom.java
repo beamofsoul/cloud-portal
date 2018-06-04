@@ -10,6 +10,7 @@ public interface UserRepositoryCustom<T,ID> {
 	List<UserMiniInformation> findAllIdAndUsername();
 	List<UserBasicInformation> findAllIdAndUsernameWhoHasOpenId();
 	List<UserBasicInformation> findLevelUserBasicInformation(Long parentId, int... levels);
+	List<UserBasicInformation> findLevelUserBasicInformation(Long parentId, boolean includedParentSelf, int... levels);
 //	List<UserBasicInformation> findLevel3UserBasicInformation(Long parentId);
 //	List<UserBasicInformation> findLevel2UserBasicInformation(Long parentId);
 //	List<UserBasicInformation> findLevel2Or3UserBasicInformation(Long parentId);

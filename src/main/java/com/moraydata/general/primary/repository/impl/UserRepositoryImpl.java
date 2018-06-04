@@ -1,6 +1,7 @@
 package com.moraydata.general.primary.repository.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 
@@ -75,6 +76,47 @@ public class UserRepositoryImpl implements UserRepositoryCustom<User, Long> {
 		}
 		
 		BooleanExpression whereExpression = ($.parentId.eq(parentId).or($.id.eq(parentId))).and(levelExpression).and($.notified.isTrue());
+		if (whereExpression != null) {
+			return query.select(Projections.constructor(UserBasicInformation.class,
+					$.id,
+					$.username,
+					$.openId,
+					$.notifiedWarningPublicSentiment,
+					$.notifiedHotPublicSentiment,
+					$.notifiedNegativePublicSentiment))
+				.from($)
+				.where(whereExpression)
+				.orderBy($.id.asc())
+				.fetch();
+		}
+		return null;
+	}
+	
+	/**
+	 * 根据parentId获取其下所有用户级别为1/2/3的子账号基本信息，通过includedParentSelf判断是否包含parent本身的记录
+	 */
+	@Override
+	public List<UserBasicInformation> findLevelUserBasicInformation(Long parentId, boolean includedParentSelf, int... levels) {
+		List<UserBasicInformation> ubsList = this.findLevelUserBasicInformationByParentId(parentId, levels);
+		return includedParentSelf ? ubsList : ubsList.stream().filter(e -> e.getId() != parentId).collect(Collectors.toList());
+	}
+	
+	/**
+	 * 根据parentId获取其下所有用户级别为1/2/3的子账号基本信息，包含parent本身的记录
+	 */
+	private List<UserBasicInformation> findLevelUserBasicInformationByParentId(Long parentId, int... levels) {
+		JPAQuery<User> query = QuerydslUtils.newQuery(entityManager);
+		QUser $ = new QUser("user");
+		BooleanExpression levelExpression = null;
+		
+		if (levels != null && levels.length > 0) {
+			levelExpression = $.level.eq(levels[0]);
+			for (int i = 1; i < levels.length; i++) {
+				levelExpression = levelExpression.or($.level.eq(levels[i]));
+			}
+		}
+		
+		BooleanExpression whereExpression = ($.parentId.eq(parentId).or($.id.eq(parentId))).and(levelExpression);
 		if (whereExpression != null) {
 			return query.select(Projections.constructor(UserBasicInformation.class,
 					$.id,
