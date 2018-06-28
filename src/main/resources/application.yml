@@ -1,20 +1,20 @@
 spring:
   profiles:
     active:
-      - prod
+      - test
       
-  redis:
-    database: 13
-    host: 10.0.54.87
-    port: 6379
-    password: HaiMan2017
-    timeout: 0
-    jedis:
-      pool:
-        max-active: 8
-        max-wait: -1
-        max-idle: 8
-        min-idle: 0
+#  redis:
+#    database: 21 # 跟cloud-portal的测试库是同一个redis库，正式上线后需要改成11号库
+#    host: 10.0.54.87
+#    port: 6379
+#    password: HaiMan2017
+#    timeout: 0
+#    jedis:
+#      pool:
+#        max-active: 8
+#        max-wait: -1
+#        max-idle: 8
+#        min-idle: 0
   cache:
     redis:
       time-to-live: 86400 # 86400 seconds equals a day

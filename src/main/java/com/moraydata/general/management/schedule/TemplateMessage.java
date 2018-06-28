@@ -100,7 +100,7 @@ public class TemplateMessage {
 	public static enum Action {
 		PUSH(2), VALIDATE(1), INVALIDATE(-1), UNTREATED(0);
 		@Getter private final Integer value;
-		public static final HashMap<Integer, Action> CODE_VALUE_MAP = new HashMap<>(3);
+		public static final HashMap<Integer, Action> CODE_VALUE_MAP = new HashMap<>(4);
 		static {
 			for (Action action : Action.values()) {
 				CODE_VALUE_MAP.put(action.value, action);

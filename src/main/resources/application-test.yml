@@ -4,6 +4,18 @@ server:
   port: 12308
 
 spring:
+  redis:
+    database: 21 # 跟cloud-portal的测试库是同一个redis库
+    host: 10.0.54.87
+    port: 6379
+    password: HaiMan2017
+    timeout: 0
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
   datasource:
     primary:
       type: com.zaxxer.hikari.HikariDataSource

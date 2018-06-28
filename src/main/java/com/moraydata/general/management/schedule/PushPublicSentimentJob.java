@@ -186,9 +186,26 @@ public class PushPublicSentimentJob extends QuartzJobBean {
 		parameters.put("url", targetUrl);
 		parameters.put("data", data);
 		
-		JSONObject jsonResponse = RestTemplateUtils.INSTANCE.getRestTemplate().postForObject(integrateUrlWithAccessToken(sendTemplateMessageUrl), RestTemplateUtils.getHttpEntity(parameters), JSONObject.class);
-		log.debug(JSON.toJSONString(jsonResponse));
-		return jsonResponse.getString("errmsg").equals("ok");
+		int times = 0;
+		Long errcode = null;
+		boolean isSent = false;
+		do {
+			times++;
+			if (errcode != null && errcode == 40001) {
+				// 如果因为token无效，尝试清除redis中token，然后二次发送
+				// PS: 因为多个系统将同一个微信appId针对的token存入到不同的redis数据库中
+				// 当其中一个应用在微信端更新了token，则其他redis中保存的token就会失效无论是否到期
+				// 所有其他应用的微信access_token将会失效，所有依赖access_token的功能将会无法使用
+				// 后期，可以通过将所有使用access_token的应用的redis指向同一个redis数据库来解决这个问题
+				handler.refreshToken();
+				log.debug("Redis中微信 AccessToken 已经清除...");
+			}
+			JSONObject jsonResponse = RestTemplateUtils.INSTANCE.getRestTemplate().postForObject(integrateUrlWithAccessToken(sendTemplateMessageUrl), RestTemplateUtils.getHttpEntity(parameters), JSONObject.class);
+			log.debug(JSON.toJSONString(jsonResponse));
+			isSent = jsonResponse.getString("errmsg").equals("ok");
+		} while(!isSent && (times < 2));
+		
+		return isSent;
 	}
 	
 	/**
@@ -225,6 +242,8 @@ public class PushPublicSentimentJob extends QuartzJobBean {
 				publicSentiment = ubi.getNotifiedHotPublicSentiment();
 			} else if (tm.getType() == 3) { // 负面
 				publicSentiment = ubi.getNotifiedNegativePublicSentiment();
+			} else {
+				log.error("未知推送消息类型: {}", tm.getType());
 			}
 			// 当前用户不接受当前消息类型的消息推送
 			if (publicSentiment.equals(User.NotifiedSentiment.NON.getValue()))
@@ -232,6 +251,14 @@ public class PushPublicSentimentJob extends QuartzJobBean {
 			// 当前用户不接收当前消息类型的非高相关的数据
 			if (publicSentiment.equals(User.NotifiedSentiment.RELATED.getValue()) && (!tm.getIsHighlyRelevant()))
 				continue;
+			
+//			System.out.println();
+//			System.out.println("#### " + ubi.getOpenId());
+//			System.out.println("#### " + ubi.getNotifiedWarningPublicSentiment());
+//			System.out.println("#### " + ubi.getNotifiedNegativePublicSentiment());
+//			System.out.println("#### " + tm.getType());
+//			System.out.println();
+			
 			/**
 			 * 修复bug - 1级用户推送消息至2、3级用户时，数据库中模板消息记录携带的openId默认是1级用户的
 			 * 当2、3级别用户打开该消息时无法获取到自己的openId，造成了无法识别当前用户级别的问题

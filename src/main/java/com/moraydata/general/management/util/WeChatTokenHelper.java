@@ -51,7 +51,11 @@ public final class WeChatTokenHelper {
 	}
 	
 	private void saveToken(Token token) {
-		redisTemplate.opsForValue().set(Constants.WECHAT.SERVICE_ACCESS_TOKEN, JSON.toJSONString(token), token.getExpiresIn(), TimeUnit.SECONDS);
+		redisTemplate.opsForValue().set(Constants.WECHAT.SERVICE_ACCESS_TOKEN, JSON.toJSONString(token), token.getExpiresIn() - 1, TimeUnit.SECONDS);
+	}
+	
+	public void refreshToken() {
+		redisTemplate.delete(Constants.WECHAT.SERVICE_ACCESS_TOKEN);
 	}
 	
 	@SuppressWarnings({ "unchecked", "serial" })
