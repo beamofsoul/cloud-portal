@@ -58,6 +58,19 @@ public class CloudPortalApplicationTest extends TestCase {
 //		List<Permission> relational = permissionRepository.getRelational(1L);
 //		relational.forEach(System.out::println);
 	}
+
+//	@Autowired
+//	private PasswordEncoder passwordEncoder;
+	
+	@Test
+	public void passwordTest() {
+//		String encode = passwordEncoder.encode("Justin1987.");
+//		System.out.println("Justin1987. => " + encode);
+//		String encode2 = passwordEncoder.encode("123123");
+//		System.out.println("123123 => " + encode2);
+//		String encode3 = passwordEncoder.encode("123456");
+//		System.out.println("123456 => " + encode3);
+	}
 	
 	@Test
 	public void testRedisKeySet() {
@@ -94,4 +107,5 @@ public class CloudPortalApplicationTest extends TestCase {
 //			e.printStackTrace();
 //		}
 	}
+
 }
