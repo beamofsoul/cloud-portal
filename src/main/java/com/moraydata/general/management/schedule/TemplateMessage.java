@@ -19,6 +19,7 @@ public class TemplateMessage {
 	private static final String DEFAUL_FIRST_VALUE = "海鳗云平台检测到一个异常事件";
 	private static final String DEFAULT_REMARK_VALUE = "请及时查看处置!";
 	private static final String DEFAULT_COLOR_173177 = "#173177";
+	private static final String DEFAULT_BLACK_COLOR = "#000000";
 	
 	private Long id;
 	
@@ -73,19 +74,19 @@ public class TemplateMessage {
 	}
 
 	public String getKeyword1Color() {
-		return getReasonableColor(this.keyword1Color);
+		return getReasonableColor(this.keyword1Color, DEFAULT_BLACK_COLOR);
 	}
 	
 	public String getKeyword2Color() {
-		return getReasonableColor(this.keyword2Color);
+		return getReasonableColor(this.keyword2Color, DEFAULT_BLACK_COLOR);
 	}
 	
 	public String getKeyword3Color() {
-		return getReasonableColor(this.keyword3Color);
+		return getReasonableColor(this.keyword3Color, DEFAULT_BLACK_COLOR);
 	}
 	
 	public String getKeyword4Color() {
-		return getReasonableColor(this.keyword4Color);
+		return getReasonableColor(this.keyword4Color, DEFAULT_BLACK_COLOR);
 	}
 	
 	public String getRemarkColor() {
@@ -93,7 +94,11 @@ public class TemplateMessage {
 	}
 	
 	private String getReasonableColor(String color) {
-		return StringUtils.isBlank(color) ? DEFAULT_COLOR_173177 : color;
+		return getReasonableColor(color, DEFAULT_COLOR_173177);
+	}
+	
+	private String getReasonableColor(String color, String defaultColor) {
+		return StringUtils.isBlank(color) ? defaultColor : color;
 	}
 	
 	@RequiredArgsConstructor(access=AccessLevel.PROTECTED)
